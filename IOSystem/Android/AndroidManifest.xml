@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.UrbanEngine.main">
-    <uses-sdk android:targetSdkVersion="22" />
+    <uses-sdk android:targetSdkVersion="25" />
 
     <application android:label="TestApp">
         <activity android:name=".MainActivity">

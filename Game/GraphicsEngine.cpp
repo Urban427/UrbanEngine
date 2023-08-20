@@ -1,5 +1,4 @@
 #include "GraphicsEngine.h"
-#include <glut.h>
 
 GraphicsEngine::GraphicsEngine()
 {

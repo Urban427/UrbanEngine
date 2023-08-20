@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <glut.h>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -14,7 +15,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
 	}
-	return NULL;
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 Window::Window()
@@ -30,15 +31,15 @@ char Window::init()
 {
 	WNDCLASSEX wc = {};
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.cbClsExtra = NULL;
-	wc.cbWndExtra = NULL;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hInstance = NULL;
-	wc.lpszClassName = L"UrbanEngineClass";
-	wc.lpszMenuName = L"";
+	wc.lpszClassName = "UrbanEngineClass";
+	wc.lpszMenuName = "";
 	wc.lpfnWndProc = WndProc;
 
 	if (!RegisterClassEx(&wc)) {
@@ -49,26 +50,12 @@ char Window::init()
 	AdjustWindowRect(&rc, WS_SYSMENU, false);
 
 	_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
-		L"UrbanEngineClass", L"UrbanEngine",
+		"UrbanEngineClass", "UrbanEngine",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		rc.right, rc.bottom, NULL, NULL, NULL, NULL);
 
 	dummyDc = GetDC(_hwnd);
-
-	PIXELFORMATDESCRIPTOR pixelFormatDesc = {};
-	pixelFormatDesc.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	pixelFormatDesc.nVersion = 1;
-	pixelFormatDesc.iPixelType = PFD_TYPE_RGBA;
-	pixelFormatDesc.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-	pixelFormatDesc.cColorBits = 32;
-	pixelFormatDesc.cAlphaBits = 8;
-	pixelFormatDesc.cDepthBits = 24;
-	pixelFormatDesc.cStencilBits = 8;
-	pixelFormatDesc.iLayerType = PFD_MAIN_PLANE;
-
-	int pixelFormat = ChoosePixelFormat(dummyDc, &pixelFormatDesc);;
-	SetPixelFormat(dummyDc, pixelFormat, &pixelFormatDesc);
 
 	if (!_hwnd)
 	{
@@ -92,11 +79,11 @@ char Window::broadcast()
 		DispatchMessage(&msg);
 	}
 
-	SetBitmapBits(renderer->map, renderer->buffer.height * 4 * renderer->buffer.width, renderer->buffer.buffer);
-	HDC src = CreateCompatibleDC(hdc);
-	SelectObject(src, renderer->map);
-	BitBlt(hdc, 0, 0, renderer->buffer.width, renderer->buffer.height, src, 0, 0, SRCCOPY);
-	DeleteDC(src);
+	//SetBitmapBits(renderer->map, renderer->buffer.height * 4 * renderer->buffer.width, renderer->buffer.buffer);
+	//HDC src = CreateCompatibleDC(hdc);
+	//SelectObject(src, renderer->map);
+	//BitBlt(hdc, 0, 0, renderer->buffer.width, renderer->buffer.height, src, 0, 0, SRCCOPY);
+	//DeleteDC(src);
 
 
 	Sleep(1);

@@ -1,9 +1,12 @@
-#include <stdio.h>
-
+#include "App.h"
 
 int main()
 {
-	printf("hello\n");
-
+	App app;
+	app.onCreate();
+	while (app.isRunning())
+	{
+		app.onUpdate();
+	}
 	return 0;
 }

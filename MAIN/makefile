@@ -1,5 +1,5 @@
 CC = g++
-Target = FNAF_Extra_Delivery
+Target = UrbanEngine
 
 build = ./build/
 bin = ./bin/
@@ -7,11 +7,17 @@ bin = ./bin/
 SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
 
-Libs = -L ../Game/ -l game
+OpenGlLib = ../OpenGL37/
+GameLib = ../Game/
+Libs = -L../libs
+Libs += -l Game
+Libs += -l IOSystem
+Libs += -l API
+
 
 ${Target}: ${OBJ}
-	${CC} -o ${build}${Target} $^
+	${CC} -o ${build}${Target} $^ ${Libs}
 	${build}${Target}
 	
 ${bin}%.o: %.cpp
-	${CC} -o $@ -c $< 
+	${CC} -I ${GameLib} -o $@ -c $< 
