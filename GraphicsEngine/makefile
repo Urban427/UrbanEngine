@@ -1,4 +1,4 @@
-Target = Game
+Target = GraphicsEngine
 
 CC = g++
 bin = ./bin/
@@ -7,12 +7,19 @@ SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
 
 libpath = ../libs/
-CFlags = -I ${IOSystemDir}
-CFlags += -I ${WindowsDir}
+openGlDir = ./OpenGl37/
+CFlags = -I ${openGlDir}
 
-${Target}: ${OBJ}
+main: binFile builder 
+
+
+builder: ${OBJ}
+	ar rcs ${libpath}lib${Target}.a ${OBJ}
+
+
+binFile: 
 	if not exist "bin" mkdir bin
-	ar rcs ${libpath}lib${Target}.a $^
+
 
 ${bin}%.o: %.cpp
 	${CC} ${CFlags} -o $@ -c $< 

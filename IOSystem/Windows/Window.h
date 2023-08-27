@@ -13,6 +13,10 @@ private:
 	HWND _hwnd; 
 	HDC dummyDc;
 public:
+	int* buffer;
+	int width;
+	int height;
+
 	bool status = 0;
 };
 

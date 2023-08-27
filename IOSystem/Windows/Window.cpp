@@ -1,5 +1,4 @@
 #include "Window.h"
-#include <glut.h>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -29,6 +28,9 @@ Window::~Window()
 
 char Window::init()
 {
+	width = 1024;
+	height = 768;
+	
 	WNDCLASSEX wc = {};
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.cbClsExtra = 0;
@@ -46,7 +48,7 @@ char Window::init()
 		return 1;
 	}
 
-	RECT rc = { 0, 0, 1024, 768 };
+	RECT rc = { 0, 0, width, height };
 	AdjustWindowRect(&rc, WS_SYSMENU, false);
 
 	_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
@@ -64,6 +66,24 @@ char Window::init()
 
 	ShowWindow(_hwnd, SW_SHOW);
 	UpdateWindow(_hwnd);
+
+
+	buffer = new int[width * height];
+	for(int i = 0; i < width * height; i++)
+	{
+		buffer[i] = 0;
+	}
+	
+	HDC hdc = GetDC(_hwnd);
+	HBITMAP map = CreateBitmap(width, height, 1, 8 * 4, buffer);
+	SetBitmapBits(map, width * height * 4, buffer);
+	HDC src = CreateCompatibleDC(hdc);
+	SelectObject(src, map);
+	BitBlt(hdc, 0, 0, width, height, src, 0, 0, SRCCOPY);
+	DeleteDC(src);
+	DeleteObject(map);
+	ReleaseDC(_hwnd, hdc);
+	
 	return 0;
 }
 
@@ -78,6 +98,21 @@ char Window::broadcast()
 		}
 		DispatchMessage(&msg);
 	}
+
+	for(int i = 0; i < width * height; i++)
+	{
+		buffer[i] += 1;
+	}
+	
+	HDC hdc = GetDC(_hwnd);
+	HBITMAP map = CreateBitmap(width, height, 1, 8 * 4, buffer);
+	SetBitmapBits(map, width * height * 4, buffer);
+	HDC src = CreateCompatibleDC(hdc);
+	SelectObject(src, map);
+	BitBlt(hdc, 0, 0, width, height, src, 0, 0, SRCCOPY);
+	DeleteDC(src);
+	DeleteObject(map);
+	ReleaseDC(_hwnd, hdc);
 
 	//SetBitmapBits(renderer->map, renderer->buffer.height * 4 * renderer->buffer.width, renderer->buffer.buffer);
 	//HDC src = CreateCompatibleDC(hdc);

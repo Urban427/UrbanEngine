@@ -1,5 +1,5 @@
 #include "App.h"
-#include "GraphicsEngine.h"
+#include <stdio.h>
 
 App::App()
 {
@@ -11,6 +11,9 @@ App::~App()
 
 void App::onCreate()
 {
+	graphicEngine.init();
+	printf("here");
+	
 	_running = true;
 	if (ioSystem.onCreate())
 	{

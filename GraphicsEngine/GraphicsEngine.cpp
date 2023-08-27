@@ -1,4 +1,5 @@
 #include "GraphicsEngine.h"
+#include <glad.h>
 
 GraphicsEngine::GraphicsEngine()
 {
@@ -7,7 +8,7 @@ GraphicsEngine::GraphicsEngine()
 
 bool GraphicsEngine::init()
 {
-	return false;
+	return true;
 }
 
 bool GraphicsEngine::release()
