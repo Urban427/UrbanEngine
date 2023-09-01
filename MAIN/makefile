@@ -25,9 +25,17 @@ IFLAGS += -I ${WindowsDir}
 IFLAGS += -I ${GraphicEngineDir}
 
 
-${Target}: ${OBJ}
-	${CC} -o ${build}${Target} $^ ${Libs} -lgdi32 
+${Target}: binFile builder
 	${build}${Target}
-	
+
+
+builder: ${OBJ}
+	${CC} -O3 -o ${build}${Target} $^ ManifestWindows.res ${Libs} -lgdi32 
+
+binFile: 
+	windres ManifestWindows.rc -O coff -o ManifestWindows.res
+	if not exist "bin" mkdir bin
+	if not exist "build" mkdir build
+
 ${bin}%.o: %.cpp
 	${CC} ${IFLAGS} -o $@ -c $< 

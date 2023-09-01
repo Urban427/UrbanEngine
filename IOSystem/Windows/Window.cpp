@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "../../MAIN/resource.h"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -36,9 +37,8 @@ char Window::init()
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(GetModuleHandle(NULL), IDC_ARROW);
+	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
 	wc.hInstance = NULL;
 	wc.lpszClassName = "UrbanEngineClass";
 	wc.lpszMenuName = "";
