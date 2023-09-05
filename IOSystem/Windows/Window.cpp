@@ -112,3 +112,12 @@ char Window::broadcast()
 	Sleep(1);
 	return 0;
 }
+
+
+
+Rect Window::getInnerSize()
+{
+	RECT rc;
+	GetClientRect(_hwnd, &rc);
+	return Rect(rc.right - rc.left, rc.bottom - rc.top);
+}

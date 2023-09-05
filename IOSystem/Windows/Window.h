@@ -9,6 +9,8 @@ public:
 	~Window();
 
 	
+	Rect getInnerSize();
+	
 	char init();
 	char broadcast();
 private:

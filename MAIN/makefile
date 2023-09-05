@@ -19,8 +19,8 @@ GraphicsEngineDir = ../GraphicsEngine/
 Libs += -L../libs
 Libs += -l Game
 Libs += -l IOSystem
-Libs += -l API
 Libs += -l GraphicsEngine
+Libs += -l glad
 Libs += -l Math
 
 IFLAGS = -I ${GameDib}
@@ -35,7 +35,7 @@ ${Target}: binFile clear builder
 
 
 builder: ${OBJ}
-	${CC} -O3 -o ${build}${Target} $^ ManifestWindows.res ${Libs} -lgdi32  "C:\Windows\System32\opengl32.dll"
+	${CC} -O3 -o ${build}${Target} $^ ManifestWindows.res ${Libs} -lgdi32  -lopengl32
 
 binFile: 
 	windres ManifestWindows.rc -O coff -o ManifestWindows.res

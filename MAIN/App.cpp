@@ -10,6 +10,13 @@ App::~App()
 
 void App::onCreate()
 {
+	const float triangleVertecles[] = {
+		-0.5f, -0.5f, 0,
+		 0.5f, -0.5f, 0,
+		 0, 0.5f, 0
+	};
+	
+	
 	_running = true;
 	if (ioSystem.onCreate())
 	{
@@ -17,6 +24,7 @@ void App::onCreate()
 	}
 	
 	graphicEngine.init();
+	graphicEngine.setViewPort(ioSystem.getInnerSize());
 }
 
 void App::onUpdate()

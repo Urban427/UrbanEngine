@@ -2,11 +2,12 @@ Target = IOSystem
 
 CC = g++
 bin = ./bin/
-WindowsApi = ./Windows/
+WindowsApi = Windows/
 MathApi = ../Math/
 libpath = ../libs/
 
 SCR = ${wildcard *.cpp}
+SCR += ${wildcard ${WindowsApi}*.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
 OBJ_DEL = ${subst /,\, ${OBJ}}
 
@@ -22,6 +23,7 @@ builder: ${OBJ}
 
 binFile: 
 	if not exist "bin" mkdir bin
+	if not exist "bin\Windows" mkdir bin\Windows
 
 
 ${bin}%.o: %.cpp
