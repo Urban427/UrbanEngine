@@ -1,14 +1,18 @@
 Target = API
+
 CC = g++
 bin = ./bin/
+MathDir = ../../Math/
+libpath = ../../libs/
+
 
 SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
+OBJ_DEL = ${subst /,\, ${OBJ}}
 
-OpenGlLib = ../../OpenGL37/
-libpath = ../../libs/
+IFlags += -I ${MathDir}
 
-${Target}: binFile builder
+${Target}: binFile clear builder
 
 builder: ${OBJ}
 	ar rcs ${libpath}lib${Target}.a $^
@@ -17,4 +21,7 @@ binFile:
 	if not exist "bin" mkdir bin
 
 ${bin}%.o: %.cpp
-	${CC} -I ${OpenGlLib} -o $@ -c $< 
+	${CC} ${IFlags} -o $@ -c $<
+
+clear:
+	del ${OBJ_DEL} 

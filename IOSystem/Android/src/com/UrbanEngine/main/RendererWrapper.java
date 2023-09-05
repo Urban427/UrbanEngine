@@ -33,18 +33,20 @@ public class RendererWrapper implements Renderer
     }
     public native void AndroidLogicCreate();
     public native void AndroidLogicUpdate();
+    public native void AndroidLogicDraw();
 	
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(1, 0, 0, 0);
+       AndroidLogicCreate();
     }
  
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        // No-op
+        AndroidLogicUpdate();
     }
  
     public void onDrawFrame(GL10 gl) {
-        //AndroidLogicUpdate();
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        AndroidLogicDraw();
+		//AndroidLogicUpdate();
+		//GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
     }
 	
 	

@@ -1,19 +1,14 @@
-Target = IOSystem
+Target = Math
 
 CC = g++
 bin = ./bin/
-WindowsApi = ./Windows/
-MathApi = ../Math/
 libpath = ../libs/
 
 SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
 OBJ_DEL = ${subst /,\, ${OBJ}}
 
-IFlags += -I ${WindowsApi}
-IFlags += -I ${MathApi}
-
-main: binFile clear builder
+main: binFile clear builder 
 
 
 builder: ${OBJ}
@@ -25,7 +20,7 @@ binFile:
 
 
 ${bin}%.o: %.cpp
-	${CC} ${IFlags} -o $@ -c $<
+	${CC} -o $@ -c $< 
 
 clear:
 	del ${OBJ_DEL} 

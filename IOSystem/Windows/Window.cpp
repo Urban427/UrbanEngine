@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "../../MAIN/resource.h"
 
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -29,6 +30,8 @@ Window::~Window()
 
 char Window::init()
 {
+	HGLRC hRC;
+
 	width = 1024;
 	height = 768;
 	
@@ -57,32 +60,33 @@ char Window::init()
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		rc.right, rc.bottom, NULL, NULL, NULL, NULL);
 
-	dummyDc = GetDC(_hwnd);
-
 	if (!_hwnd)
 	{
 		return 1;
 	}
 
 	ShowWindow(_hwnd, SW_SHOW);
-	UpdateWindow(_hwnd);
 
 
-	buffer = new int[width * height];
-	for(int i = 0; i < width * height; i++)
-	{
-		buffer[i] = 0;
-	}
+
+
+
+	PIXELFORMATDESCRIPTOR pfd;
+	int iFormat;
+	hDC = GetDC(_hwnd);
+	ZeroMemory(&pfd, sizeof(pfd));
+	pfd.nSize = sizeof(pfd);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+	pfd.cDepthBits = 16;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+	iFormat = ChoosePixelFormat(hDC, &pfd);
+	SetPixelFormat(hDC, iFormat, &pfd);
+	hRC = wglCreateContext(hDC);
+	wglMakeCurrent(hDC, hRC);
 	
-	HDC hdc = GetDC(_hwnd);
-	HBITMAP map = CreateBitmap(width, height, 1, 8 * 4, buffer);
-	SetBitmapBits(map, width * height * 4, buffer);
-	HDC src = CreateCompatibleDC(hdc);
-	SelectObject(src, map);
-	BitBlt(hdc, 0, 0, width, height, src, 0, 0, SRCCOPY);
-	DeleteDC(src);
-	DeleteObject(map);
-	ReleaseDC(_hwnd, hdc);
 	
 	return 0;
 }
@@ -90,35 +94,19 @@ char Window::init()
 char Window::broadcast()
 {
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
 		if (msg.message == WM_QUIT)
 		{
 			return 1;
 		}
-		DispatchMessage(&msg);
+		else
+		{
+			DispatchMessage(&msg);
+		}
 	}
 
-	for(int i = 0; i < width * height; i++)
-	{
-		buffer[i] += 1;
-	}
-	
-	HDC hdc = GetDC(_hwnd);
-	HBITMAP map = CreateBitmap(width, height, 1, 8 * 4, buffer);
-	SetBitmapBits(map, width * height * 4, buffer);
-	HDC src = CreateCompatibleDC(hdc);
-	SelectObject(src, map);
-	BitBlt(hdc, 0, 0, width, height, src, 0, 0, SRCCOPY);
-	DeleteDC(src);
-	DeleteObject(map);
-	ReleaseDC(_hwnd, hdc);
-
-	//SetBitmapBits(renderer->map, renderer->buffer.height * 4 * renderer->buffer.width, renderer->buffer.buffer);
-	//HDC src = CreateCompatibleDC(hdc);
-	//SelectObject(src, renderer->map);
-	//BitBlt(hdc, 0, 0, renderer->buffer.width, renderer->buffer.height, src, 0, 0, SRCCOPY);
-	//DeleteDC(src);
+	SwapBuffers(hDC);
 
 
 	Sleep(1);

@@ -1,6 +1,7 @@
 #pragma once
 #if defined(WIN32)
 	#include "Window.h"
+	#define _Window Window 
 #endif
 
 class IOSystem
@@ -12,8 +13,6 @@ public:
 	char onCreate();
 	char onUpdate();
 private:
-#if defined(WIN32)
-	Window _window;
-#endif
+	_Window _window;
 };
 

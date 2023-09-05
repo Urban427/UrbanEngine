@@ -2,15 +2,15 @@ Target = GraphicsEngine
 
 CC = g++
 bin = ./bin/
+libpath = ../libs/
 
 SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
+OBJ_DEL = ${subst /,\, ${OBJ}}
 
-libpath = ../libs/
-openGlDir = ./OpenGl37/
-CFlags = -I ${openGlDir}
+main: binFile clear builder 
 
-main: binFile builder 
+IFlags = -I ../Math/
 
 
 builder: ${OBJ}
@@ -22,4 +22,7 @@ binFile:
 
 
 ${bin}%.o: %.cpp
-	${CC} ${CFlags} -o $@ -c $< 
+	${CC} ${IFlags} -o $@ -c $< 
+	
+clear:
+	del ${OBJ_DEL} 

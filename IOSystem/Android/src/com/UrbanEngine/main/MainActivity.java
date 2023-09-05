@@ -29,14 +29,15 @@ public class MainActivity extends Activity {
 		
 		RendererWrapper rend = new RendererWrapper();
 		rend.contect = this;
-		rend.AndroidLogicCreate();
-		rend.AndroidLogicUpdate();
+		//rend.AndroidLogicCreate();
+		//rend.debug();
 		
 		rendererSet = true;
 		glSurfaceView = new GLSurfaceView(this);
 		glSurfaceView.setEGLContextClientVersion(2);
 		glSurfaceView.setRenderer(rend);
 		setContentView(glSurfaceView);
+		
 		//setContentView(R.layout.main);
     }
 	

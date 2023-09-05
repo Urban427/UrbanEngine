@@ -6,9 +6,8 @@ typedef struct {
     int height;
     int size;
     GLenum gl_color_format;
-    void* data;
+    int* data;
 } RawImageData;
 
 
-RawImageData readPng();
-RawImageData readBMPFile(const char* filename);
+RawImageData readResource(const char* filename);

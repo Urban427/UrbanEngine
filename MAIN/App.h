@@ -1,6 +1,6 @@
 #pragma once
 #include "IOSystem.h"
-#include "GraphicsEngine.h"
+#include "../GraphicsEngine/GraphicsEngine.h"
 
 class App
 {

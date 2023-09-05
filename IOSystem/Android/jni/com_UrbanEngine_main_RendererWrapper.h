@@ -23,6 +23,14 @@ JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicCre
 JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicUpdate
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_UrbanEngine_main_RendererWrapper
+ * Method:    AndroidLogicDraw
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicDraw
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif
