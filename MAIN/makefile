@@ -1,4 +1,5 @@
 CC = g++
+AndroidCC = clang++
 Target = UrbanEngine
 
 build = ./build/
@@ -6,7 +7,9 @@ bin = ./bin/
 
 SCR = ${wildcard *.cpp}
 OBJ = ${patsubst %.cpp,${bin}%.o, ${SCR}}
+AndroidOBJ = ${patsubst %.cpp,${bin}%.oa, ${SCR}}
 OBJ_DEL = ${subst /,\, ${OBJ}}
+OBJ_DEL += ${subst /,\, ${AndroidOBJ}}
 
 MathDir = ../Math/
 IOSystemDir = ../IOSystem/
@@ -19,7 +22,7 @@ GraphicsEngineDir = ../GraphicsEngine/
 Libs += -L../libs
 Libs += -l Game
 Libs += -l IOSystem
-Libs += -l GraphicsEngine
+Libs += -l GraphicsEnginez
 Libs += -l glad
 Libs += -l Math
 
@@ -30,12 +33,18 @@ IFLAGS += -I ${WindowsDir}
 IFLAGS += -I ${GraphicsEngineDir}
 
 
-${Target}: binFile clear builder
+windows: binFile clear builder
 	${build}${Target}
 
 
+android: binFile clear androidBuilder
+
 builder: ${OBJ}
 	${CC} -O3 -o ${build}${Target} $^ ManifestWindows.res ${Libs} -lgdi32  -lopengl32
+
+androidBuilder: ${AndroidOBJ}
+	ar rcs ../IOSystem/Android/libs/arm64-v8a/${Target}.a ${AndroidOBJ}
+	
 
 binFile: 
 	windres ManifestWindows.rc -O coff -o ManifestWindows.res
@@ -44,6 +53,9 @@ binFile:
 
 ${bin}%.o: %.cpp
 	${CC} ${IFLAGS} -o $@ -c $< 
+
+${bin}%.oa: %.cpp
+	${AndroidCC} -D android ${IFLAGS} -o $@ -c $< --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O2
 
 clear:
 	del ${OBJ_DEL} 

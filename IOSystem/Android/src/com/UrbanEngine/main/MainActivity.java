@@ -36,9 +36,9 @@ public class MainActivity extends Activity {
 		glSurfaceView = new GLSurfaceView(this);
 		glSurfaceView.setEGLContextClientVersion(2);
 		glSurfaceView.setRenderer(rend);
-		setContentView(glSurfaceView);
+		//setContentView(glSurfaceView);
 		
-		//setContentView(R.layout.main);
+		setContentView(R.layout.main);
     }
 	
 	@Override

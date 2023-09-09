@@ -1,6 +1,6 @@
 #pragma once
 #include "IOSystem.h"
-#include "../GraphicsEngine/GraphicsEngine.h"
+#include "GraphicsEngine.h"
 
 class App
 {
@@ -13,6 +13,9 @@ public:
 
 	bool isRunning();
 private:
+	VertexArrayObjectPtr triangle;
+	ShaderPtr shader;
+
 	bool _running = false;
 	IOSystem ioSystem;
 	GraphicsEngine graphicEngine;

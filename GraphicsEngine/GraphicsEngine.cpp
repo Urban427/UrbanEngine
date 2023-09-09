@@ -1,5 +1,5 @@
 #include "GraphicsEngine.h"
-#include <gl/gl.h>
+#include "glad/glad.h"
 
 GraphicsEngine::GraphicsEngine()
 {
@@ -8,43 +8,13 @@ GraphicsEngine::GraphicsEngine()
 
 bool GraphicsEngine::init()
 {
-	clear(Color(1, 0, 1, 1));
-	glClear(GL_COLOR_BUFFER_BIT);
+	gladLoadGL();
 	return true;
-}
-
-bool GraphicsEngine::update()
-{
-	setViewPort(Rect(0, 0, 120, 120));
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	
-	glPushMatrix();
-	glRotatef(theta, 0.0f, 0.0f, 1.0f);
-	
-	glBegin(GL_TRIANGLES);
-
-		glColor3f(1.0f, 0.0f, 0.0f);   glVertex2f(0.0f, 1.0f);
-		glColor3f(0.0f, 1.0f, 0.0f);   glVertex2f(0.87f, -0.5f);
-		glColor3f(0.0f, 0.0f, 1.0f);   glVertex2f(-0.87f, -0.5f);
-
-	glEnd();
-	
-	glPopMatrix();
-
-	theta += 1.0f;
-	
-	return true;
-}
-
-
-bool GraphicsEngine::release()
-{
-	return false;
 }
 
 GraphicsEngine::~GraphicsEngine()
 {
+	
 }
 
 
@@ -54,6 +24,11 @@ void GraphicsEngine::clear(const Color& color)
 	glClearColor(color.r, color.g, color.b, color.a);
 }
 
+void GraphicsEngine::clear()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
 void GraphicsEngine::setViewPort(const Rect& size)
 {
 	glViewport(size.left, size.top, size.width, size.height);
@@ -61,10 +36,26 @@ void GraphicsEngine::setViewPort(const Rect& size)
 
 void GraphicsEngine::setVertexArrayObject(const VertexArrayObjectPtr& vao)
 {
+	glBindVertexArray(vao->getID());
 	
 }
 
-VertexArrayObjectPtr GraphicsEngine::createVertexArrayObject(const VertexBufferData& data)
+VertexArrayObjectPtr GraphicsEngine::createVertexArrayObject(const VertexBufferDesc& desc)
 {
-	return std::make_shared<VertexArrayObject>(data);
+	return std::make_shared<VertexArrayObject>(desc);
+}
+
+void GraphicsEngine::drawTriangles(unsigned int vertexCount, unsigned int offset)
+{
+	glDrawArrays(GL_TRIANGLES, offset, vertexCount);
+}
+
+ShaderPtr GraphicsEngine::createShaderProgram(const ShaderDesc& desc)
+{
+	return std::make_shared<Shader>(desc);
+}
+
+void GraphicsEngine::setShaderProgram(const ShaderPtr& program)
+{
+	glUseProgram(program->getID());
 }

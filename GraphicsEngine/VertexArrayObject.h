@@ -1,23 +1,34 @@
 #pragma once
 #include <memory>
 
-typedef struct VertexBufferData
+typedef struct VertexAttribute
+{
+	unsigned int numElements = 0;
+}VertexAttribute;
+
+typedef struct VertexBufferDesc
 {
 	void* verticlesList = nullptr;
 	unsigned int vertexSize = 0;
 	unsigned int listSize = 0;
-}VertexBufferData;
+	
+	VertexAttribute* attributesList = nullptr;
+	unsigned int attributesListSize = 0;
+}VertexBufferDesc;
 
 class VertexArrayObject
 {
 public:
-	VertexArrayObject(const VertexBufferData& data);
+	VertexArrayObject(const VertexBufferDesc& desc);
 	~VertexArrayObject();
 	
 	unsigned int getID();
+	unsigned int getVertexBufferSize();
+	unsigned int getVertexSize();
 private:
 	unsigned int vertexBufferID;
 	unsigned int vertexArrayObjectID;
+	VertexBufferDesc vertexBufferData;
 };
 
 
