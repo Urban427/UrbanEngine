@@ -13,8 +13,8 @@ public:
 
 	bool isRunning();
 private:
-	VertexArrayObjectPtr triangle;
-	ShaderPtr shader;
+	VertexArrayObject* triangle;
+	Shader* shader;
 
 	bool _running = false;
 	IOSystem ioSystem;

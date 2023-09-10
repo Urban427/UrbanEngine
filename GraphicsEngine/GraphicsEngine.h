@@ -4,6 +4,7 @@
 #include "VertexArrayObject.h"
 #include "Shader.h"
 
+
 class GraphicsEngine
 {
 public:
@@ -16,13 +17,11 @@ public:
 	void clear();
 	void clear(const Color& color);
 	void setViewPort(const Rect& size);
-	void setVertexArrayObject(const VertexArrayObjectPtr& vao);
-	void setShaderProgram(const ShaderPtr& program);
+	void setVertexArrayObject( VertexArrayObject* vao);
+	void setShaderProgram( Shader* program);
 	void drawTriangles(unsigned int vertexCount, unsigned int offset);
 public:
-	VertexArrayObjectPtr createVertexArrayObject(const VertexBufferDesc& desc);
-	ShaderPtr createShaderProgram(const ShaderDesc& desc);
-	
-	unsigned int texture_object_id;
+	VertexArrayObject* createVertexArrayObject(const VertexBufferDesc& desc); 
+	Shader* createShaderProgram(const ShaderDesc& desc);
 };
 

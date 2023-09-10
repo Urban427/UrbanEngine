@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+//#include <memory>
 
 typedef struct VertexAttribute
 {
@@ -16,10 +16,13 @@ typedef struct VertexBufferDesc
 	unsigned int attributesListSize = 0;
 }VertexBufferDesc;
 
+
+
 class VertexArrayObject
 {
 public:
 	VertexArrayObject(const VertexBufferDesc& desc);
+	void init(const VertexBufferDesc& desc);
 	~VertexArrayObject();
 	
 	unsigned int getID();
@@ -32,4 +35,4 @@ private:
 };
 
 
-typedef std::shared_ptr<VertexArrayObject> VertexArrayObjectPtr;
+//typedef std::shared_ptr<VertexArrayObject> VertexArrayObjectPtr;

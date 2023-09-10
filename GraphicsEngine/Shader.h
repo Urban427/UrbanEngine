@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+//#include <memory>
 
 enum ShaderType
 {
@@ -19,6 +19,7 @@ class Shader
 {
 public:
 	Shader(const ShaderDesc& desc);
+	void init(const ShaderDesc& desc);
 	~Shader();
 	
 	unsigned int getID();
@@ -30,4 +31,4 @@ private:
 	unsigned int attachedShaders[2] = {};
 };
 
-typedef std::shared_ptr<Shader> ShaderPtr;
+//typedef std::shared_ptr<Shader> ShaderPtr;

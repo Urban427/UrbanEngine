@@ -16,8 +16,8 @@ void App::onCreate()
 	}
 	
 	graphicEngine.init();
-	graphicEngine.setViewPort(ioSystem.getInnerSize());
-	graphicEngine.clear(Color(0, 0, 0, 1));
+	//graphicEngine.setViewPort(ioSystem.getInnerSize());
+	graphicEngine.clear(Color(1, 0, 0, 1));
 	
 	
 	const float triangleVertecles[] = {
@@ -28,7 +28,7 @@ void App::onCreate()
 		 0, 1, 0,
 		 
 		 0, 0.5f, 0,
-		 0, 0, 1,
+		 0, 0, 1
 	};
 	
 	VertexAttribute attributeList[] = {
@@ -42,10 +42,7 @@ void App::onCreate()
 		attributeList,
 		2});
 		
-	shader = graphicEngine.createShaderProgram({
-		"../Assets/shader.vsh", 
-		"../Assets/shader.fsh"
-	});
+	shader = graphicEngine.createShaderProgram({ "../Assets/shader.vsh",  "../Assets/shader.fsh" });
 }
 
 void App::onUpdate()

@@ -1,5 +1,12 @@
 #include "GraphicsEngine.h"
-#include "glad/glad.h"
+#include <malloc.h>
+
+#ifdef glad
+	#include "glad/glad.h"
+#elif gles2
+	#include "gles2/gl2.h"
+#endif
+
 
 GraphicsEngine::GraphicsEngine()
 {
@@ -8,7 +15,9 @@ GraphicsEngine::GraphicsEngine()
 
 bool GraphicsEngine::init()
 {
+#ifdef glad
 	gladLoadGL();
+#endif
 	return true;
 }
 
@@ -34,28 +43,35 @@ void GraphicsEngine::setViewPort(const Rect& size)
 	glViewport(size.left, size.top, size.width, size.height);
 }
 
-void GraphicsEngine::setVertexArrayObject(const VertexArrayObjectPtr& vao)
-{
-	glBindVertexArray(vao->getID());
-	
-}
-
-VertexArrayObjectPtr GraphicsEngine::createVertexArrayObject(const VertexBufferDesc& desc)
-{
-	return std::make_shared<VertexArrayObject>(desc);
-}
-
 void GraphicsEngine::drawTriangles(unsigned int vertexCount, unsigned int offset)
 {
-	glDrawArrays(GL_TRIANGLES, offset, vertexCount);
+	glDrawArrays(GL_TRIANGLE_STRIP, offset, vertexCount);
 }
 
-ShaderPtr GraphicsEngine::createShaderProgram(const ShaderDesc& desc)
+void GraphicsEngine::setVertexArrayObject(VertexArrayObject* vao)
 {
-	return std::make_shared<Shader>(desc);
+#ifdef glad
+	glBindVertexArray(vao->getID());
+#elif gles2
+	glBindBuffer(GL_ARRAY_BUFFER, vao->getID());
+#endif
 }
 
-void GraphicsEngine::setShaderProgram(const ShaderPtr& program)
+void GraphicsEngine::setShaderProgram(Shader* program)
 {
 	glUseProgram(program->getID());
+}
+
+VertexArrayObject* GraphicsEngine::createVertexArrayObject(const VertexBufferDesc& desc)
+{
+	VertexArrayObject* m = (VertexArrayObject*)malloc(sizeof(VertexArrayObject));
+	m->init(desc);
+	return m;
+}
+
+Shader* GraphicsEngine::createShaderProgram(const ShaderDesc& desc)
+{
+	Shader* m = (Shader*)malloc(sizeof(Shader));
+	m->init(desc);
+	return m;
 }

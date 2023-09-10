@@ -29,10 +29,10 @@ binFile:
 
 
 ${bin}%.o: %.cpp
-	${CC} ${IFlags} -o $@ -c $< 
+	${CC} -D pc -D glad ${IFlags} -o $@ -c $< 
 	
 ${bin}%.oa: %.cpp
-	${AndroidCC} -D android ${IFlags} -o $@ -c $< --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O2
+	${AndroidCC} -D android -D gles2 ${IFlags} -o $@ -c $< --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O3
 	
 clear:
 	del ${OBJ_DEL} 

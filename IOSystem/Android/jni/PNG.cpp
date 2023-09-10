@@ -2,8 +2,8 @@
 #include "AndroidFileManager.h"
 #include <malloc.h>
 
-
-GLenum get_gl_color_format(const int png_color_format) {
+/*
+int get_gl_color_format(const int png_color_format) {
     switch (png_color_format) 
 	{
         case 4:
@@ -16,6 +16,7 @@ GLenum get_gl_color_format(const int png_color_format) {
  
     return 0;
 }
+*/
 
 RawImageData readResource(const char* filename)
 {

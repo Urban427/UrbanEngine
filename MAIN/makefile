@@ -22,7 +22,7 @@ GraphicsEngineDir = ../GraphicsEngine/
 Libs += -L../libs
 Libs += -l Game
 Libs += -l IOSystem
-Libs += -l GraphicsEnginez
+Libs += -l GraphicsEngine
 Libs += -l glad
 Libs += -l Math
 
