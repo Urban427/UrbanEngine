@@ -8,7 +8,6 @@
 class GraphicsEngine
 {
 public:
-	GraphicsEngine();
 
 	bool init();
 	~GraphicsEngine();

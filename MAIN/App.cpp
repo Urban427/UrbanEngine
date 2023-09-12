@@ -1,4 +1,5 @@
 #include "App.h"
+#include "Color.h"
 
 App::App()
 {
@@ -17,18 +18,21 @@ void App::onCreate()
 	
 	graphicEngine.init();
 	//graphicEngine.setViewPort(ioSystem.getInnerSize());
-	graphicEngine.clear(Color(1, 0, 0, 1));
+	graphicEngine.clear(Color(1, 0, 1, 1));
 	
 	
 	const float triangleVertecles[] = {
-		-0.5f, -0.5f, 0,
-		1, 0, 0,
+		 -0.5f, -0.5f, 0,
+		 1, 0, 0,
 		
-		 0.5f, -0.5f, 0,
+		 -0.5f, 0.5f, 0,
 		 0, 1, 0,
 		 
-		 0, 0.5f, 0,
-		 0, 0, 1
+		 0.5, -0.5f, 0,
+		 0, 0, 1,
+		 
+		 0.5, 0.5f, 0,
+		 0, 1, 1
 	};
 	
 	VertexAttribute attributeList[] = {
@@ -36,11 +40,12 @@ void App::onCreate()
 		3
 	};
 	
-	triangle = graphicEngine.createVertexArrayObject({
-		(void*)triangleVertecles, sizeof(float) * (3 + 3),
-		3,
-		attributeList,
-		2});
+	triangle = graphicEngine.createVertexArrayObject({ 
+	(void*)triangleVertecles, 
+	sizeof(float) * (3 + 3),
+	4, 
+	attributeList, 
+	2});
 		
 	shader = graphicEngine.createShaderProgram({ "../Assets/shader.vsh",  "../Assets/shader.fsh" });
 }

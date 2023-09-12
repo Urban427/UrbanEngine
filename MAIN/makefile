@@ -14,6 +14,7 @@ OBJ_DEL += ${subst /,\, ${AndroidOBJ}}
 MathDir = ../Math/
 IOSystemDir = ../IOSystem/
 WindowsDir = ../IOSystem/Windows/
+AndroidDir = ../IOSystem/Android/Filter/
 OpenGlDib = ../OpenGL37/
 GameDib = ../Game/
 GraphicsEngineDir = ../GraphicsEngine/
@@ -29,6 +30,7 @@ Libs += -l Math
 IFLAGS = -I ${GameDib}
 IFLAGS = -I ${MathDir}
 IFLAGS += -I ${IOSystemDir}
+IFLAGS += -I ${AndroidDir}
 IFLAGS += -I ${WindowsDir}
 IFLAGS += -I ${GraphicsEngineDir}
 
@@ -43,7 +45,7 @@ builder: ${OBJ}
 	${CC} -O3 -o ${build}${Target} $^ ManifestWindows.res ${Libs} -lgdi32  -lopengl32
 
 androidBuilder: ${AndroidOBJ}
-	ar rcs ../IOSystem/Android/libs/arm64-v8a/${Target}.a ${AndroidOBJ}
+	ar rcs ../IOSystem/Android/libs/arm64-v8a/lib${Target}.a ${AndroidOBJ}
 	
 
 binFile: 
@@ -52,7 +54,7 @@ binFile:
 	if not exist "build" mkdir build
 
 ${bin}%.o: %.cpp
-	${CC} ${IFLAGS} -o $@ -c $< 
+	${CC} -D windows ${IFLAGS} -o $@ -c $< 
 
 ${bin}%.oa: %.cpp
 	${AndroidCC} -D android ${IFLAGS} -o $@ -c $< --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O2

@@ -28,8 +28,3 @@ Color::Color(const Color& color)
 	this->b = color.b;
 	this->a = color.a;
 }
-
-Color::~Color()
-{
-	
-}

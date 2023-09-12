@@ -1,6 +1,10 @@
 #pragma once
 #include "Rect.h"
-#if defined(WIN32)
+
+#ifdef android
+	#include "AndroidFilter.h"
+	#define _Window AndroidFilter 
+#elif windows
 	#include "Window.h"
 	#define _Window Window 
 #endif

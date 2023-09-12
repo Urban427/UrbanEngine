@@ -8,10 +8,6 @@
 #endif
 
 
-GraphicsEngine::GraphicsEngine()
-{
-
-}
 
 bool GraphicsEngine::init()
 {

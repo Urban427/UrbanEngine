@@ -18,5 +18,7 @@ ${Target}:
 Android:
 	${MAKE} -C ${helperDir}
 	${MAKE} android -C ${MathDir}
+	${MAKE} android -C ${IOSystemDir}
 	${MAKE} android -C ${GraphicLibrary}
+	${MAKE} android -C ${MAINDir}
 	${MAKE} -C ${AndroidDir}
