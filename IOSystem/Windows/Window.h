@@ -11,6 +11,9 @@ public:
 	
 	Rect getInnerSize();
 	
+	void setSize(unsigned int width, unsigned int height);
+	double getTime();
+	
 	char init();
 	char broadcast();
 private:

@@ -21,6 +21,16 @@ char IOSystem::onUpdate()
 }
 
 
+double IOSystem::getTime()
+{
+	return _window.getTime();
+}
+
+void IOSystem::setSize(unsigned int width, unsigned int height)
+{
+	_window.setSize(width, height);
+}
+
 Rect IOSystem::getInnerSize()
 {
 	return _window.getInnerSize();

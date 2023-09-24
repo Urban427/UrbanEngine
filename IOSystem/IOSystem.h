@@ -18,6 +18,9 @@ public:
 	char onCreate();
 	char onUpdate();
 	
+	double getTime();
+	
+	void setSize(unsigned int width, unsigned int height);
 	Rect getInnerSize();
 private:
 	_Window _window;

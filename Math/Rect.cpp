@@ -27,7 +27,4 @@ Rect::Rect(const Rect& rect)
 	this->top = rect.top;
 }
 
-Rect::~Rect()
-{
-	
-}
+//Rect::~Rect(){	}

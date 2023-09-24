@@ -1,0 +1,35 @@
+#include "Texture.h"
+
+#ifdef glad
+	#include "glad/glad.h"
+#elif gles2
+	#include "gles2/gl2.h"
+#endif
+
+Texture::Texture(const TextureDesc& desc)
+{
+	init(desc);
+}
+
+void Texture::init(const TextureDesc& desc)
+{
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, desc.width, desc.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, desc.image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+//Texture::~Texture() {}
+
+
+
+unsigned int Texture::getID()
+{
+	return textureID;
+}

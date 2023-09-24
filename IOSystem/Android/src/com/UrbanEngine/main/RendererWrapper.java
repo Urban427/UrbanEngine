@@ -32,7 +32,7 @@ public class RendererWrapper implements Renderer
         System.loadLibrary("Filter");
     }
     public native void AndroidLogicCreate();
-    public native void AndroidLogicUpdate();
+    public native void AndroidLogicUpdate(int width, int height);
     public native void AndroidLogicDraw();
 	
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -40,7 +40,7 @@ public class RendererWrapper implements Renderer
     }
  
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        AndroidLogicUpdate();
+        AndroidLogicUpdate(width, height);
     }
  
     public void onDrawFrame(GL10 gl) {
@@ -48,7 +48,11 @@ public class RendererWrapper implements Renderer
 		//AndroidLogicUpdate();
 		//GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
     }
-	
+
+
+	public void debug() {
+        //AndroidLogicUpdate();
+    }	
 	
 	
 	public void printText(byte[] text) 

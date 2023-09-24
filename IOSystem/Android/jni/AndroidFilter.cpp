@@ -1,32 +1,29 @@
 ﻿#include <jni.h>
-#include "PNG.h"
-#include "AndroidFileManager.h"
-#include <GraphicsEngine.h>
 #include <App.h>
+#include "../Filter/AndroidFileManager.h"
 
 App app;
+AndroidFileManager androidFileManager;
 
 extern "C" JNIEXPORT void JNICALL
 	Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicCreate(
 		JNIEnv * env,
 		jobject java_obj) 
 {
+	androidFileManager.init(env, &java_obj);
 	app.onCreate();
-}
-
-void AndroidLogicUpdate()
-{
-	//VertexBufferData d;
-	//VertexArrayObject vbo(d);
 }
 
 
 extern "C" JNIEXPORT void JNICALL
 	Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicUpdate(
 		JNIEnv * env,
-		jobject java_obj) 
+		jobject java_obj,
+		jint width,
+		jint height) 
 {
-	
+	androidFileManager.init(env, &java_obj);
+	app.setSize(width, height);
 }
 
 

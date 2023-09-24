@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <time.h>
 #include "../../MAIN/resource.h"
 
 
@@ -109,10 +110,15 @@ char Window::broadcast()
 	SwapBuffers(hDC);
 
 
-	Sleep(1);
+	//Sleep(1);
 	return 0;
 }
 
+
+void  Window::setSize(unsigned int width, unsigned int height)
+{
+	
+}
 
 
 Rect Window::getInnerSize()
@@ -120,4 +126,11 @@ Rect Window::getInnerSize()
 	RECT rc;
 	GetClientRect(_hwnd, &rc);
 	return Rect(rc.right - rc.left, rc.bottom - rc.top);
+}
+
+double Window::getTime()
+{
+	struct timeval tv;
+	mingw_gettimeofday(&tv, NULL);
+    return (double)tv.tv_sec + ((double)tv.tv_usec / 1000000);
 }

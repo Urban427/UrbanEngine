@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 		RendererWrapper rend = new RendererWrapper();
 		rend.contect = this;
 		//rend.AndroidLogicCreate();
-		//rend.debug();
+		rend.debug();
 		
 		rendererSet = true;
 		glSurfaceView = new GLSurfaceView(this);

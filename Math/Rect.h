@@ -7,7 +7,7 @@ public:
 	Rect(unsigned int width, unsigned int height);
 	Rect(unsigned int left, unsigned int top, unsigned int width, unsigned int height);
 	Rect(const Rect& rect);
-	~Rect();
+	//~Rect();
 public:
 	unsigned int width  = 0;
 	unsigned int height = 0;

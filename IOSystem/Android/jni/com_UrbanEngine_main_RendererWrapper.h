@@ -18,10 +18,10 @@ JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicCre
 /*
  * Class:     com_UrbanEngine_main_RendererWrapper
  * Method:    AndroidLogicUpdate
- * Signature: ()V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicUpdate
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jint, jint);
 
 /*
  * Class:     com_UrbanEngine_main_RendererWrapper
