@@ -26,5 +26,13 @@ private:
 	bool _running = false;
 	IOSystem ioSystem;
 	GraphicsEngine graphicEngine;
+	
+	
+	char drawLines = 1;
+	unsigned int circlesToDraw = 1;
+	float numberOfSqueres = 2225;
+	float* x;
+	float* y;
+	
 };
 

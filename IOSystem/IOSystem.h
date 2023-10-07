@@ -18,10 +18,16 @@ public:
 	char onCreate();
 	char onUpdate();
 	
+	//time
 	double getTime();
-	
+
+	//window
 	void setSize(unsigned int width, unsigned int height);
 	Rect getInnerSize();
+
+	//input
+	void createInputState();
+	void updateInputState();
 private:
 	_Window _window;
 };

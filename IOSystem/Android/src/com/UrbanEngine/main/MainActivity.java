@@ -7,6 +7,10 @@ import android.widget.Toast;
 import android.app.ActivityManager;
 import android.content.Context;
 
+
+import android.view.View;
+import android.view.MotionEvent;
+
 import android.opengl.GLSurfaceView;
 
 public class MainActivity extends Activity {
@@ -32,8 +36,27 @@ public class MainActivity extends Activity {
 		//rend.AndroidLogicCreate();
 		rend.debug();
 		
+		
 		rendererSet = true;
 		glSurfaceView = new GLSurfaceView(this);
+		
+		glSurfaceView.setOnTouchListener(
+		new View.OnTouchListener() 
+		{
+			float x;
+			float y;
+			@Override
+			public boolean onTouch(View v, MotionEvent event) 
+			{
+				x = event.getX();
+				y = event.getY();
+				
+				Toast.makeText(getApplicationContext(), Float.toString(x) + " " + Float.toString(y), Toast.LENGTH_SHORT).show();
+				
+				return true;
+			}
+		});
+		
 		glSurfaceView.setEGLContextClientVersion(2);
 		glSurfaceView.setRenderer(rend);
 		setContentView(glSurfaceView);

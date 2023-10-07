@@ -34,7 +34,7 @@ char Window::init()
 	HGLRC hRC;
 
 	width = 1024;
-	height = 768;
+	height = 1024;
 	
 	WNDCLASSEX wc = {};
 	wc.cbSize = sizeof(WNDCLASSEX);

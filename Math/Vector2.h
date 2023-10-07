@@ -7,6 +7,7 @@ public:
 	Vector2(float x, float y);
 	//~Vector2();
 
+	float length();
 public:
 	float x = 0;
 	float y = 0;

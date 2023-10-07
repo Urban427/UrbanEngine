@@ -21,10 +21,13 @@ char IOSystem::onUpdate()
 }
 
 
+
 double IOSystem::getTime()
 {
 	return _window.getTime();
 }
+
+
 
 void IOSystem::setSize(unsigned int width, unsigned int height)
 {
@@ -34,4 +37,16 @@ void IOSystem::setSize(unsigned int width, unsigned int height)
 Rect IOSystem::getInnerSize()
 {
 	return _window.getInnerSize();
+}
+
+
+
+void IOSystem::createInputState()
+{
+	
+}
+
+void IOSystem::updateInputState()
+{
+	
 }

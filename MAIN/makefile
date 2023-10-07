@@ -54,7 +54,7 @@ binFile:
 	if not exist "build" mkdir build
 
 ${bin}%.o: %.cpp
-	${CC} -D windows ${IFLAGS} -o $@ -c $< 
+	${CC} -D windows ${IFLAGS} -o $@ -c $< -Wl,--subsystem,windows
 
 ${bin}%.oa: %.cpp
 	${AndroidCC} -D android ${IFLAGS} -o $@ -c $< --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O2

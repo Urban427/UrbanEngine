@@ -70,7 +70,7 @@ void Shader::attach(const char* shaderFilePath, const ShaderType& type)
 		"uniform mat4 transform;"
 		"uniform mat4 projection;"
 		"void main(){"
-		"	gl_Position = projection * (transform * a_Position);"
+		"	gl_Position =  transform * a_Position;"
 		"	v_TextureCoordinates = a_TextureCoordinates.xy;"
 		"}";
 		
@@ -86,6 +86,7 @@ void Shader::attach(const char* shaderFilePath, const ShaderType& type)
 		"uniform sampler2D u_TextureUnit;"
 		"void main(){"
 		"	gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);"
+		"	gl_FragColor = vec4(0, 0, 0, 1);"
 		"}";
 		
 		shaderID = glCreateShader(GL_FRAGMENT_SHADER);

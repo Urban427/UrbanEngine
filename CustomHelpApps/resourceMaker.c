@@ -111,8 +111,8 @@ int main()
 {
 	Texture tex;
 	
-	ReadBMPFile(&tex, "../Assets/ghost2.bmp");
-	saveTexture(&tex, "../IOSystem/Android/build/apk/assets/ghost2.b");
+	ReadBMPFile(&tex, "../Assets/0012.bmp");
+	saveTexture(&tex, "../IOSystem/Android/build/apk/assets/0012.b");
 	
 	long unsigned int size;
 	unsigned char* buffer;

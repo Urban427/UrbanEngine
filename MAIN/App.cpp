@@ -3,8 +3,10 @@
 #include "Matrix4x4.h"
 #include "FileManager.h"
 #include "Rect.h"
+#include "Math.h"
 
 #include <math.h>
+#include <cmath>
 #include <malloc.h>
 
 App::App()
@@ -31,7 +33,7 @@ void App::onCreate()
 	
 	int width;
 	int height;
-	FileData* f = openFile(ghost2.b);
+	FileData* f = openFile(0012.b);
 	readFile(&width, sizeof(int), 1, f);
 	readFile(&height, sizeof(int), 1, f);
 	unsigned int* image = (unsigned int*)malloc(width * height* sizeof(int));
@@ -126,6 +128,19 @@ void App::onCreate()
 		(unsigned int)height,
 		image
 	});
+	
+	
+	setSeed(33);
+	x = (float*)malloc(sizeof(float) * numberOfSqueres);
+	y = (float*)malloc(sizeof(float) * numberOfSqueres);
+	generateIncreasingArray(x, numberOfSqueres);
+	//randomArray2(x, numberOfSqueres);
+	//randomArray(x, numberOfSqueres);
+	//generateSquaredArray(y, numberOfSqueres);
+	//generateLowingArray(y, numberOfSqueres);
+	//randomArray(y, numberOfSqueres);
+	generateSawArray(y, numberOfSqueres, 12);
+	//generateSinusArray(y, numberOfSqueres);
 }
 
 void  App::setSize(unsigned int width, unsigned int height)
@@ -140,11 +155,11 @@ void App::onUpdate()
 	Rect size = ioSystem.getInnerSize();
 	Matrix4x4 camView, temp;
 	camView.setIdentity();
-	camView.setRotationY(sin(-scale) * 1.14f);
+	//camView.setRotationY(sin(-scale) * 1.14f);
 	
 	
 	temp.setIdentity();
-	temp.setTranslation(Vector3(sin(scale) * 3, 1, cos(scale) * 3));
+	//temp.setTranslation(Vector3(sin(scale) * 3, 1, cos(scale) * 3));
 	camView *= temp;
 	
 	camView.inverse();
@@ -153,34 +168,12 @@ void App::onUpdate()
 	Matrix4x4 projection;
 	projection.setIdentity();
 	//projection.setOrthoLH(size.width * 0.004f, size.height * 0.004f, -4, 4);
-	projection.setPerspectiveFovLH(
-	1.57f, 
-	(float)size.width / (float)size.height,
-	0.1f, 111);
+	//projection.setPerspectiveFovLH(
+	//1.57f, 
+	//(float)size.width / (float)size.height,
+	//0.1f, 111);
 	
 	Matrix4x4 world;
-	world.setIdentity();
-	//world.setRotationX(scale * 3.14f);
-	
-	temp.setIdentity();
-	//temp.setRotationY(scale * 3.14f);
-	world *= temp;
-	
-	temp.setIdentity();
-	//temp.setRotationZ(scale * 3.14f);
-	world *= temp;
-	
-	temp.setIdentity();
-	//temp.setScale(Vector3(2, 2, 1));
-	world *= temp;
-	
-	temp.setIdentity();
-	temp.setTranslation(Vector3(0, 0, -5));
-	world *= temp;
-	
-	world *= camView;
-	
-	graphicEngine.setMatrix(shader, world);
 	graphicEngine.setProjectionMatrix(shader, projection);
 	
 	
@@ -192,7 +185,81 @@ void App::onUpdate()
 	uniform->setValue(0);
 	graphicEngine.setVertexArrayObject(triangle);
 	graphicEngine.setIndexArrayObject(indexes);
-	graphicEngine.drawTriangles(indexes->getSize());
+	
+	
+	if(scale > 0.001f)
+	{
+		circlesToDraw += 20;
+		scale = 0;
+	}
+	unsigned int index = 0;
+	
+	float circleSize = 0.003f;
+	
+	
+	for(int i = 0; i < numberOfSqueres - 1; i++)
+	{
+		if(drawLines == 0) {
+			break;
+		}
+		Vector2 a = Vector2(
+		x[i + 1] - x[i],
+		y[i + 1] - y[i]);
+		
+		index++;
+		world.setIdentity();
+		world.setScale(Vector3(a.length() * 2, circleSize, 1));
+		
+		
+		temp.setIdentity();
+		temp.setRotationZ( atan(a.y / a.x) );
+		world *= temp;
+
+
+		float x1 = (x[i] + x[i + 1]) / 2;
+		float y1 = (y[i] + y[i + 1]) / 2;
+		temp.setIdentity();
+		temp.setTranslation(Vector3(
+		2 * x1 - 1 + circleSize / 2, 
+		2 * y1 - 1 + circleSize / 2,
+		0));
+		world *= temp;
+		
+		graphicEngine.setMatrix(shader, world);
+		graphicEngine.drawTriangles(indexes->getSize());
+		
+		if(index == circlesToDraw) {
+			break;
+		}
+	}
+	
+	index = 0;
+	circleSize = 0.01f;
+	for(int i = 0; i < numberOfSqueres; i++)
+	{
+		Vector2 a = Vector2(
+		x[i + 1] - x[i],
+		y[i + 1] - y[i]);
+		
+		index++;
+		world.setIdentity();
+		world.setScale(Vector3(circleSize, circleSize, 1));
+
+
+		temp.setIdentity();
+		temp.setTranslation(Vector3(
+		2 * x[i] - 1 + circleSize / 4, 
+		2 * y[i] - 1 + circleSize / 4,
+		0));
+		world *= temp;
+		
+		graphicEngine.setMatrix(shader, world);
+		graphicEngine.drawTriangles(indexes->getSize());
+		
+		if(index == circlesToDraw) {
+			break;
+		}
+	}
 	
 	
 	if (ioSystem.onUpdate()) {
