@@ -95,6 +95,7 @@ void randomArray(float* array, unsigned int size)
 			temp += ((i >> j) & 1) / del2;
 			del2 *= 2;
 		}
+		//*array = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 		*array = temp;
 	}
 }
@@ -131,4 +132,14 @@ void saveFileData(float* array, unsigned int size)
 	}
 	
 	fclose(file);
+}
+
+
+
+void normalizePoints(float* array, unsigned int size)
+{
+	for(unsigned int i = 0; i < size; i++)
+	{
+		array[i] = array[i] * 0.8f + 0.1f;
+	}
 }

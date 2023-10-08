@@ -11,5 +11,7 @@ void randomArray(float* array, unsigned int size);
 void randomArray2(float* array, unsigned int size);
 void setSeed(const unsigned int _seed);
 
+void normalizePoints(float* array, unsigned int size);
+
 
 void saveFileData(float* array, unsigned int size);

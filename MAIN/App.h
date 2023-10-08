@@ -29,7 +29,7 @@ private:
 	
 	
 	char drawLines = 1;
-	unsigned int circlesToDraw = 1;
+	unsigned int circlesToDraw = 10;
 	float numberOfSqueres = 3333;
 	float* x;
 	float* y;

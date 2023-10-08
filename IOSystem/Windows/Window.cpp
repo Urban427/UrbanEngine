@@ -56,9 +56,9 @@ char Window::init()
 	AdjustWindowRect(&rc, WS_SYSMENU, false);
 
 	_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
-		"UrbanEngineClass", "UrbanEngine",
+		"UrbanEngineClass", "Urban",
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		0, 0,
 		rc.right, rc.bottom, NULL, NULL, NULL, NULL);
 
 	if (!_hwnd)

@@ -45,7 +45,7 @@ void App::onCreate()
 	
 	graphicEngine.init();
 	//graphicEngine.setViewPort(ioSystem.getInnerSize());
-	graphicEngine.clear(Color(1, 0, 0, 1));
+	graphicEngine.clear(Color(1, 1, 1, 1));
 	graphicEngine.setCullMode(FrontFace);
 
 	unsigned int indeces[] = {
@@ -141,19 +141,40 @@ void App::onCreate()
 		randomArray2,				 //7
 	};
 	
-	numberOfSqueres = 5000000;
+	unsigned int numberOfSqueresArray[] = {
+		5 * 50,
+		10 * 1000000,
+		50 * 1000000,
+	};
+	
+	circlesToDraw = 50000000;
+	numberOfSqueres = numberOfSqueresArray[0];
 	drawLines = 0;
+	
 	setSeed(33);
 	x = (float*)malloc(sizeof(float) * numberOfSqueres);
 	y = (float*)malloc(sizeof(float) * numberOfSqueres);
+
+
+	/*
+	x = (float*)malloc(sizeof(float) * 3);
+	y = (float*)malloc(sizeof(float) * 3);
+	for(int i = 0; i < 3; i++)
+	{
+		ioSystem.initTime();
+		functions[6](_x, numberOfSqueresArray[i]);
+		double t = ioSystem.getDeltaTime();
+		y[i] = (t / 10) * 0.8f + 0.1f;
+		x[i] = ((float)numberOfSqueresArray[i] / 60000000) * 0.8f + 0.1f;
+	}*/
 	
-	ioSystem.initTime();
 	
 	functions[6](x, numberOfSqueres);
 	functions[7](y, numberOfSqueres);
 	
-	saveFileData(x, numberOfSqueres);
-	printf("%f\n", ioSystem.getDeltaTime());
+	normalizePoints(x, numberOfSqueres);
+	normalizePoints(y, numberOfSqueres);
+	//saveFileData(x, numberOfSqueres);
 	
 }
 
@@ -203,12 +224,40 @@ void App::onUpdate()
 	
 	if(scale > 0.001f)
 	{
-		circlesToDraw += 20;
+		//circlesToDraw += 20;
 		scale = 0;
 	}
 	unsigned int index = 0;
 	
 	float circleSize = 0.003f;
+	
+	
+	world.setIdentity();
+	world.setScale(Vector3(1.8f, circleSize, 1));
+	float x1 = 0.5f;
+	float y1 = 0.05f;
+	temp.setIdentity();
+	temp.setTranslation(Vector3(
+	2 * x1 - 1 + circleSize / 2, 
+	2 * y1 - 1 + circleSize / 2,
+	0));
+	world *= temp;
+	graphicEngine.setMatrix(shader, world);
+	graphicEngine.drawTriangles(indexes->getSize());
+	
+	
+	world.setIdentity();
+	world.setScale(Vector3(circleSize, 1.8f, 1));
+	x1 = 0.05f;
+	y1 = 0.5f;
+	temp.setIdentity();
+	temp.setTranslation(Vector3(
+	2 * x1 - 1 + circleSize / 2, 
+	2 * y1 - 1 + circleSize / 2,
+	0));
+	world *= temp;
+	graphicEngine.setMatrix(shader, world);
+	graphicEngine.drawTriangles(indexes->getSize());
 	
 	
 	for(int i = 0; i < numberOfSqueres - 1; i++)
@@ -230,8 +279,8 @@ void App::onUpdate()
 		world *= temp;
 
 
-		float x1 = (x[i] + x[i + 1]) / 2;
-		float y1 = (y[i] + y[i + 1]) / 2;
+		x1 = (x[i] + x[i + 1]) / 2;
+		y1 = (y[i] + y[i + 1]) / 2;
 		temp.setIdentity();
 		temp.setTranslation(Vector3(
 		2 * x1 - 1 + circleSize / 2, 
@@ -251,10 +300,6 @@ void App::onUpdate()
 	circleSize = 0.01f;
 	for(int i = 0; i < numberOfSqueres; i++)
 	{
-		Vector2 a = Vector2(
-		x[i + 1] - x[i],
-		y[i + 1] - y[i]);
-		
 		index++;
 		world.setIdentity();
 		world.setScale(Vector3(circleSize, circleSize, 1));
@@ -273,6 +318,43 @@ void App::onUpdate()
 		if(index == circlesToDraw) {
 			break;
 		}
+	}
+	
+	
+	
+	for(int i = 0; i < 9; i++)
+	{
+		world.setIdentity();
+		world.setScale(Vector3(circleSize, circleSize, 1));
+
+
+		temp.setIdentity();
+		temp.setTranslation(Vector3(
+		2 * (0.05f + 0.1f * i) - 1 + circleSize / 2, 
+		2 * 0.05f - 1 + circleSize / 2,
+		0));
+		world *= temp;
+		
+		graphicEngine.setMatrix(shader, world);
+		graphicEngine.drawTriangles(indexes->getSize());
+	}
+
+	
+	for(int i = 0; i < 9; i++)
+	{
+		world.setIdentity();
+		world.setScale(Vector3(circleSize, circleSize, 1));
+
+
+		temp.setIdentity();
+		temp.setTranslation(Vector3(
+		2 * 0.05f - 1 + circleSize / 2, 
+		2 * (0.05f + 0.1f * i) - 1 + circleSize / 2,
+		0));
+		world *= temp;
+		
+		graphicEngine.setMatrix(shader, world);
+		graphicEngine.drawTriangles(indexes->getSize());
 	}
 	
 	
