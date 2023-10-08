@@ -130,17 +130,31 @@ void App::onCreate()
 	});
 	
 	
+	void (*functions[])(float* array, unsigned int size) = {
+		generateIncreasingArray, 	 //0
+		generateLowingArray,		 //1
+		generateSquaredArray,		 //2
+		generateSawArray,		 	 //3
+		generateSinusArray,		 	 //4
+		generateStepsArray,			 //5
+		randomArray,		 		 //6
+		randomArray2,				 //7
+	};
+	
+	numberOfSqueres = 5000000;
+	drawLines = 0;
 	setSeed(33);
 	x = (float*)malloc(sizeof(float) * numberOfSqueres);
 	y = (float*)malloc(sizeof(float) * numberOfSqueres);
-	generateIncreasingArray(x, numberOfSqueres);
-	//randomArray2(x, numberOfSqueres);
-	//randomArray(x, numberOfSqueres);
-	//generateSquaredArray(y, numberOfSqueres);
-	//generateLowingArray(y, numberOfSqueres);
-	//randomArray(y, numberOfSqueres);
-	generateSawArray(y, numberOfSqueres, 12);
-	//generateSinusArray(y, numberOfSqueres);
+	
+	ioSystem.initTime();
+	
+	functions[6](x, numberOfSqueres);
+	functions[7](y, numberOfSqueres);
+	
+	saveFileData(x, numberOfSqueres);
+	printf("%f\n", ioSystem.getDeltaTime());
+	
 }
 
 void  App::setSize(unsigned int width, unsigned int height)

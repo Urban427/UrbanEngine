@@ -12,13 +12,17 @@ public:
 	Rect getInnerSize();
 	
 	void setSize(unsigned int width, unsigned int height);
-	double getTime();
+	
+	void initTime();
+	double getDeltaTime();
 	
 	char init();
 	char broadcast();
 private:
 	HWND _hwnd; 
 	HDC hDC;
+	
+	long time;
 public:
 	int width;
 	int height;

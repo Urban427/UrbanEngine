@@ -1,5 +1,6 @@
 #include "Math.h"
 #include <math.h>
+#include <stdio.h>
 
 static unsigned int seed = 0;
 
@@ -47,23 +48,37 @@ void generateLowingArray(float* array, unsigned int size)
 	}
 }
 
-void generateSawArray(float* array, unsigned int size, int period)
+void generateSawArray(float* array, unsigned int size)
 {
-	float delta = 1.0f / (size - 1);
+	int period = 5;
+	float delta = 1.0f / size;
 	float temp = 0;
-	for(int i = 0; i < size; i++, array++, temp += delta)
+	for(unsigned int i = 0; i < size; i++, array++, temp += delta)
 	{
-		*array = (float)abs((int)(temp * period * 5) % period - period / 2) / period + 0.25f;
+		float t = temp * period;
+		*array = 0.3f * (t - (int)(t + 0.5f)) + 0.5f;
 	}
 }
 
 void generateSinusArray(float* array, unsigned int size)
 {
-	float delta = 1.0f / 33;
+	float delta = 1.0f / size;
 	float temp = 0;
 	for(int i = 0; i < size; i++, array++, temp += delta)
 	{
-		*array = sin(0.3f * temp) / 4 + 0.5f;
+		*array = sin(54.3f * temp) / 4 + 0.5f;
+	}
+}
+
+void generateStepsArray(float* array, unsigned int size)
+{
+	int period = 6;
+	float delta = 1.0f / size;
+	float temp = 0;
+	for(unsigned int i = 0; i < size; i++, array++, temp += delta)
+	{
+		float t = (float)((int)(temp * period) % period)/ period;
+		*array = t + sin(temp * 111) * 0.002f + 0.1f;
 	}
 }
 
@@ -103,4 +118,17 @@ void randomArray2(float* array, unsigned int size)
 		}
 		*array = temp;
 	}
+}
+
+void saveFileData(float* array, unsigned int size)
+{
+	FILE* file = fopen("save.data", "wb");
+	
+	fwrite(&size, sizeof(unsigned int), 1 , file);
+	for(unsigned int i = 0; i < size; i++)
+	{
+		fwrite(&array[i], sizeof(unsigned int), 1 , file);
+	}
+	
+	fclose(file);
 }

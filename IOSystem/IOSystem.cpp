@@ -22,9 +22,14 @@ char IOSystem::onUpdate()
 
 
 
-double IOSystem::getTime()
+void IOSystem::initTime()
 {
-	return _window.getTime();
+	_window.initTime();
+}
+
+double IOSystem::getDeltaTime()
+{
+	return _window.getDeltaTime();
 }
 
 

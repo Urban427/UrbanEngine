@@ -128,9 +128,15 @@ Rect Window::getInnerSize()
 	return Rect(rc.right - rc.left, rc.bottom - rc.top);
 }
 
-double Window::getTime()
+void Window::initTime()
 {
-	struct timeval tv;
-	mingw_gettimeofday(&tv, NULL);
-    return (double)tv.tv_sec + ((double)tv.tv_usec / 1000000);
+	time = GetTickCount();
+}
+
+double Window::getDeltaTime()
+{
+	long new_time = GetTickCount();
+	double ans = (new_time - time) / 1000.0f;
+	time = new_time;
+    return ans;
 }

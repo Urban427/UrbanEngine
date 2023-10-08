@@ -19,7 +19,8 @@ public:
 	char onUpdate();
 	
 	//time
-	double getTime();
+	void initTime();
+	double getDeltaTime();
 
 	//window
 	void setSize(unsigned int width, unsigned int height);
