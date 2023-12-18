@@ -33,8 +33,6 @@ public class MainActivity extends Activity {
 		
 		RendererWrapper rend = new RendererWrapper();
 		rend.contect = this;
-		//rend.AndroidLogicCreate();
-		rend.debug();
 		
 		
 		rendererSet = true;
@@ -48,10 +46,21 @@ public class MainActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) 
 			{
-				x = event.getX();
-				y = event.getY();
+				if(event == null)
+				{
+					return false;
+				} 
+				x = (event.getX() / (float)v.getWidth ()) * 2 - 1;
+				y = (event.getY() / (float)v.getHeight()) * 2 - 1;
 				
-				Toast.makeText(getApplicationContext(), Float.toString(x) + " " + Float.toString(y), Toast.LENGTH_SHORT).show();
+				if(event.getAction() == MotionEvent.ACTION_DOWN) {
+					glSurfaceView.queueEvent(new Runnable()  {
+						@Override
+						public void run() {
+							rend.handleTouchPress(x, y);
+						}
+					});
+				}
 				
 				return true;
 			}

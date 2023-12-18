@@ -5,19 +5,22 @@ class AndroidFilter
 {
 	public:
 	AndroidFilter();
-	~AndroidFilter();
-
-	void setSize(unsigned int width, unsigned int height);
+	//~AndroidFilter();
+	
+	void setSize(int width, int height);
 	Rect getInnerSize();
+	Rect getCenter();
 	
 	char init();
 	char broadcast();
 	
-	double getTime();
+	void initTime();
+	double getDeltaTime();
 private:
-	//HWND _hwnd; 
-	//HDC hDC;
-public:
 	int width;
 	int height;
+	int left;
+	int top;
+	int centerX;
+	int centerY;
 };

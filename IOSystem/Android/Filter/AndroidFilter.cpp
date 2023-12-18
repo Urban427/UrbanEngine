@@ -6,12 +6,9 @@ AndroidFilter::AndroidFilter()
 	
 }
 
-AndroidFilter::~AndroidFilter()
-{
-	
-}
+//AndroidFilter::~AndroidFilter(){}
 
-void AndroidFilter::setSize(unsigned int width, unsigned int height)
+void AndroidFilter::setSize(int width, int height)
 {
 	this->width = width;
 	this->height = height;
@@ -20,6 +17,11 @@ void AndroidFilter::setSize(unsigned int width, unsigned int height)
 Rect AndroidFilter::getInnerSize()
 {
 	return Rect(width, height);
+}
+
+Rect AndroidFilter::getCenter()
+{
+	return Rect(centerX, centerY);
 }
 
 char AndroidFilter::init()
@@ -33,7 +35,12 @@ char AndroidFilter::broadcast()
 }
 
 
-double AndroidFilter::getTime()
+void AndroidFilter::initTime()
+{
+	
+}
+
+double AndroidFilter::getDeltaTime()
 {
 	struct timeval tv;
     gettimeofday(&tv, NULL);

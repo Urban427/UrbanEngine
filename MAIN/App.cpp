@@ -3,7 +3,6 @@
 #include "Matrix4x4.h"
 #include "FileManager.h"
 #include "Rect.h"
-#include "Math.h"
 
 #include <math.h>
 #include <cmath>
@@ -13,9 +12,7 @@ App::App()
 {
 }
 
-App::~App()
-{
-}
+//App::~App(){}
 
 struct Vertex
 {
@@ -44,8 +41,8 @@ void App::onCreate()
 	//closeFile(f);
 	
 	graphicEngine.init();
-	//graphicEngine.setViewPort(ioSystem.getInnerSize());
-	graphicEngine.clear(Color(1, 1, 1, 1));
+	graphicEngine.setViewPort(ioSystem.getInnerSize());
+	graphicEngine.clear(Color(0, 0, 1, 1));
 	graphicEngine.setCullMode(FrontFace);
 
 	unsigned int indeces[] = {
@@ -115,7 +112,7 @@ void App::onCreate()
 	});
 	
 	
-	shader = graphicEngine.createShaderProgram({ "../Assets/shader.vsh",  "../Assets/shader.fsh" });
+	shader = graphicEngine.createShaderProgram({ "./Assets/shader.vsh",  "./Assets/shader.fsh" });
 	
 	uniform = graphicEngine.createUniformObject({
 		shader->getID(),
@@ -129,53 +126,11 @@ void App::onCreate()
 		image
 	});
 	
-	
-	void (*functions[])(float* array, unsigned int size) = {
-		generateIncreasingArray, 	 //0
-		generateLowingArray,		 //1
-		generateSquaredArray,		 //2
-		generateSawArray,		 	 //3
-		generateSinusArray,		 	 //4
-		generateStepsArray,			 //5
-		randomArray,		 		 //6
-		randomArray2,				 //7
-	};
-	
-	unsigned int numberOfSqueresArray[] = {
-		5 * 50,
-		10 * 1000000,
-		50 * 1000000,
-	};
-	
-	circlesToDraw = 50000000;
-	numberOfSqueres = numberOfSqueresArray[0];
-	drawLines = 0;
-	
-	setSeed(33);
-	x = (float*)malloc(sizeof(float) * numberOfSqueres);
-	y = (float*)malloc(sizeof(float) * numberOfSqueres);
-
-
-	/*
-	x = (float*)malloc(sizeof(float) * 3);
-	y = (float*)malloc(sizeof(float) * 3);
-	for(int i = 0; i < 3; i++)
-	{
-		ioSystem.initTime();
-		functions[6](_x, numberOfSqueresArray[i]);
-		double t = ioSystem.getDeltaTime();
-		y[i] = (t / 10) * 0.8f + 0.1f;
-		x[i] = ((float)numberOfSqueresArray[i] / 60000000) * 0.8f + 0.1f;
-	}*/
-	
-	
-	functions[6](x, numberOfSqueres);
-	functions[7](y, numberOfSqueres);
-	
-	normalizePoints(x, numberOfSqueres);
-	normalizePoints(y, numberOfSqueres);
-	//saveFileData(x, numberOfSqueres);
-	
+	ioSystem.showCursor(showCursor);
+	ioSystem.createInputState();
+	inputState =  ioSystem.getInputState();
+	oldinputState =  ioSystem.getOldInputState();
+	ioSystem.moveCursor();
 }
 
 void  App::setSize(unsigned int width, unsigned int height)
@@ -183,33 +138,94 @@ void  App::setSize(unsigned int width, unsigned int height)
 	ioSystem.setSize(width, height);
 }
 
+void App::setInput(float x, float y)
+{
+	
+}
+
+void  App::Move()
+{
+	moveTo.x += 0.03f;
+}
+	
 void App::onUpdate()
 {
-	scale += 0.003f;
+	graphicEngine.setViewPort(ioSystem.getInnerSize());
+	Vector2 cursor(0, 0);
+	if(showCursor == false)
+	{
+		cursor = ioSystem.moveCursor();
+	}
+	rot_x += cursor.x * 0.003f;
+	rot_y += cursor.y * 0.003f;
+	ioSystem.updateInputState();
+	float speed = 3;
+	if(inputState[87]  >> 7 == 1)
+	{
+		x = -0.003f * speed;
+	}
+	else if(inputState[83] >> 7 == 1)
+	{
+		x = 0.003f * speed;
+	}
+	else
+	{
+		x = 0;
+	}
 	
-	Rect size = ioSystem.getInnerSize();
-	Matrix4x4 camView, temp;
+	if(inputState[65] >> 7 == 1)
+	{
+		y = -0.003f * speed;
+	}
+	else if(inputState[68] >> 7 == 1)
+	{
+		y = 0.003f * speed;
+	}
+	else
+	{
+		y = 0;
+	}
+	
+	if(inputState[32] >> 7 == 1)
+	{
+		up = 0.003f * speed;
+	}
+	else if(inputState[17] >> 7 == 1)
+	{
+		up = -0.003f * speed;
+	}
+	else
+	{
+		up = 0;
+	}
+	
+	if((inputState[27] & 0x80) == 0x80 && (inputState[27] & 0x80) != (oldinputState[27] & 0x80))
+	{
+		showCursor = !showCursor;
+		ioSystem.showCursor(showCursor);
+		Rect rc = ioSystem.getCenter();
+		ioSystem.setInput(rc.width, rc.height);
+	}
+	
+	
+	Matrix4x4 temp, camView;
+	
 	camView.setIdentity();
-	//camView.setRotationY(sin(-scale) * 1.14f);
-	
+	camView.setRotationX(rot_y);
 	
 	temp.setIdentity();
-	//temp.setTranslation(Vector3(sin(scale) * 3, 1, cos(scale) * 3));
+	temp.setRotationY(rot_x);
+	camView *= temp;
+	
+	moveTo += camView.getZDirection().normalized() * x;
+	moveTo += camView.getXDirection().normalized() * y;
+	moveTo += camView.getYDirection().normalized() * up;
+	temp.setIdentity();
+	temp.setTranslation(moveTo);
 	camView *= temp;
 	
 	camView.inverse();
 	
-	
-	Matrix4x4 projection;
-	projection.setIdentity();
-	//projection.setOrthoLH(size.width * 0.004f, size.height * 0.004f, -4, 4);
-	//projection.setPerspectiveFovLH(
-	//1.57f, 
-	//(float)size.width / (float)size.height,
-	//0.1f, 111);
-	
-	Matrix4x4 world;
-	graphicEngine.setProjectionMatrix(shader, projection);
 	
 	
 	
@@ -222,141 +238,37 @@ void App::onUpdate()
 	graphicEngine.setIndexArrayObject(indexes);
 	
 	
-	if(scale > 0.001f)
-	{
-		//circlesToDraw += 20;
-		scale = 0;
-	}
-	unsigned int index = 0;
 	
-	float circleSize = 0.003f;
+	Rect size = ioSystem.getInnerSize();
+	Matrix4x4 projection;
+	projection.setIdentity();
+	//projection.setOrthoLH(size.width * 0.004f, size.height * 0.004f, -4, 4);
+	projection.setPerspectiveFovLH(
+	1.17f, 
+	(float)size.width / (float)size.height,
+	0.01f, 111);
+	graphicEngine.setProjectionMatrix(shader, projection);
 	
 	
+	
+	
+	Matrix4x4 world;
 	world.setIdentity();
-	world.setScale(Vector3(1.8f, circleSize, 1));
-	float x1 = 0.5f;
-	float y1 = 0.05f;
+	world.setScale(Vector3(1, 1, 1));
+
+
 	temp.setIdentity();
 	temp.setTranslation(Vector3(
-	2 * x1 - 1 + circleSize / 2, 
-	2 * y1 - 1 + circleSize / 2,
-	0));
+	0, 
+	0,
+	-3));
 	world *= temp;
+	world *= camView;
+	
 	graphicEngine.setMatrix(shader, world);
 	graphicEngine.drawTriangles(indexes->getSize());
-	
-	
-	world.setIdentity();
-	world.setScale(Vector3(circleSize, 1.8f, 1));
-	x1 = 0.05f;
-	y1 = 0.5f;
-	temp.setIdentity();
-	temp.setTranslation(Vector3(
-	2 * x1 - 1 + circleSize / 2, 
-	2 * y1 - 1 + circleSize / 2,
-	0));
-	world *= temp;
-	graphicEngine.setMatrix(shader, world);
-	graphicEngine.drawTriangles(indexes->getSize());
-	
-	
-	for(int i = 0; i < numberOfSqueres - 1; i++)
-	{
-		if(drawLines == 0) {
-			break;
-		}
-		Vector2 a = Vector2(
-		x[i + 1] - x[i],
-		y[i + 1] - y[i]);
-		
-		index++;
-		world.setIdentity();
-		world.setScale(Vector3(a.length() * 2, circleSize, 1));
-		
-		
-		temp.setIdentity();
-		temp.setRotationZ( atan(a.y / a.x) );
-		world *= temp;
 
 
-		x1 = (x[i] + x[i + 1]) / 2;
-		y1 = (y[i] + y[i + 1]) / 2;
-		temp.setIdentity();
-		temp.setTranslation(Vector3(
-		2 * x1 - 1 + circleSize / 2, 
-		2 * y1 - 1 + circleSize / 2,
-		0));
-		world *= temp;
-		
-		graphicEngine.setMatrix(shader, world);
-		graphicEngine.drawTriangles(indexes->getSize());
-		
-		if(index == circlesToDraw) {
-			break;
-		}
-	}
-	
-	index = 0;
-	circleSize = 0.01f;
-	for(int i = 0; i < numberOfSqueres; i++)
-	{
-		index++;
-		world.setIdentity();
-		world.setScale(Vector3(circleSize, circleSize, 1));
-
-
-		temp.setIdentity();
-		temp.setTranslation(Vector3(
-		2 * x[i] - 1 + circleSize / 4, 
-		2 * y[i] - 1 + circleSize / 4,
-		0));
-		world *= temp;
-		
-		graphicEngine.setMatrix(shader, world);
-		graphicEngine.drawTriangles(indexes->getSize());
-		
-		if(index == circlesToDraw) {
-			break;
-		}
-	}
-	
-	
-	
-	for(int i = 0; i < 9; i++)
-	{
-		world.setIdentity();
-		world.setScale(Vector3(circleSize, circleSize, 1));
-
-
-		temp.setIdentity();
-		temp.setTranslation(Vector3(
-		2 * (0.05f + 0.1f * i) - 1 + circleSize / 2, 
-		2 * 0.05f - 1 + circleSize / 2,
-		0));
-		world *= temp;
-		
-		graphicEngine.setMatrix(shader, world);
-		graphicEngine.drawTriangles(indexes->getSize());
-	}
-
-	
-	for(int i = 0; i < 9; i++)
-	{
-		world.setIdentity();
-		world.setScale(Vector3(circleSize, circleSize, 1));
-
-
-		temp.setIdentity();
-		temp.setTranslation(Vector3(
-		2 * 0.05f - 1 + circleSize / 2, 
-		2 * (0.05f + 0.1f * i) - 1 + circleSize / 2,
-		0));
-		world *= temp;
-		
-		graphicEngine.setMatrix(shader, world);
-		graphicEngine.drawTriangles(indexes->getSize());
-	}
-	
 	
 	if (ioSystem.onUpdate()) {
 		_running = false;

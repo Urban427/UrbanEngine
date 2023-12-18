@@ -63,16 +63,16 @@ void Shader::attach(const char* shaderFilePath, const ShaderType& type)
 	if(type == VertexShader)
 	{
 		const char* buffer = 
-		"attribute vec4 a_Position;"
-		"attribute vec2 a_TextureCoordinates;"
-		"varying vec2 v_TextureCoordinates;"
-		
-		"uniform mat4 transform;"
-		"uniform mat4 projection;"
-		"void main(){"
-		"	gl_Position =  transform * a_Position;"
-		"	v_TextureCoordinates = a_TextureCoordinates.xy;"
-		"}";
+			"attribute vec4 a_Position;"
+			"attribute vec2 a_TextureCoordinates;"
+			"varying vec2 v_TextureCoordinates;"
+			
+			"uniform mat4 transform;"
+			"uniform mat4 projection;"
+			"void main(){"
+			"	gl_Position =  projection * (transform * a_Position);"
+			"	v_TextureCoordinates = a_TextureCoordinates.xy;"
+			"}";
 		
 		shaderID = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(shaderID, 1, &buffer, NULL);
@@ -80,13 +80,11 @@ void Shader::attach(const char* shaderFilePath, const ShaderType& type)
 	else
 	{
 		const char* buffer = 
-		"precision mediump float;"
 		"varying vec2 v_TextureCoordinates;"
 		
 		"uniform sampler2D u_TextureUnit;"
 		"void main(){"
 		"	gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);"
-		"	gl_FragColor = vec4(0, 0, 0, 1);"
 		"}";
 		
 		shaderID = glCreateShader(GL_FRAGMENT_SHADER);

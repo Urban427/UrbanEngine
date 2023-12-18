@@ -11,7 +11,7 @@
 	#include <stdio.h>
 	#define FileData FILE
 	#define readFile fread
-	#define openFile(x) fopen("../Assets/" #x , "rb")
+	#define openFile(x) fopen("./Assets/" #x , "rb")
 	#define seekFile fseek
 	#define closeFile fclose
 #endif

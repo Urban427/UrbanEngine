@@ -33,7 +33,12 @@ public class RendererWrapper implements Renderer
     }
     public native void AndroidLogicCreate();
     public native void AndroidLogicUpdate(int width, int height);
+    public native void on_touch_press(float x, float y);
     public native void AndroidLogicDraw();
+	
+	public void handleTouchPress(float x, float y) {
+        on_touch_press(x, y);
+    }
 	
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
        AndroidLogicCreate();

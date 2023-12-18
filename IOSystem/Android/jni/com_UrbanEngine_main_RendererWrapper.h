@@ -25,6 +25,14 @@ JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicUpd
 
 /*
  * Class:     com_UrbanEngine_main_RendererWrapper
+ * Method:    on_touch_press
+ * Signature: (FF)V
+ */
+JNIEXPORT void JNICALL Java_com_UrbanEngine_main_RendererWrapper_on_1touch_1press
+  (JNIEnv *, jobject, jfloat, jfloat);
+
+/*
+ * Class:     com_UrbanEngine_main_RendererWrapper
  * Method:    AndroidLogicDraw
  * Signature: ()V
  */

@@ -19,7 +19,10 @@ public:
 
 	void setOrthoLH(float width, float height, float nearPlane, float farPlane);
 	void setPerspectiveFovLH(float fov, float aspect, float nearPlane, float farPlane);
-
+	
+	Vector3 getXDirection();
+	Vector3 getYDirection();
+	Vector3 getZDirection();
 
 	float* getPtr();
 public:

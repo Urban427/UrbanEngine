@@ -1,7 +1,9 @@
 #include "Window.h"
+#include <stdio.h>
 #include <time.h>
 #include "../../MAIN/resource.h"
 
+Window* win;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -10,6 +12,30 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_DESTROY:
 		{
 			PostQuitMessage(0);
+			break;
+		}
+		case WM_MOVE:
+		{
+			int left = (int)(short) LOWORD(lParam);
+			int top  = (int)(short) HIWORD(lParam);
+			win->setPos(left, top);
+			break;
+		}
+		case WM_SIZE:
+		{
+			unsigned int width  = LOWORD(lParam);
+            unsigned int height = HIWORD(lParam);
+			win->setSize(width, height);
+			break;
+		}
+		case WM_SETFOCUS:
+		{
+			win->onFocus();
+			break;
+		}
+		case WM_KILLFOCUS:
+		{
+			win->onKillFocus();
 			break;
 		}
 		default:
@@ -31,9 +57,10 @@ Window::~Window()
 
 char Window::init()
 {
+	win = this;
 	HGLRC hRC;
 
-	width = 1024;
+	width = 1680;
 	height = 1024;
 	
 	WNDCLASSEX wc = {};
@@ -44,9 +71,10 @@ char Window::init()
 	wc.hCursor = LoadCursor(GetModuleHandle(NULL), IDC_ARROW);
 	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
 	wc.hInstance = NULL;
-	wc.lpszClassName = "UrbanEngineClass";
+	wc.lpszClassName = "Urban";
 	wc.lpszMenuName = "";
 	wc.lpfnWndProc = WndProc;
+	wc.style = NULL;
 
 	if (!RegisterClassEx(&wc)) {
 		return 1;
@@ -55,23 +83,30 @@ char Window::init()
 	RECT rc = { 0, 0, width, height };
 	AdjustWindowRect(&rc, WS_SYSMENU, false);
 
-	_hwnd = CreateWindowEx(WS_EX_APPWINDOW,
-		"UrbanEngineClass", "Urban",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
-		0, 0,
+	_hwnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW,
+		"Urban", "Urban",
+		WS_OVERLAPPEDWINDOW,
+		rc.left,  rc.top,
 		rc.right, rc.bottom, NULL, NULL, NULL, NULL);
 
 	if (!_hwnd)
 	{
 		return 1;
 	}
+	GetClientRect(_hwnd, &rc);
+	width   = rc.right - rc.left;
+	height  = rc.bottom - rc.top;
+	left    = rc.left;
+	top     = rc.top;
+	centerX = left + width  / 2;
+	centerY = top  + height / 2;
 
 	ShowWindow(_hwnd, SW_SHOW);
+	UpdateWindow(_hwnd);
 
 
 
-
-
+	//OpenGL
 	PIXELFORMATDESCRIPTOR pfd;
 	int iFormat;
 	hDC = GetDC(_hwnd);
@@ -106,28 +141,52 @@ char Window::broadcast()
 			DispatchMessage(&msg);
 		}
 	}
-
 	SwapBuffers(hDC);
-
-
-	//Sleep(1);
 	return 0;
 }
 
+void Window::setSize(unsigned int width, unsigned int height)
+{
+	RECT rc;
+	GetClientRect(_hwnd, &rc);
+	this->width   = width;
+	this->height  = height;
+	this->left    = rc.left;
+	this->top     = rc.top;
+	this->centerX = left + width  / 2;
+	this->centerY = top  + height / 2;
+}
 
-void  Window::setSize(unsigned int width, unsigned int height)
+void Window::setPos(int x, int y)
+{
+	left = x;
+	top  = y;
+	centerX = left + width  / 2;
+	centerY = top  + height / 2;
+}
+Rect Window::getCenter()
+{
+	return Rect(centerX, centerY);
+}
+
+Rect Window::getInnerSize()
+{
+	return Rect(left, top, width, height);
+}
+
+void Window::onFocus()
+{
+	
+}
+
+void Window::onKillFocus()
 {
 	
 }
 
 
-Rect Window::getInnerSize()
-{
-	RECT rc;
-	GetClientRect(_hwnd, &rc);
-	return Rect(rc.right - rc.left, rc.bottom - rc.top);
-}
 
+//time
 void Window::initTime()
 {
 	time = GetTickCount();

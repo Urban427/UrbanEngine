@@ -165,3 +165,18 @@ void Matrix4x4::setPerspectiveFovLH(
 	mat[2][3] = -1;
 	mat[3][3] = 0;
 }
+
+Vector3 Matrix4x4::getXDirection()
+{
+	return Vector3(mat[0][0], mat[0][1], mat[0][2]);
+}
+
+Vector3 Matrix4x4::getYDirection()
+{
+	return Vector3(mat[1][0], mat[1][1], mat[1][2]);
+}
+
+Vector3 Matrix4x4::getZDirection()
+{
+	return Vector3(mat[2][0], mat[2][1], mat[2][2]);
+}

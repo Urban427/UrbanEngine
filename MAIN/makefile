@@ -17,6 +17,7 @@ WindowsDir = ../IOSystem/Windows/
 AndroidDir = ../IOSystem/Android/Filter/
 OpenGlDib = ../OpenGL37/
 GameDib = ../Game/
+PhysicLib = ../Physic/
 GraphicsEngineDir = ../GraphicsEngine/
 
 
@@ -26,9 +27,11 @@ Libs += -l IOSystem
 Libs += -l GraphicsEngine
 Libs += -l glad
 Libs += -l Math
+Libs += -l Physic
 
-IFLAGS = -I ${GameDib}
-IFLAGS = -I ${MathDir}
+IFLAGS = -I ${PhysicLib}
+IFLAGS += -I ${GameDib}
+IFLAGS += -I ${MathDir}
 IFLAGS += -I ${IOSystemDir}
 IFLAGS += -I ${AndroidDir}
 IFLAGS += -I ${WindowsDir}
@@ -36,7 +39,7 @@ IFLAGS += -I ${GraphicsEngineDir}
 
 
 windows: binFile clear builder
-	${build}${Target}
+	MAKE -C ${build}
 
 
 android: binFile clear androidBuilder

@@ -9,6 +9,10 @@ public:
 	//~Vector3();
 	
 	float length();
+	Vector3 normalized();
+public:
+	Vector3 operator*(const float& b);
+	Vector3 operator+=(const Vector3& vec3);
 public:
 	float x = 0;
 	float y = 0;
