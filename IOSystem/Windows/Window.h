@@ -2,34 +2,49 @@
 #include <Windows.h>
 #include "Rect.h"
 
+typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int);
+
 class Window
 {
 public:
 	Window();
 	~Window();
 
+	//system metrics
+	Rect screenSize();
 	
+	//size
 	Rect getCenter();
 	Rect getInnerSize();
 	void setPos(int x, int y);
-	void setSize(unsigned int width, unsigned int height);
-	void onFocus();
-	void onKillFocus();
+	void setFullscreen(const bool state);
 	
-	void initTime();
-	double getDeltaTime();
+	//cursor
+	void showCursor(const bool show);
 	
-	char init();
-	char broadcast();
+	//main
+	void init(const char* windowName, int width, int height, bool fullscreen);
+	void broadcast();
+	void swapBuffers();
+	void setVSync(const bool vsync);
+	bool getVSync();
 	
-	static Window* get();
+	//virtuals
+	virtual void setSize(unsigned int width, unsigned int height);
+	virtual void onDestroy();
+	virtual void onFocus();
+	virtual void onKillFocus();
 private:
+	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = nullptr;
+
 	HWND _hwnd; 
 	HDC hDC;
-	long time;
+	HCURSOR arrowCursor;
+	HCURSOR  noneCursor;
+	bool vsync = false;
 	
-	
-	
+	int screen_width;
+	int screen_height;
 	int width;
 	int height;
 	int left;

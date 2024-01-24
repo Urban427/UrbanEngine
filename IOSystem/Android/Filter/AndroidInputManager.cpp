@@ -4,7 +4,7 @@
 AndroidInputManager:: AndroidInputManager() {}
 //AndroidInputManager::~AndroidInputManager() {}
 
-void AndroidInputManager::create(WindowInputs& windowInput)
+void AndroidInputManager::create()
 {
 	
 }
@@ -14,12 +14,12 @@ void AndroidInputManager::update()
 	
 }
 
-unsigned char* AndroidInputManager::getState()
+unsigned char* AndroidInputManager::getInputState()
 {
 	return keys;
 }
 
-unsigned char* AndroidInputManager::getOldState()
+unsigned char* AndroidInputManager::getOldInputState()
 {
 	return oldKeys;
 }
@@ -40,7 +40,7 @@ void  AndroidInputManager::setCursorPos(int x, int y)
 	
 }
 
-Vector2 AndroidInputManager::moveCursorFrame(int x, int y) 
+Vector2 AndroidInputManager::deltaCursorPos() 
 {
 	return Vector2(0, 0);
 }

@@ -8,6 +8,9 @@
 #endif
 
 
+GraphicsEngine::GraphicsEngine() { }
+//GraphicsEngine::~GraphicsEngine() { }
+
 
 bool GraphicsEngine::init()
 {
@@ -19,12 +22,8 @@ bool GraphicsEngine::init()
 	glDepthFunc(GL_LESS);
 	glDepthRangef(0.0f, 1.0f);
 
+	inizilizated = true;
 	return true;
-}
-
-GraphicsEngine::~GraphicsEngine()
-{
-	
 }
 
 
@@ -39,9 +38,9 @@ void GraphicsEngine::clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 }
 
-void GraphicsEngine::setViewPort(const Rect& size)
+void GraphicsEngine::setViewPort(const unsigned int& width, const unsigned int& height)
 {
-	glViewport(0, 0, size.width, size.height);
+	glViewport(0, 0, width, height);
 }
 
 void GraphicsEngine::drawTriangles(unsigned int vertexCount)

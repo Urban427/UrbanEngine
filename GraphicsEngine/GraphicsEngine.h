@@ -18,14 +18,16 @@ enum CullMode
 class GraphicsEngine
 {
 public:
-
+	GraphicsEngine();
+	//~GraphicsEngine();
 	bool init();
-	~GraphicsEngine();
 	
+public:
+	bool inizilizated = false;
 public:
 	void clear();
 	void clear(const Color& color);
-	void setViewPort(const Rect& size);
+	void setViewPort(const unsigned int& width, const unsigned int& height);
 	void setIndexArrayObject(IndexArrayObject* iao);
 	void setVertexArrayObject(VertexArrayObject* vao);
 	void setShaderProgram(Shader* program);

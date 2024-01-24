@@ -8,6 +8,12 @@ AndroidFilter::AndroidFilter()
 
 //AndroidFilter::~AndroidFilter(){}
 
+
+void AndroidFilter::setFullscreen(const bool fullscreen)
+{
+	
+}
+
 void AndroidFilter::setSize(int width, int height)
 {
 	this->width = width;
@@ -24,25 +30,29 @@ Rect AndroidFilter::getCenter()
 	return Rect(centerX, centerY);
 }
 
-char AndroidFilter::init()
-{
-	return 0;
-}
-
-char AndroidFilter::broadcast()
-{
-	return 0;
-}
-
-
-void AndroidFilter::initTime()
+void AndroidFilter::init(const char* windowName, int width, int height, const bool fullscreen)
 {
 	
 }
 
-double AndroidFilter::getDeltaTime()
+void AndroidFilter::broadcast()
 {
-	struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (double)tv.tv_usec / 1000000;
+	
+}
+
+
+
+bool AndroidFilter::getVSync()
+{
+	return vsync;
+}
+
+void  AndroidFilter::setVSync(const bool vsync)
+{
+	this->vsync = vsync;
+}
+
+void AndroidFilter::setCursorPosWithoutMoving()
+{
+	
 }

@@ -1,7 +1,6 @@
 #include "KeyBoard.h"
 #include <Windows.h>
 
-
 keyBoard::keyBoard()
 {
 	
@@ -12,11 +11,12 @@ keyBoard::~keyBoard()
 	
 }
 
-void keyBoard::create(WindowInputs& windowInput)
+void keyBoard::create()
 {
-	windowInput.number = 1;
-	windowInput.states = new unsigned char(0);
-	windowInput.poses  = new Vector2(0, 0);
+	windowInput.number 		= 1;
+	windowInput.states 		= new unsigned char(0);
+	windowInput.poses  		= new Vector2(0, 0);
+	windowInput.oldPoses  	= new Vector2(0, 0);
 	
 	
 	if(GetKeyboardState(keyBoarState) == 0) { }
@@ -33,7 +33,6 @@ void keyBoard::create(WindowInputs& windowInput)
 
 void keyBoard::update()
 {
-	//(*ptr) = (*ptr) >> 7;
 	unsigned char* ptrA = keyBoarState;
 	unsigned char* ptrB = oldkeyBoarState;
 	for(unsigned int i = 0; i < 256; i++)
@@ -43,15 +42,22 @@ void keyBoard::update()
 		ptrB++;
 	}
 	if(GetKeyboardState(keyBoarState) == 0) { }
+	
+	
+	POINT p;
+	GetCursorPos(&p);
+	*(windowInput.states)  	= *(keyBoarState + 1) & 0x80;
+	*(windowInput.oldPoses) = *(windowInput.poses);
+	*(windowInput.poses)    = Vector2(p.x, p.y);
 }
 
 
-unsigned char* keyBoard::getState()
+unsigned char* keyBoard::getInputState()
 {
 	return keyBoarState;
 }
 
-unsigned char* keyBoard::getOldState()
+unsigned char* keyBoard::getOldInputState()
 {
 	return oldkeyBoarState;
 }
@@ -59,27 +65,23 @@ unsigned char* keyBoard::getOldState()
 
 Vector2 keyBoard::getCursorPos()
 {
-	POINT p;
-	GetCursorPos(&p);
-	return Vector2(p.x, p.y);
+	return *(windowInput.poses);
 }
 
 void keyBoard::setCursorPos(int x, int y)
 {
+	*(windowInput.poses) = Vector2(x, y);
 	SetCursorPos(x, y);
 }
 
-
-void keyBoard::showCursor(bool state)
-{
-	ShowCursor(state);
-}
-
-Vector2 keyBoard::moveCursorFrame(int x, int y)
+void keyBoard::setCursorPosWithoutMoving()
 {
 	POINT p;
 	GetCursorPos(&p);
-	Vector2 move = Vector2(p.x - x, y - p.y);
-	SetCursorPos(x, y);
-	return move;
+	*(windowInput.poses)    = Vector2(p.x, p.y);
+}
+
+Vector2 keyBoard::deltaCursorPos()
+{
+	return (*windowInput.poses) - (*windowInput.oldPoses);
 }

@@ -24,6 +24,7 @@ builder: ${OBJ}
 androidBuilder: ${AndroidOBJ}
 	ar rcs ${androidlibpath}lib${Target}.a ${AndroidOBJ}
 
+
 binFile: 
 	if not exist "bin" mkdir bin
 

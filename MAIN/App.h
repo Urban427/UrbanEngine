@@ -3,7 +3,7 @@
 #include "GraphicsEngine.h"
 #include "Matrix4x4.h"
 
-class App
+class App: IOSystem, GraphicsEngine
 {
 public:
 	App();
@@ -14,30 +14,41 @@ public:
 
 	void Move();
 	void setInput(float x, float y);
+	
+	
 	void setSize(unsigned int width, unsigned int height);
-
+	void onDestroy();
+	void onFocus();
+	void onKillFocus();
+	
+	
 	bool isRunning();
 private:
-	VertexArrayObject* triangle;
+	void calculateCameraView();
+private:
+	//shape
+	VertexArrayObject* vertexes;
+	IndexArrayObject* vertexes_indexes;
+	
+	//material
 	Shader* shader;
-	IndexArrayObject* indexes;
 	UniformObject* uniform;
 	Texture* texture;
 
-	float scale = 0;
-	float x = 0;
-	float y = 0;
-	float up = 0;
+	//world camera
+	Matrix4x4 camView;
+	Matrix4x4 projection;
+
+	//cube transdtorm data
 	float rot_x = 0;
 	float rot_y = 0;
 	Vector3 moveTo;
-
-	bool showCursor = false;
-	bool _running = false;
-	IOSystem ioSystem;
-	GraphicsEngine graphicEngine;
 	
-	unsigned char* inputState;
-	unsigned char* oldinputState;
+	//system paramerts
+	bool focus = true;
+	bool lockCursor = 0;
+	bool showCursorParametr = true;
+	bool fulscreen = false;
+	bool _running = false;
 };
 

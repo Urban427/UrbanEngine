@@ -22,17 +22,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+		//check open gl es 2 support
 		ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		final boolean supportsEs2 = activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x20000;
- 
 		if (!supportsEs2) 
 		{
 			Toast.makeText(this, "This device does not support OpenGL ES 2.0.", Toast.LENGTH_LONG).show();
 			return;
 		} 
 		
+		
+		
 		RendererWrapper rend = new RendererWrapper();
-		rend.contect = this;
+		rend.create(this);
 		
 		
 		rendererSet = true;

@@ -80,6 +80,9 @@ void Shader::attach(const char* shaderFilePath, const ShaderType& type)
 	else
 	{
 		const char* buffer = 
+		#ifdef android
+		"precision mediump float;"
+		#endif
 		"varying vec2 v_TextureCoordinates;"
 		
 		"uniform sampler2D u_TextureUnit;"

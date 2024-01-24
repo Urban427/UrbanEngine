@@ -8,16 +8,22 @@ public:
 	AndroidInputManager();
 	//~AndroidInputManager();
 	
-	void create(WindowInputs& windowInput);
+	//main
+	void create();
 	void update();
-	unsigned char* getState();
-	unsigned char* getOldState();
 	
+	//keyboard
+	unsigned char* getInputState();
+	unsigned char* getOldInputState();
+	
+	//cursor
 	void showCursor(bool state);
 	void setCursorPos(int x, int y);
 	Vector2 getCursorPos();
-	Vector2 moveCursorFrame(int x, int y);
+	Vector2 deltaCursorPos();
 private:
+	WindowInputs windowInput;
+	
 	unsigned char keys[256] = {0};
 	unsigned char oldKeys[256] = {0};
 };

@@ -40,4 +40,4 @@ Main:
 	adb shell am start --activity-clear-top -n ${pacakge}/.MainActivity
 
 Key:
-	keytool -genkeypair -keystore keystore.jks -alias androidkey -validity 10000 -keyalg RSA -keysize 2048
+	keytool -genkeypair -keystore keystore.jks -alias androidkey -validity 10000 -keyalg RSA -7 2048

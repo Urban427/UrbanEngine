@@ -14,20 +14,26 @@ App::App()
 
 //App::~App(){}
 
-struct Vertex
-{
-	Vector3 pos;
-	Vector2 ui;
-};
-
 void App::onCreate()
 {
-	_running = true;
-	if (ioSystem.onCreate()) {
-		_running = false;
-	}
+	fulscreen 	= false;
+	focus 		= true;
+	_running 	= true;
+	lockCursor 	= false;
+	showCursorParametr 	= true;
+
+	//create input/output system
+	IOSystem::onCreate("Sanya lol", 1620 , 720, fulscreen);
+	
+	//create graphics egine
+	GraphicsEngine::init();
+	GraphicsEngine::clear(Color(0, 0, 0, 1));
+	GraphicsEngine::setCullMode(FrontFace);
+	Rect size = IOSystem::getInnerSize();
+	setSize(size.width, size.height);
 	
 	
+	//create texture
 	int width;
 	int height;
 	FileData* f = openFile(0012.b);
@@ -39,12 +45,27 @@ void App::onCreate()
 		readFile(&image[i], sizeof(int), 1, f);
 	}
 	//closeFile(f);
-	
-	graphicEngine.init();
-	graphicEngine.setViewPort(ioSystem.getInnerSize());
-	graphicEngine.clear(Color(0, 0, 1, 1));
-	graphicEngine.setCullMode(FrontFace);
+	texture = GraphicsEngine::createTexture({
+		(unsigned int)width,
+		(unsigned int)height,
+		image
+	});
 
+	
+	
+	//create shader
+	shader = GraphicsEngine::createShaderProgram({ "./Assets/shader.vsh",  "./Assets/shader.fsh" });
+	uniform = GraphicsEngine::createUniformObject({
+		shader->getID(),
+		"u_TextureUnit",
+		0
+	});
+
+
+
+
+
+	//create shape polygons
 	unsigned int indeces[] = {
 		0,1,2,
 		0,2,3,
@@ -65,12 +86,15 @@ void App::onCreate()
 		4,3,7,
 	};
 	
-	
-	indexes = graphicEngine.createIndexArrayObject({
+	vertexes_indexes = GraphicsEngine::createIndexArrayObject({
 		indeces, 
-		sizeof(indeces) / sizeof(int)});
+		sizeof(indeces) / sizeof(int)
+	});
 
 
+
+
+	//create shape points
 	Vector3 positionList[] = 
 	{
 		Vector3( 0.5f,-0.5f,-0.5f),
@@ -93,49 +117,23 @@ void App::onCreate()
 		
 	};
 
-	Vertex triangleVertecles[] = {
+	Vertex m_vertexes[] = {
 		{positionList[0], texcoordsList[1]},
 		{positionList[1], texcoordsList[0]},
 		{positionList[2], texcoordsList[2]},
 		{positionList[3], texcoordsList[3]},
-		
 		{positionList[4], texcoordsList[0]},
 		{positionList[5], texcoordsList[2]},
 		{positionList[6], texcoordsList[3]},
-		{positionList[7], texcoordsList[1]},
+		{positionList[7], texcoordsList[1]}
 	};
 	
-	triangle = graphicEngine.createVertexArrayObject({ 
-	(void*)triangleVertecles, 
-	sizeof(Vertex),
-	sizeof(triangleVertecles) / sizeof(Vertex)
-	});
-	
-	
-	shader = graphicEngine.createShaderProgram({ "./Assets/shader.vsh",  "./Assets/shader.fsh" });
-	
-	uniform = graphicEngine.createUniformObject({
-		shader->getID(),
-		"u_TextureUnit",
-		0
-	});
-	
-	texture = graphicEngine.createTexture({
-		(unsigned int)width,
-		(unsigned int)height,
-		image
-	});
-	
-	ioSystem.showCursor(showCursor);
-	ioSystem.createInputState();
-	inputState =  ioSystem.getInputState();
-	oldinputState =  ioSystem.getOldInputState();
-	ioSystem.moveCursor();
-}
 
-void  App::setSize(unsigned int width, unsigned int height)
-{
-	ioSystem.setSize(width, height);
+	vertexes = GraphicsEngine::createVertexArrayObject({
+		m_vertexes,
+		sizeof(Vertex),
+		sizeof(m_vertexes) / sizeof(Vertex)
+	});
 }
 
 void App::setInput(float x, float y)
@@ -147,69 +145,12 @@ void  App::Move()
 {
 	moveTo.x += 0.03f;
 }
-	
-void App::onUpdate()
+
+
+
+void App::calculateCameraView()
 {
-	graphicEngine.setViewPort(ioSystem.getInnerSize());
-	Vector2 cursor(0, 0);
-	if(showCursor == false)
-	{
-		cursor = ioSystem.moveCursor();
-	}
-	rot_x += cursor.x * 0.003f;
-	rot_y += cursor.y * 0.003f;
-	ioSystem.updateInputState();
-	float speed = 3;
-	if(inputState[87]  >> 7 == 1)
-	{
-		x = -0.003f * speed;
-	}
-	else if(inputState[83] >> 7 == 1)
-	{
-		x = 0.003f * speed;
-	}
-	else
-	{
-		x = 0;
-	}
-	
-	if(inputState[65] >> 7 == 1)
-	{
-		y = -0.003f * speed;
-	}
-	else if(inputState[68] >> 7 == 1)
-	{
-		y = 0.003f * speed;
-	}
-	else
-	{
-		y = 0;
-	}
-	
-	if(inputState[32] >> 7 == 1)
-	{
-		up = 0.003f * speed;
-	}
-	else if(inputState[17] >> 7 == 1)
-	{
-		up = -0.003f * speed;
-	}
-	else
-	{
-		up = 0;
-	}
-	
-	if((inputState[27] & 0x80) == 0x80 && (inputState[27] & 0x80) != (oldinputState[27] & 0x80))
-	{
-		showCursor = !showCursor;
-		ioSystem.showCursor(showCursor);
-		Rect rc = ioSystem.getCenter();
-		ioSystem.setInput(rc.width, rc.height);
-	}
-	
-	
-	Matrix4x4 temp, camView;
-	
+	Matrix4x4 temp;
 	camView.setIdentity();
 	camView.setRotationX(rot_y);
 	
@@ -217,65 +158,135 @@ void App::onUpdate()
 	temp.setRotationY(rot_x);
 	camView *= temp;
 	
-	moveTo += camView.getZDirection().normalized() * x;
-	moveTo += camView.getXDirection().normalized() * y;
-	moveTo += camView.getYDirection().normalized() * up;
 	temp.setIdentity();
 	temp.setTranslation(moveTo);
 	camView *= temp;
 	
 	camView.inverse();
+}
+
+
+void App::onUpdate()
+{
+	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80)
+	{
+		showCursorParametr = !showCursorParametr;
+		lockCursor = !lockCursor;
+		
+		IOSystem::showCursor(showCursorParametr);
+	}
+	if((IOSystem::getInputState()[2] & 0x80) == 0x80 && (IOSystem::getOldInputState()[2] & 0x80) != 0x80)
+	{
+		fulscreen = !fulscreen;
+		IOSystem::setFullscreen(fulscreen);
+	}
+	
+	if((getInputState()[46] & 0x80) == 0x80 && (getOldInputState()[46] & 0x80) != 0x80)
+	{
+		setVSync(!getVSync());
+	}
+	
+	Vector2 cursor(0, 0);
+	if((IOSystem::getInputState()[1] & 0x80) == 0x80 || (lockCursor && focus))
+	{
+		cursor = IOSystem::deltaCursorPos();
+	}
+	
+	rot_x += cursor.x * 0.003f;
+	rot_y -= cursor.y * 0.003f;
+	if(lockCursor && focus)
+	{
+		IOSystem::setCenterCursorPos();
+	}
 	
 	
 	
+	//clear render target
+	GraphicsEngine::clear();
 	
-	graphicEngine.clear();
+	//calculate new camera projections
+	GraphicsEngine::setProjectionMatrix(shader, projection);
+	calculateCameraView();
+
+	//set material
+	GraphicsEngine::setShaderProgram(shader);
+	GraphicsEngine::setTexture(texture);
+	//uniform->setValue(texture->getID());
 	
-	graphicEngine.setShaderProgram(shader);
-	graphicEngine.setTexture(texture);
-	uniform->setValue(0);
-	graphicEngine.setVertexArrayObject(triangle);
-	graphicEngine.setIndexArrayObject(indexes);
-	
-	
-	
-	Rect size = ioSystem.getInnerSize();
-	Matrix4x4 projection;
-	projection.setIdentity();
-	//projection.setOrthoLH(size.width * 0.004f, size.height * 0.004f, -4, 4);
-	projection.setPerspectiveFovLH(
-	1.17f, 
-	(float)size.width / (float)size.height,
-	0.01f, 111);
-	graphicEngine.setProjectionMatrix(shader, projection);
+	//set shape
+	GraphicsEngine::setVertexArrayObject(vertexes);
+	GraphicsEngine::setIndexArrayObject(vertexes_indexes);
 	
 	
 	
-	
-	Matrix4x4 world;
+	//calculate object projection
+	Matrix4x4 world, temp;
 	world.setIdentity();
-	world.setScale(Vector3(1, 1, 1));
-
-
+	world.setScale(Vector3(2, 1, 1));
+	
 	temp.setIdentity();
-	temp.setTranslation(Vector3(
-	0, 
-	0,
-	-3));
+	temp.setRotationY(45 * 3.14f / 180.0f);
 	world *= temp;
+	
+	temp.setIdentity();
+	temp.setTranslation(Vector3(0, 0, -3));
+	world *= temp;
+	
 	world *= camView;
 	
-	graphicEngine.setMatrix(shader, world);
-	graphicEngine.drawTriangles(indexes->getSize());
-
-
 	
-	if (ioSystem.onUpdate()) {
-		_running = false;
-	}
+	
+	//draw object 
+	GraphicsEngine::setMatrix(shader, world);
+	GraphicsEngine::drawTriangles(vertexes_indexes->getSize());
+
+
+	//update ioSystem{
+	IOSystem::onUpdate();
 }
 
 bool App::isRunning()
 {
 	return _running;
+}
+
+
+
+
+
+
+void App::setSize(unsigned int width, unsigned int height)
+{
+	IOSystem::setSize(width, height);
+	if(GraphicsEngine::inizilizated){
+		GraphicsEngine::setViewPort(width, height);
+	}
+	
+	projection.setIdentity();
+	//projection.setOrthoLH(width * 0.004f, height * 0.004f, -4, 4);
+	projection.setPerspectiveFovLH(
+	1.17f, 
+	(float)width / (float)height,
+	0.01f, 111);
+}
+
+void App::onDestroy()
+{
+	_running = false;
+}
+
+void App::onFocus()
+{
+	focus = true;
+	if(lockCursor)
+	{
+		IOSystem::setCursorPosWithoutMoving();
+	}
+	IOSystem::showCursor(showCursorParametr);
+}
+
+void App::onKillFocus()
+{
+	focus = false;
+	IOSystem::showCursor(true);
 }

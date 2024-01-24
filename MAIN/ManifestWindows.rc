@@ -1,6 +1,7 @@
 #include "resource.h"
  
 IDI_ICON ICON "../Assets/UE.ico"
+IDI_NONECURSOR CURSOR "../Assets/NoneCursor.cur"
 
 1 VERSIONINFO
 FILEVERSION     1,0,0,0
@@ -11,7 +12,6 @@ BEGIN
     BLOCK "080904E4"
     BEGIN
       VALUE "CompanyName", "Urban team"
-      VALUE "FileDescription", "Engine made by Urban"
       VALUE "FileVersion", "1.0"
       VALUE "InternalName", "UrbanEngine"
       VALUE "LegalCopyright", "Urban"

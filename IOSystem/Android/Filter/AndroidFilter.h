@@ -3,20 +3,25 @@
 
 class AndroidFilter
 {
-	public:
+public:
 	AndroidFilter();
 	//~AndroidFilter();
 	
+	void setFullscreen(const bool fullscreen);
 	void setSize(int width, int height);
 	Rect getInnerSize();
 	Rect getCenter();
 	
-	char init();
-	char broadcast();
+	void setCursorPosWithoutMoving();
 	
-	void initTime();
-	double getDeltaTime();
+	void init(const char* windowName, int width, int height, const bool fullscreen);
+	void broadcast();
+	
+	bool getVSync();
+	void setVSync(bool vsync);
 private:
+	bool vsync;
+
 	int width;
 	int height;
 	int left;

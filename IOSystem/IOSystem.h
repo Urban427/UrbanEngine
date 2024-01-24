@@ -15,37 +15,20 @@
 	#define _Input keyBoard
 #endif
 
-class IOSystem
+class IOSystem: public _Input, public _Window
 {
 public:
 	IOSystem();
-	~IOSystem();
+	//~IOSystem();
 
-	char onCreate();
-	char onUpdate();
+	void onCreate(const char* windowName, int width, int height, bool fullscreen);
+	void onUpdate();
 	
 	//time
 	void initTime();
 	double getDeltaTime();
-
-	//window
-	void setSize(unsigned int width, unsigned int height);
-	Rect getInnerSize();
-	Rect getCenter();
-
-	//input
-	void  createInputState();
-	void  updateInputState();
-	void  setInput(float x, float y);
-	unsigned char* getInputState();
-	unsigned char* getOldInputState();
-	void showCursor(bool state);
 	
-	Vector2 moveCursor();
-private:
-	WindowInputs windowInputs;
-
-	_Window _window;
-	_Input  _input;
+	//input
+	void setCenterCursorPos();
 };
 

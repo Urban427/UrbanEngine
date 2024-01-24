@@ -8,7 +8,7 @@ App app;
 AndroidFileManager androidFileManager;
 
 extern "C" JNIEXPORT void JNICALL
-	Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicCreate(
+	Java_com_UrbanEngine_main_NativeLib_AndroidLogicCreate(
 		JNIEnv * env,
 		jobject java_obj) 
 {
@@ -18,7 +18,7 @@ extern "C" JNIEXPORT void JNICALL
 
 
 extern "C" JNIEXPORT void JNICALL
-	Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicUpdate(
+	Java_com_UrbanEngine_main_NativeLib_AndroidLogicUpdate(
 		JNIEnv * env,
 		jobject java_obj,
 		jint width,
@@ -29,7 +29,7 @@ extern "C" JNIEXPORT void JNICALL
 }
 
 extern "C" JNIEXPORT void JNICALL 
-	Java_com_UrbanEngine_main_RendererWrapper_on_1touch_1press(
+	Java_com_UrbanEngine_main_NativeLib_on_1touch_1press(
 	JNIEnv * env,
 	jobject java_obj,
 	jfloat x,
@@ -50,7 +50,7 @@ extern "C" JNIEXPORT void JNICALL
 }
 
 extern "C" JNIEXPORT void JNICALL
-	Java_com_UrbanEngine_main_RendererWrapper_AndroidLogicDraw(
+	Java_com_UrbanEngine_main_NativeLib_AndroidLogicDraw(
 		JNIEnv * env,
 		jobject java_obj) 
 {
