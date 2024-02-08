@@ -1,6 +1,6 @@
 #include "Window.h"
 #include <stdio.h>
-#include "../../MAIN/resource.h"
+#include "resource.h"
 
 Window* win;
 
@@ -94,7 +94,7 @@ void Window::init(const char* windowName, int width, int height, bool fullscreen
 	wc.lpszClassName = windowName;
 	wc.lpszMenuName = "";
 	wc.lpfnWndProc = WndProc;
-	wc.style = NULL;
+	wc.style = 0;
 
 	if (!RegisterClassEx(&wc)) {
 		onDestroy();

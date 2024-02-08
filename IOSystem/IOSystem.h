@@ -10,7 +10,7 @@
 	#define _Input AndroidInputManager
 #elif windows
 	#include "Window.h"
-	#include "keyBoard.h"
+	#include "KeyBoard.h"
 	#define _Window Window 
 	#define _Input keyBoard
 #endif
