@@ -6,7 +6,7 @@ appBuilder: ${OBJ}
 	${CC} -o ${build}${Target} $^ ${resources} ${Libs} ${LFlags} ${CFlags}
 
 libBuilder: ${OBJ}
-	ar rcs ${libpath}lib${Target}.a ${OBJ} ${CFlags}
+	ar rcs ${libpath}lib${Target}.a ${OBJ}
 
 binFile: 
 	if not exist ${bin} mkdir ${subst /,\, ${folders}}

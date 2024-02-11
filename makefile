@@ -4,7 +4,7 @@ AppDir = ./App/
 MathDir = ./Math/
 IOSystemDir = ./IOSystem/
 AndroidDir = ./IOSystem/Android/
-GameLibrary = ./Game/
+LogicLibrary = ./Logic/
 GraphicLibrary = ./GraphicsEngine/
 PhysicLibrary = ./Physic/
 
@@ -15,12 +15,17 @@ windowsAPI = Windows/
 target = windows
 
 
-windows: 
+windows: binFile
 	@echo ${MAKE} platform=${target} -C ${helperDir}
 	${MAKE} platform=${target} -C ${MathDir}
 	${MAKE} platform=${target} -C ${IOSystemDir}
-	${MAKE} platform=${target} -C ${GameLibrary}
+	${MAKE} platform=${target} -C ${LogicLibrary}
 	${MAKE} platform=${target} -C ${GraphicLibrary}
 	${MAKE} platform=${target} -C ${PhysicLibrary}
 	${MAKE} platform=${target} -C ${AppDir}
-	${MAKE} platform=${target} -C ${MAINDir}${${target}API} appBuilder
+	${MAKE} platform=${target} -C ${MAINDir}${${target}API} buildApp
+
+
+
+binFile: 
+	if not exist "build" mkdir build

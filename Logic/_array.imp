@@ -1,0 +1,60 @@
+template<class T>
+array<T>::array()
+{
+	_size = 0;
+	data = nullptr;
+}
+
+template<class T>
+array<T>::~array()
+{
+	delete[] data;
+}
+
+template<class T>
+unsigned int array<T>::size()
+{
+	return _size;
+}
+
+template<class T>
+void array<T>::push_back(const T& value)
+{
+
+}
+
+template<class T>
+T& array<T>::back()
+{
+	return data[_size - 1];
+}
+
+template<class T>
+T* array<T>::begin()
+{
+	return data;
+}
+
+template<class T>
+const T* array<T>::begin() const
+{
+	return data;
+}
+
+template<class T>
+T* array<T>::end()
+{
+	return &data[_size - 1];
+}
+
+template<class T>
+const T* array<T>::end() const
+{
+	return &data[_size - 1];
+}
+
+template<class T>
+T& array<T>::operator[](unsigned int index)
+{
+	return data[index];
+}
