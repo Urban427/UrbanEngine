@@ -1,5 +1,10 @@
 Target=AndroidApp
 
+buildPath = ../../build/Android
+bin = bin
+folders = ${bin}
+folders += ${buildPath}
+
 pacakge = com.UrbanEngine.main
 pacakgePath = com/UrbanEngine/main
 AdnroidJarPath = ./lib/android.jar
@@ -16,29 +21,36 @@ IFlags += -I ../../App/
 
 CFlags += -L ./
 CFlags += -lGLESv2
-CFlags += -L ../../libs
+CFlags += -L ../../libs/
+CFlags += -lApp
 CFlags += -lIOSystem
 CFlags += -lGraphicsEngine
 CFlags += -lMath
-CFlags += -lApp
 
-appBuilder:
-	if not exist "build\apk" mkdir build\apk
-	if not exist "build\gen\com\UrbanEngine\main" mkdir build\gen\com\UrbanEngine\main
-	if not exist "build\apk\lib\arm64-v8a" mkdir build\apk\lib\arm64-v8a
-	
-	
-	aapt package -f -m -S ./res -J ./build/gen/ -M ./AndroidManifest.xml -I ${AdnroidJarPath}
-	javac -h ./jni -bootclasspath "C:\Program Files\Java\jdk-1.8\jre\lib\rt.jar" -cp ${AdnroidJarPath} -d ./build/obj ./build/gen/${pacakgePath}/R.java ./src/${pacakgePath}/*.java
-	d8 --output=./build/apk/ .\build\obj\com\UrbanEngine\main\\*.class
-
-	clang++ --target=aarch64-none-linux-android21  -D android -stdlib=libstdc++ -O3 -shared -o ./build/apk/lib/arm64-v8a/libFilter.so ${SRC} ${IFlags}  ${CFlags}
-	
-	aapt package -f -M ./AndroidManifest.xml -S .\res -I ./lib/android.jar -F build/AndroidApp.unsigned.apk .\build\apk
-	zipalign -f -p 4 build/${Target}.unsigned.apk build/${Target}.aligned.apk
-	jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore keystore.jks -storepass android -keypass android -signedjar build/${Target}.apk build/${Target}.aligned.apk androidkey
-	adb install -r build/${Target}.apk
+buildApp: binFile javaCompiler CCompiler apkCreator
+	adb install -r ${buildPath}/${Target}.apk
 	adb shell am start --activity-clear-top -n ${pacakge}/.MainActivity
+
+
+javaCompiler:
+	aapt package -f -m -S ./res -J ${bin}/gen/ -M ./AndroidManifest.xml -I ${AdnroidJarPath}
+	javac -h ./jni -classpath "C:/Program Files/Java/jdk-1.8/jre/lib/rt.jar" -cp ${AdnroidJarPath} -d ${bin}/obj ${bin}/gen/${pacakgePath}/R.java ./src/${pacakgePath}/*.java
+	d8 --output=${bin}/apk/ ${bin}\obj\com\UrbanEngine\main\\*.class
+
+CCompiler:
+	clang++ --target=aarch64-none-linux-android21  -D android -stdlib=libstdc++ -O3 -shared -o ${bin}/apk/lib/arm64-v8a/libFilter.so ${SRC} ${IFlags}  ${CFlags}
+
+apkCreator:
+	aapt package -f -M ./AndroidManifest.xml -S .\res -I ./lib/android.jar -F ${bin}/${Target}.unsigned.apk ${bin}\apk
+	zipalign -f -p 4 ${bin}/${Target}.unsigned.apk ${bin}/${Target}.aligned.apk
+	jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore keystore.jks -storepass android -keypass android -signedjar ${buildPath}/${Target}.apk ${bin}/${Target}.aligned.apk androidkey
+
+binFile: 
+	if not exist ${bin} mkdir ${subst /,\, ${folders}}
+	if not exist "${bin}\apk" mkdir ${bin}\apk
+	if not exist "${bin}\obj" mkdir ${bin}\obj
+	if not exist "${bin}\gen\com\UrbanEngine\main" mkdir ${bin}\gen\com\UrbanEngine\main
+	if not exist "${bin}\apk\lib\arm64-v8a" mkdir ${bin}\apk\lib\arm64-v8a
 
 Key:
 	keytool -genkeypair -keystore keystore.jks -alias androidkey -validity 10000 -keyalg RSA -7 2048

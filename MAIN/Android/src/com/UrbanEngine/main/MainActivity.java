@@ -43,7 +43,6 @@ public class MainActivity extends Activity {
 		glSurfaceView.setOnTouchListener(
 		new View.OnTouchListener() 
 		{
-			Context c = this;
 			float x;
 			float y;
 			@Override

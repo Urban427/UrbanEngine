@@ -1,17 +1,17 @@
 ﻿#include <jni.h>
 #include <App.h>
-#include <android/asset_manager.h>
 #include <malloc.h>
 #include "AndroidFileManager.h"
-	#include "gles2/gl2.h"
+
+App app;
 
 extern "C" JNIEXPORT void JNICALL
 	Java_com_UrbanEngine_main_NativeLib_AndroidLogicCreate(
 		JNIEnv * env,
 		jobject java_obj) 
 {
-	
-	glClearColor(0, 0, 1, 1);
+	FileManager::init(env, &java_obj);
+	app.onCreate();
 }
 
 
@@ -22,7 +22,7 @@ extern "C" JNIEXPORT void JNICALL
 		jint width,
 		jint height) 
 {
-	
+	app.setSize(width, height);
 }
 
 extern "C" JNIEXPORT void JNICALL 
@@ -32,7 +32,7 @@ extern "C" JNIEXPORT void JNICALL
 	jfloat x,
 	jfloat y)
 {
-	
+	app.Move();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -40,5 +40,5 @@ extern "C" JNIEXPORT void JNICALL
 		JNIEnv * env,
 		jobject java_obj) 
 {
-	
+	app.onUpdate();
 }

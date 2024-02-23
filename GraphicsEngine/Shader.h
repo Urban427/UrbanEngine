@@ -9,8 +9,8 @@ enum ShaderType
 
 typedef struct ShaderDesc
 {
-	const char* vertexShaderFilePath;
-	const char* fragmentShaderFilePath;
+	char* vertexShaderBuffer;
+	char* fragmentShaderBuffer;
 }ShaderDesc;
 
 
@@ -24,7 +24,7 @@ public:
 	
 	unsigned int getID();
 private:
-	void attach(const char* shaderFilePath, const ShaderType& type);
+	void attach(char* buffer, const ShaderType& type);
 	void link();
 private:
 	unsigned int programID;

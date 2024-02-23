@@ -51,4 +51,3 @@ private:
 	bool fulscreen = false;
 	bool _running = false;
 };
-

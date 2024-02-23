@@ -15,7 +15,6 @@ GraphicsEngineDir = ../../GraphicsEngine/
 
 Libs += -L../../libs
 Libs += -l App
-Libs += -l Game
 Libs += -l IOSystem
 Libs += -l GraphicsEngine
 Libs += -l glad

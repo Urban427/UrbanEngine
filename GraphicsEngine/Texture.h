@@ -16,7 +16,7 @@ public:
 	//~Texture();
 	
 	unsigned int getID();
-private:
+public:
 	unsigned int textureID;
 	
 	

@@ -13,6 +13,9 @@ Texture::Texture(const TextureDesc& desc)
 
 void Texture::init(const TextureDesc& desc)
 {
+	width = desc.width;
+	height = desc.height;
+	
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	

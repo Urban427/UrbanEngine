@@ -1,7 +1,6 @@
 #include "Shader.h"
 
 #ifdef glad
-	#include <stdio.h>
 	#include "glad/glad.h"
 #elif gles2
 	#include "gles2/gl2.h"
@@ -9,17 +8,14 @@
 
 Shader::Shader(const ShaderDesc& desc)
 {
-	programID = glCreateProgram();
-	attach(desc.vertexShaderFilePath, VertexShader);
-	attach(desc.fragmentShaderFilePath, FragmentShader);
-	link();
+	init(desc);
 }
 
 void Shader::init(const ShaderDesc& desc)
 {
 	programID = glCreateProgram();
-	attach(desc.vertexShaderFilePath, VertexShader);
-	attach(desc.fragmentShaderFilePath, FragmentShader);
+	attach(desc.vertexShaderBuffer, VertexShader);
+	attach(desc.fragmentShaderBuffer, FragmentShader);
 	link();
 }
 
@@ -37,70 +33,24 @@ Shader::~Shader()
 }
 
 
-void Shader::attach(const char* shaderFilePath, const ShaderType& type)
+void Shader::attach(char* buffer, const ShaderType& type)
 {
-	/*
-	char* buffer;
-	int size;
-	FILE* f = fopen(shaderFilePath, "rb");
-	if(!f) {
-		return;
-	}
-	
-	fseek(f, 0, SEEK_END);
-    size = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	
-	buffer = new char[size];
-	fread(buffer, size, sizeof(char), f);
-	fclose(f);
-	*/
-	
-	
-	
 	
 	unsigned int shaderID = 0;
 	if(type == VertexShader)
 	{
-		const char* buffer = 
-			"attribute vec4 a_Position;"
-			"attribute vec2 a_TextureCoordinates;"
-			"varying vec2 v_TextureCoordinates;"
-			
-			"uniform mat4 transform;"
-			"uniform mat4 projection;"
-			"void main(){"
-			"	gl_Position =  projection * (transform * a_Position);"
-			"	v_TextureCoordinates = a_TextureCoordinates.xy;"
-			"}";
-		
 		shaderID = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(shaderID, 1, &buffer, NULL);
 	}
 	else
 	{
-		const char* buffer = 
-		#ifdef android
-		"precision mediump float;"
-		#endif
-		"varying vec2 v_TextureCoordinates;"
-		
-		"uniform sampler2D u_TextureUnit;"
-		"void main(){"
-		"	gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);"
-		"}";
-		
 		shaderID = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(shaderID, 1, &buffer, NULL);
 	}
 
-	//glShaderSource(shaderID, 1, &buffer, &size);
+	glShaderSource(shaderID, 1, &buffer, NULL);
 	glCompileShader(shaderID);
 	
 	glAttachShader(programID, shaderID);
 	attachedShaders[type] = shaderID;
-	
-	//delete[] buffer;
 }
 
 void Shader::link()

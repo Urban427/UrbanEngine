@@ -1,12 +1,12 @@
 #include "App.h"
 #include "Color.h"
 #include "Matrix4x4.h"
-#include "FileManager.h"
 #include "Rect.h"
 
 #include <math.h>
 #include <cmath>
 #include <malloc.h>
+#include <stdio.h>
 
 App::App()
 {
@@ -16,6 +16,7 @@ App::App()
 
 void App::onCreate()
 {
+	
 	fulscreen 	= false;
 	focus 		= true;
 	_running 	= true;
@@ -34,32 +35,17 @@ void App::onCreate()
 	
 	
 	//create texture
-	int width;
-	int height;
-	FileData* f = openFile(0012.b);
-	readFile(&width, sizeof(int), 1, f);
-	readFile(&height, sizeof(int), 1, f);
-	unsigned int* image = (unsigned int*)malloc(width * height* sizeof(int));
-	for(int i = 0; i < width * height; i++)
-	{
-		readFile(&image[i], sizeof(int), 1, f);
-	}
-	//closeFile(f);
-	texture = GraphicsEngine::createTexture({
-		(unsigned int)width,
-		(unsigned int)height,
-		image
-	});
+	char* textureData = IOSystem::readFile("./Assets/0012.b");
+	unsigned int width = (unsigned int)(*textureData);
+	unsigned int height = (unsigned int)(textureData[4]);
+	unsigned int* image = (unsigned int*)(textureData + 8);
+	texture = GraphicsEngine::createTexture({width, height, image});
 
 	
 	
 	//create shader
-	shader = GraphicsEngine::createShaderProgram({ "./Assets/shader.vsh",  "./Assets/shader.fsh" });
-	uniform = GraphicsEngine::createUniformObject({
-		shader->getID(),
-		"u_TextureUnit",
-		0
-	});
+	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("./Assets/shader.vsh"), IOSystem::readFile("./Assets/shader.fsh")});
+	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
 
 

@@ -1,2 +1,9 @@
-#version 410
-in vec3 vertOutColor;out vec4 outColor;void main(){	outColor = vec4(vertOutColor, 1);}
+precision mediump float;
+varying vec2 v_TextureCoordinates;
+
+uniform sampler2D u_TextureUnit;
+
+void main()
+{
+	gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);
+};

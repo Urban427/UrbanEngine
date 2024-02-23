@@ -1,4 +1,4 @@
-CC = clang++ --target=aarch64-none-linux-android20
+CC = clang++ --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O3
 bin = ./bin/
 folders += ${bin}
 libpath = ../libs/
@@ -8,6 +8,6 @@ OBJ += ${patsubst %.cpp,${bin}%.o, ${SCR}}
 OBJ_DEL += ${subst /,\, ${OBJ}}
 
 IFlags += -I ../Math/
-DFlags += -D glad 
+DFlags += -D gles2
 DFlags += -D android
 DFlags += -stdlib=libstdc++

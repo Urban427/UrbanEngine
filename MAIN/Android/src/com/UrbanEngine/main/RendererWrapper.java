@@ -11,13 +11,11 @@ import android.opengl.GLES20;
 public class RendererWrapper implements Renderer
 {
 	private NativeLib nativeLib;
-	public Context contect;
 	
 	public void create(Context content)
 	{
 		nativeLib = new NativeLib();
 		nativeLib.contect = content;
-		this.contect = content;
 	}
 	
 	public void handleTouchPress(float x, float y) {
@@ -25,11 +23,11 @@ public class RendererWrapper implements Renderer
     }
 	
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-      GLES20.glClearColor(0, 0, 1, 1);
+		nativeLib.AndroidLogicCreate();
     }
  
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-         GLES20.glClearColor(0, 0, 1, 1);
+		nativeLib.AndroidLogicUpdate(width, height);
     }
  
     public void onDrawFrame(GL10 gl) {

@@ -1,18 +1,12 @@
-#version 410 core
+attribute vec4 a_Position;
+attribute vec2 a_TextureCoordinates;
+varying vec2 v_TextureCoordinates;
 
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 color;
-
-layout(location = 0) out vec3 vertOutColor;
+uniform mat4 transform;
+uniform mat4 projection;
 
 void main()
 {
-	gl_Position.xyz = position;
-	if(gl_Position.y > 0 && gl_Position.y < 1)
-	{
-		gl_Position.x += 0.25;
-	}
-	gl_Position.w = 1.0;
-
-	vertOutColor = color;
-}
+	v_TextureCoordinates = a_TextureCoordinates.xy;
+	gl_Position =  projection * (transform * a_Position);
+};

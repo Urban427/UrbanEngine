@@ -11,4 +11,4 @@ OBJ_DEL += ${subst /,\, ${OBJ}}
 IFlags += -I ../Math/
 DFlags += -D glad 
 DFlags += -D windows
-CFlags += -O1
+CFlags += -O0
