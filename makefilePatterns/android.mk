@@ -1,4 +1,4 @@
-CC = clang++ --target=aarch64-none-linux-android21 -stdlib=libstdc++ -O3
+CC = clang++ --target=aarch64-none-linux-android20
 bin = ./bin/
 folders += ${bin}
 libpath = ../libs/

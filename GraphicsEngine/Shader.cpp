@@ -37,15 +37,12 @@ void Shader::attach(char* buffer, const ShaderType& type)
 {
 	
 	unsigned int shaderID = 0;
-	if(type == VertexShader)
-	{
+	if(type == VertexShader) {
 		shaderID = glCreateShader(GL_VERTEX_SHADER);
 	}
-	else
-	{
+	else {
 		shaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	}
-
 	glShaderSource(shaderID, 1, &buffer, NULL);
 	glCompileShader(shaderID);
 	

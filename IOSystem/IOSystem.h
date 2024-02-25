@@ -4,15 +4,15 @@
 #include "IOstructures.h"
 
 #ifdef android
-	#include "AndroidFileManager.h"
 	#include "AndroidInputManager.h"
 	#include "AndroidFilter.h"
+	#include "AndroidFileManager.h"
 	#define _Window AndroidFilter 
 	#define _Input AndroidInputManager
 #elif windows
-	#include "winFileManager.h"
 	#include "Window.h"
 	#include "KeyBoard.h"
+	#include "winFileManager.h"
 	#define _Window Window 
 	#define _Input keyBoard
 #endif

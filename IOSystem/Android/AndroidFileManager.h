@@ -1,17 +1,13 @@
 #pragma once
 #include <jni.h>
 
-
 class FileManager
 {
 public:
 	FileManager();
-	FileManager(JNIEnv* env, jobject* java_obj);
-	static FileManager* get();
+	
 	static void init(JNIEnv* env, jobject* java_obj);
-	
-	
-	static char* readFile(const char* name);
+	static char* readFile(const char* fileName);
 public:
 	static FileManager* androidFileManager;
 

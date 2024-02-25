@@ -35,16 +35,15 @@ void App::onCreate()
 	
 	
 	//create texture
-	char* textureData = IOSystem::readFile("./Assets/0012.b");
-	unsigned int width = (unsigned int)(*textureData);
+	char* textureData = IOSystem::readFile("0012.b");
+	unsigned int width =  (unsigned int)(*textureData);
 	unsigned int height = (unsigned int)(textureData[4]);
 	unsigned int* image = (unsigned int*)(textureData + 8);
 	texture = GraphicsEngine::createTexture({width, height, image});
 
 	
-	
 	//create shader
-	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("./Assets/shader.vsh"), IOSystem::readFile("./Assets/shader.fsh")});
+	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh"), IOSystem::readFile("shader.fsh")});
 	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
 
