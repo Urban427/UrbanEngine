@@ -31,3 +31,21 @@ void IOSystem::setCenterCursorPos()
 	Rect rect = _Window::getCenter();
 	_Input::setCursorPos(rect.width, rect.height);
 }
+
+
+
+
+
+void IOSystem::readFBX(const char* filename)
+{
+	char* rowData = readFile(filename);
+	if(rowData == nullptr)
+	{
+		return;
+	}
+	
+	
+	
+	delete[] rowData;
+	return;
+}

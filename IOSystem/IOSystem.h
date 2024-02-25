@@ -32,5 +32,7 @@ public:
 	
 	//input
 	void setCenterCursorPos();
+	
+	void readFBX(const char* filename);
 };
 
