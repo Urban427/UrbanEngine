@@ -13,15 +13,39 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidLogicCreate
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_UrbanEngine_main_NativeLib
  * Method:    AndroidLogicUpdate
- * Signature: (II)V
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidLogicUpdate
-  (JNIEnv *, jobject, jint, jint);
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_UrbanEngine_main_NativeLib
+ * Method:    AndroidGraphicInit
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidGraphicInit
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_UrbanEngine_main_NativeLib
+ * Method:    AndroidGraphicRender
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidGraphicRender
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_UrbanEngine_main_NativeLib
+ * Method:    AndroidGraphicSetSize
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidGraphicSetSize
+  (JNIEnv *, jclass, jint, jint);
 
 /*
  * Class:     com_UrbanEngine_main_NativeLib
@@ -29,15 +53,7 @@ JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidLogicUpdate
  * Signature: (FF)V
  */
 JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_on_1touch_1press
-  (JNIEnv *, jobject, jfloat, jfloat);
-
-/*
- * Class:     com_UrbanEngine_main_NativeLib
- * Method:    AndroidLogicDraw
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_com_UrbanEngine_main_NativeLib_AndroidLogicDraw
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass, jfloat, jfloat);
 
 #ifdef __cplusplus
 }

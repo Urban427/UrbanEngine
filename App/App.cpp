@@ -8,9 +8,7 @@
 #include <malloc.h>
 #include <stdio.h>
 
-App::App()
-{
-}
+App::App(){}
 
 //App::~App(){}
 

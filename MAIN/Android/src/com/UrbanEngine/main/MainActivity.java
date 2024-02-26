@@ -32,9 +32,8 @@ public class MainActivity extends Activity {
 		} 
 		
 		
-		
+		NativeLib.contect = this;
 		RendererWrapper rend = new RendererWrapper();
-		rend.create(this);
 		
 		
 		rendererSet = true;
@@ -59,7 +58,7 @@ public class MainActivity extends Activity {
 					glSurfaceView.queueEvent(new Runnable()  {
 						@Override
 						public void run() {
-							rend.handleTouchPress(x, y);
+							NativeLib.on_touch_press(x, y);
 						}
 					});
 				}
@@ -68,9 +67,13 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		
 		glSurfaceView.setEGLContextClientVersion(2);
 		glSurfaceView.setRenderer(rend);
 		setContentView(glSurfaceView);
+		
+		
+		NativeLib.AndroidLogicCreate();
 		
 		//setContentView(R.layout.main);
     }

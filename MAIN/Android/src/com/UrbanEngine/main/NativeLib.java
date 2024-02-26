@@ -10,31 +10,36 @@ import java.nio.charset.StandardCharsets;
 
 public class NativeLib
 {
-	public Context contect;
+	public static Context contect;
 	static
 	{
         System.loadLibrary("Filter");
     }
 	
-	public native void AndroidLogicCreate();
-    public native void AndroidLogicUpdate(int width, int height);
-    public native void on_touch_press(float x, float y);
-    public native void AndroidLogicDraw();
+	//logic
+	public static native void AndroidLogicCreate();
+    public static native void AndroidLogicUpdate();
 	
 	
-	public void debug() 
-	{
-		
-    }	
+	//graphic
+	public static native void AndroidGraphicInit();
+	public static native void AndroidGraphicRender();
+    public static native void AndroidGraphicSetSize(int width, int height);
 	
-	public void printText(byte[] text, byte[] text2, int number) 
+	
+	//input
+    public static native void on_touch_press(float x, float y);
+	
+	
+	
+	//printText
+	public static void printText(byte[] text) 
 	{
 		Toast.makeText(contect, new String(text, StandardCharsets.UTF_8), Toast.LENGTH_SHORT).show();
-		Toast.makeText(contect, new String(text2, StandardCharsets.UTF_8), Toast.LENGTH_SHORT).show();
-		Toast.makeText(contect, Integer.toString(number), Toast.LENGTH_SHORT).show();
     }
-	
-	public byte[] readFile(byte[] filename)
+
+	//readFile
+	public static byte[] readFile(byte[] filename)
 	{
 		String filenm = new String(filename, StandardCharsets.UTF_8);
 		byte buffer[];
