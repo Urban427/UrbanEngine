@@ -20,6 +20,7 @@ Libs += -l GraphicsEngine
 Libs += -l glad
 Libs += -l Math
 Libs += -l Physic
+Libs += -lz
 
 IFlags += -I ${AppDir}
 IFlags += -I ${PhysicLib}

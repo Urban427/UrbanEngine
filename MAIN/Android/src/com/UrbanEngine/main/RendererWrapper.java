@@ -19,7 +19,7 @@ public class RendererWrapper implements Renderer
 		NativeLib.AndroidGraphicSetSize(width, height);
     }
  
-    public void onDrawFrame(GL10 gl) {
+    public void onDrawFrame(GL10 gl) {;
       NativeLib.AndroidGraphicRender();
     }	
 };

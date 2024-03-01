@@ -40,14 +40,6 @@ char* FileManager::readFile(const char* fileName)
 	androidFileManager->env->SetByteArrayRegion(textArray, 0, filename_size, (jbyte*)fileName);
 	jbyteArray ReadFileArray = (jbyteArray)androidFileManager->env->CallStaticObjectMethod(androidFileManager->cls, androidFileManager->readFileID, textArray);
 	
-	static char f = 0;
-	if(f < 3){
-		f++;
-		androidFileManager->env->CallStaticObjectMethod(androidFileManager->cls, androidFileManager->printTextID, textArray);
-	}
-	
-	
-	
 	char* res = (char*)androidFileManager->env->GetByteArrayElements(ReadFileArray, NULL);
 	int size =  int((res[0]) << 24 |
 					(res[1]) << 16 |

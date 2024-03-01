@@ -8,9 +8,20 @@
 #include <malloc.h>
 #include <stdio.h>
 
-App::App(){}
+App::App()
+{
+}
 
 //App::~App(){}
+
+void App::GraphicInit()
+{
+	GraphicsEngine::init();
+	GraphicsEngine::clear(Color(0, 1, 0, 1));
+	GraphicsEngine::setCullMode(FrontFace);
+	Rect size = IOSystem::getInnerSize();
+	setSize(size.width, size.height);
+}
 
 void App::onCreate()
 {
@@ -25,15 +36,11 @@ void App::onCreate()
 	IOSystem::onCreate("Sanya lol", 1620 , 720, fulscreen);
 	
 	//create graphics egine
-	GraphicsEngine::init();
-	GraphicsEngine::clear(Color(0, 1, 0, 1));
-	GraphicsEngine::setCullMode(FrontFace);
-	Rect size = IOSystem::getInnerSize();
-	setSize(size.width, size.height);
+	GraphicInit();
 	
 	
 	//create texture
-	char* textureData = IOSystem::readFile("0012.b");
+	char* textureData = IOSystem::readFile("0012.b").start;
 	unsigned int width =  (unsigned int)(*textureData);
 	unsigned int height = (unsigned int)(textureData[4]);
 	unsigned int* image = (unsigned int*)(textureData + 8);
@@ -41,7 +48,7 @@ void App::onCreate()
 
 	
 	//create shader
-	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh"), IOSystem::readFile("shader.fsh")});
+	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh").start, IOSystem::readFile("shader.fsh").start});
 	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
 
@@ -49,6 +56,9 @@ void App::onCreate()
 
 
 	//create shape polygons
+	IOSystem::readFBX("cube.fbx");
+	
+	
 	unsigned int indeces[] = {
 		0,1,2,
 		0,2,3,
@@ -151,6 +161,7 @@ void App::calculateCameraView()
 
 void App::onUpdate()
 {
+	//gamelogic
 	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80)
 	{
 		showCursorParametr = !showCursorParametr;
@@ -181,8 +192,6 @@ void App::onUpdate()
 	{
 		IOSystem::setCenterCursorPos();
 	}
-	
-	
 	
 	//clear render target
 	GraphicsEngine::clear();
@@ -227,6 +236,13 @@ void App::onUpdate()
 	//update ioSystem{
 	IOSystem::onUpdate();
 }
+
+
+void App::render()
+{
+	
+}
+
 
 bool App::isRunning()
 {

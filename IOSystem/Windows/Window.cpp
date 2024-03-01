@@ -125,7 +125,7 @@ void Window::init(const char* windowName, int width, int height, bool fullscreen
 	centerX = left + width  / 2;
 	centerY = top  + height / 2;
 
-	ShowWindow(_hwnd, SW_SHOW);
+	//ShowWindow(_hwnd, SW_SHOW);
 	UpdateWindow(_hwnd);
 
 

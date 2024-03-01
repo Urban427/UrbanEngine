@@ -9,8 +9,7 @@ extern "C" JNIEXPORT void JNICALL
 		JNIEnv * env,
 		jobject java_obj) 
 {
-	FileManager::init(env, &java_obj);
-	app.onCreate();
+	
 }
 
 
@@ -33,6 +32,7 @@ extern "C" JNIEXPORT void JNICALL
 		jobject java_obj) 
 {
 	FileManager::init(env, &java_obj);
+	//app.GraphicInit();
 	app.onCreate();
 }
 

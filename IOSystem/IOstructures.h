@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector2.h"
 
 struct WindowInputs
 {
@@ -7,4 +8,13 @@ struct WindowInputs
 	Vector2*		 oldPoses  = nullptr;
 	
 	unsigned int number = 0;
+};
+
+
+
+struct CFile
+{
+	char* start = nullptr;
+	char* pointer = nullptr;
+	unsigned int size = 0;
 };

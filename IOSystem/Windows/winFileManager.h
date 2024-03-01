@@ -1,8 +1,8 @@
 #pragma once
-
+#include "../IOstructures.h"
 
 class FileManager
 {
 public:
-	static char* readFile(const char* name);
+	static CFile readFile(const char* name);
 };

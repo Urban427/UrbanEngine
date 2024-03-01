@@ -9,14 +9,19 @@ public:
 	App();
 	//~App();
 
+	void GraphicInit();
+	void render();
+	void setSize(unsigned int width, unsigned int height);
+	
+	
 	void onCreate();
 	void onUpdate();
+
 
 	void Move();
 	void setInput(float x, float y);
 	
 	
-	void setSize(unsigned int width, unsigned int height);
 	void onDestroy();
 	void onFocus();
 	void onKillFocus();

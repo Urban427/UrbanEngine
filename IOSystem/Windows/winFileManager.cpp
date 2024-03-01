@@ -30,7 +30,7 @@ char* combineTwoWords(const char* text1, const char* text2)
 	return summ;
 }
 
-char* FileManager::readFile(const char* name)
+CFile FileManager::readFile(const char* name)
 {
 	//get file full name
 	const char* folderName = "./Assets/";
@@ -40,7 +40,7 @@ char* FileManager::readFile(const char* name)
 	
 	//end if file not found
 	if(f == NULL) {
-		return nullptr;
+		return CFile();
 	}
 	
 	//get file size
@@ -55,6 +55,10 @@ char* FileManager::readFile(const char* name)
 	data[size] = '\0';
 	fclose(f);
 	
+	CFile file;
+	file.start = data;
+	file.pointer = data;
+	file.size = size + 1;
 	
-	return data;
+	return file;
 }
