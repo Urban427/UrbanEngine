@@ -67,6 +67,24 @@ char readCFile(void* value, int value_size, CFile& file)
 	return 0;
 }
 
+struct AllProps
+{
+	int Integer;
+	float Float;
+	double Double;
+	char Byte;
+	short  Short;
+	long Long;
+	char* rawData;
+	
+	int* IntegerArray;
+	float* FloatArray;
+	double* DoubleArray;
+	char* ByteArray;
+	short*  ShortArray;
+	long* LongArray;
+};
+
 struct Node
 {
 	int EndOffset;
@@ -76,9 +94,8 @@ struct Node
 	
 	char* name;
 	std::vector<Node*> children;
+	
 };
-
-
 
 
 
@@ -160,33 +177,19 @@ void getProperties(char type, CFile& file)
 			readCFile(&ArrayLength, 4, file);
 			readCFile(&Encoding, 4, file);
 			readCFile(&CompressedLength, 4, file);
-			printf("size: %d    ",ArrayLength);
 			
 			unsigned char* array = new unsigned char[ArrayLength * typeSize];
 			if(Encoding == 0)
 			{
 				readCFile(array, ArrayLength * typeSize, file);
-				
-				double* ar = (double*)array;
-				for(int i = 0; i < ArrayLength; i++)
-				{
-					if(i % 3 == 0)
-					{
-						printf("   ");
-					}
-					printf("%f ", ar[i]);
-				}
-				system("pause");
 				return;
 			}
 			
 			
-			
-			long unsigned int lLength = ArrayLength;
+			long unsigned int lLength = ArrayLength * typeSize;
 			unsigned char* compressArray = new unsigned char[CompressedLength];
 			readCFile(compressArray, CompressedLength, file);
-			uncompress(array, &lLength, compressArray, CompressedLength);
-			
+			int res = uncompress(array, &lLength, compressArray, CompressedLength);
 			
 			
 			double* ar = (double*)array;
@@ -212,7 +215,6 @@ void getProperties(char type, CFile& file)
 			readCFile(&ArrayLength, 4, file);
 			readCFile(&Encoding, 4, file);
 			readCFile(&CompressedLength, 4, file);
-			printf("size: %d    ",ArrayLength);
 			
 			unsigned char* array = new unsigned char[ArrayLength * 4];
 			if(Encoding == 0)
