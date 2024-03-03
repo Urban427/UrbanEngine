@@ -1,7 +1,9 @@
 #pragma once
 #include "Rect.h"
 #include "Vector2.h"
+#include "Vector3.h"
 #include "IOstructures.h"
+#include "FBXfile.h"
 
 #ifdef android
 	#include "AndroidInputManager.h"
@@ -33,6 +35,6 @@ public:
 	//input
 	void setCenterCursorPos();
 	
-	void readFBX(const char* filename);
+	Vector3* readFBX(const char* filename);
 };
 

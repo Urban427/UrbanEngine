@@ -17,7 +17,7 @@ App::App()
 void App::GraphicInit()
 {
 	GraphicsEngine::init();
-	GraphicsEngine::clear(Color(0, 1, 0, 1));
+	GraphicsEngine::clear(Color(0, 0, 0, 1));
 	GraphicsEngine::setCullMode(FrontFace);
 	Rect size = IOSystem::getInnerSize();
 	setSize(size.width, size.height);
@@ -51,12 +51,6 @@ void App::onCreate()
 	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh").start, IOSystem::readFile("shader.fsh").start});
 	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
-
-
-
-
-	//create shape polygons
-	IOSystem::readFBX("cube.fbx");
 	
 	
 	unsigned int indeces[] = {
@@ -88,19 +82,7 @@ void App::onCreate()
 
 
 	//create shape points
-	Vector3 positionList[] = 
-	{
-		Vector3( 0.5f,-0.5f,-0.5f),
-		Vector3( 0.5f,-0.5f, 0.5f),
-		Vector3(-0.5f,-0.5f, 0.5f),
-		Vector3(-0.5f,-0.5f,-0.5f),
-
-		//back face
-		Vector3( 0.5f, 0.5f,-0.5f),
-		Vector3( 0.5f, 0.5f, 0.5f),
-		Vector3(-0.5f, 0.5f, 0.5f),
-		Vector3(-0.5f, 0.5f,-0.5f),
-	};
+	Vector3* positionList = IOSystem::readFBX("cube.fbx");
 
 	Vector2 texcoordsList[] = {
 		Vector2(0, 0),
@@ -214,10 +196,10 @@ void App::onUpdate()
 	//calculate object projection
 	Matrix4x4 world, temp;
 	world.setIdentity();
-	world.setScale(Vector3(2, 1, 1));
+	world.setScale(Vector3(0.3f, 0.3f, 0.3f));
 	
 	temp.setIdentity();
-	temp.setRotationY(45 * 3.14f / 180.0f);
+	temp.setRotationY(0 * 3.14f / 180.0f);
 	world *= temp;
 	
 	temp.setIdentity();
