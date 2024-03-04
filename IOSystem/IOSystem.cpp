@@ -33,6 +33,10 @@ void IOSystem::setCenterCursorPos()
 }
 
 
+bool clockwiseTrio(Vector2 a, Vector2  b, Vector2 c)
+{
+	return (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)) > 0;
+}
 
 
 #include <stdio.h>
@@ -52,9 +56,59 @@ Vector3* IOSystem::readFBX(const char* filename)
 	Node* Geometry 	= fbxFile.findChildrenByName("Geometry", Objects);
 	Node* Vertices 	= fbxFile.findChildrenByName("Vertices", Geometry);
 	Node* Indecies 	= fbxFile.findChildrenByName("PolygonVertexIndex", Geometry);
-	for(int i = 0; i < Indecies->props[0].ArrayLength; i++)
+	
+	int  first = 0;
+	std::vector<int> result_indicies_array;
+	int* indicies_array = Indecies->props[0].IntegerArray;
+	int  number_of_vertexes = Vertices->props[0].ArrayLength;
+	int  number_of_indicies = Indecies->props[0].ArrayLength;
+	bool* removed_vertexes  = new bool[number_of_vertexes];
+	for(int i = 0; i < number_of_indicies; i++)
 	{
-		printf("%i\n", Indecies->props[0].IntegerArray[i]);
+		if(!(indicies_array[i] & 0x80'00'00'00)) {
+			continue;
+		}
+		
+		indicies_array[i]++;
+		indicies_array[i] *= -1;
+		i++;
+		
+		
+		int number_of_points = i - first;
+		printf("number: %d\n", number_of_points);
+		
+		
+		memset(removed_vertexes, 0, i - first);
+		while(number_of_points > 3)
+		{
+			int ear = 0;
+			for(; ear < i; ear++)
+			{
+				if(removed_vertexes[ear] == 1) {
+					continue;
+				}
+				
+				
+			}
+			
+			number_of_points--;
+		}
+		
+		
+		
+		for(int j = first; j < i; j++)
+		{
+			printf("%i\n", indicies_array[j]);
+		}
+		printf("\n");
+		first = i;
+	}
+	delete[] removed_vertexes;
+	
+	
+	//while(number_of_vertexes > 3)
+	{
+		
 	}
 	
 	
@@ -64,6 +118,6 @@ Vector3* IOSystem::readFBX(const char* filename)
 		Vertexes[j] = Vector3(Vertices->props[0].DoubleArray[i], Vertices->props[0].DoubleArray[i + 1], Vertices->props[0].DoubleArray[i + 2]);
 		printf("%f %f %f\n", Vertexes[j].x, Vertexes[j].y, Vertexes[j].z);
 	}
-	system("pause");
+	//system("pause");
 	return Vertexes;
 }

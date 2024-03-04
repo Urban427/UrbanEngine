@@ -33,7 +33,7 @@ void App::onCreate()
 	showCursorParametr 	= true;
 
 	//create input/output system
-	IOSystem::onCreate("Sanya lol", 1620 , 720, fulscreen);
+	IOSystem::onCreate("Sanya lol", 500 , 200, fulscreen);
 	
 	//create graphics egine
 	GraphicInit();
