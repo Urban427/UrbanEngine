@@ -11,8 +11,9 @@ public:
 	float length();
 	Vector3 normalized();
 public:
-	Vector3 operator*(const float& b);
+	Vector3 operator*(const float b);
 	Vector3 operator+=(const Vector3& vec3);
+	float operator[](const int index);
 public:
 	float x = 0;
 	float y = 0;

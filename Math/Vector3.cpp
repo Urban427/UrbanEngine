@@ -30,7 +30,7 @@ Vector3 Vector3::normalized()
 	return Vector3(x / l, y / l, z / l);
 }
 
-Vector3 Vector3::operator*(const float& b)
+Vector3 Vector3::operator*(const float b)
 {
 	return Vector3(this->x * b, this->y * b, this->z * b);
 }
@@ -42,4 +42,24 @@ Vector3 Vector3::operator+=(const Vector3& vec3)
 	this->y += vec3.y;
 	this->z += vec3.z;
 	return *this;
+}
+
+float Vector3::operator[](const int index)
+{
+	switch(index)
+	{
+		case(0):
+		{
+			return x;
+		}
+		case(1):
+		{
+			return y;
+		}
+		default:
+		{
+			return z;
+		}
+	}
+	return z;
 }
