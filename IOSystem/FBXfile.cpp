@@ -158,10 +158,9 @@ AllProps FBXfile::getProperties(char type, CFile& file)
 		}
 		case('S'):
 		{
-			int stringLength;
-			readCFile(&stringLength, sizeof(int), file);
-			prop.rawData = new char[stringLength];
-			readCFile(prop.rawData, stringLength, file);
+			readCFile(&prop.ArrayLength, sizeof(int), file);
+			prop.rawData = new char[prop.ArrayLength];
+			readCFile(prop.rawData, prop.ArrayLength, file);
 			prop.parametr = 6;
 			return prop;
 		}

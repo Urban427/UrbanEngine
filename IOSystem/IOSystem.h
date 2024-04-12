@@ -5,6 +5,15 @@
 #include "IOstructures.h"
 #include "FBXfile.h"
 
+struct Mesh
+{
+	int* index;
+	int index_size;
+	
+	Vector3* vertex;
+	int vertex_size;
+};
+
 #ifdef android
 	#include "AndroidInputManager.h"
 	#include "AndroidFilter.h"
@@ -35,6 +44,6 @@ public:
 	//input
 	void setCenterCursorPos();
 	
-	Vector3* readFBX(const char* filename);
+	Mesh readFBX(const char* filename);
 };
 

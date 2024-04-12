@@ -111,8 +111,8 @@ int main()
 {
 	Texture tex;
 	
-	ReadBMPFile(&tex, "../Assets/0012.bmp");
-	saveTexture(&tex, "../IOSystem/Android/build/apk/assets/0012.b");
+	ReadBMPFile(&tex, "../Assets/test.bmp");
+	saveTexture(&tex, "../Assets/test.b");
 	
 	long unsigned int size;
 	unsigned char* buffer;
@@ -121,7 +121,7 @@ int main()
 	printf("%d %d\n", size_or, size);
 	
 	ReadBMPFile(&tex, "../Assets/test.bmp");
-	saveTexture(&tex, "../IOSystem/Android/build/apk/assets/test.b");
+	//saveTexture(&tex, "../IOSystem/Android/build/apk/assets/test.b");
 	
 	return 0;
 }

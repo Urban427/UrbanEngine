@@ -164,7 +164,7 @@ void Window::broadcast()
 	}
 	
 	swapBuffers();
-	Sleep(1);
+	//Sleep(1);
 }
 
 void Window::swapBuffers()
@@ -216,6 +216,7 @@ void Window::setFullscreen(const bool state)
 		SetWindowLong(_hwnd, GWL_STYLE,(l_WinStyle | WS_POPUP | WS_MAXIMIZE) & ~(WS_CAPTION | WS_THICKFRAME));
         SetWindowLong(_hwnd, GWL_EXSTYLE, WS_EX_TOPMOST);
 		
+		ShowWindow(_hwnd, SW_MAXIMIZE);
 		SetWindowPos (_hwnd, HWND_TOP, 0, 0, screen_width, screen_height, 0);
 	}
 	else

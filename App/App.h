@@ -41,6 +41,7 @@ private:
 	Texture* texture;
 
 	//world camera
+	Matrix4x4 cam;
 	Matrix4x4 camView;
 	Matrix4x4 projection;
 

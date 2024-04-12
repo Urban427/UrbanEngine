@@ -18,7 +18,7 @@ void App::GraphicInit()
 {
 	GraphicsEngine::init();
 	GraphicsEngine::clear(Color(0, 0, 0, 1));
-	GraphicsEngine::setCullMode(FrontFace);
+	GraphicsEngine::setCullMode(BackFace);
 	Rect size = IOSystem::getInnerSize();
 	setSize(size.width, size.height);
 }
@@ -40,7 +40,7 @@ void App::onCreate()
 	
 	
 	//create texture
-	char* textureData = IOSystem::readFile("0012.b").start;
+	char* textureData = IOSystem::readFile("test.b").start;
 	unsigned int width =  (unsigned int)(*textureData);
 	unsigned int height = (unsigned int)(textureData[4]);
 	unsigned int* image = (unsigned int*)(textureData + 8);
@@ -52,37 +52,12 @@ void App::onCreate()
 	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
 	
-	
-	unsigned int indeces[] = {
-		0,1,2,
-		0,2,3,
-		
-		4,7,6,
-		4,6,5,
-		
-		0,4,5,
-		0,5,1,
-		
-		1,5,6,
-		1,6,2,
-		
-		2,6,7,
-		2,7,3,
-		
-		4,0,3,
-		4,3,7,
-	};
-	
-	vertexes_indexes = GraphicsEngine::createIndexArrayObject({
-		indeces, 
-		sizeof(indeces) / sizeof(int)
-	});
-
-
-
-
 	//create shape points
-	Vector3* positionList = IOSystem::readFBX("cube.fbx");
+	Mesh positionList = IOSystem::readFBX("Cube.fbx");
+	
+	vertexes_indexes = GraphicsEngine::createIndexArrayObject(
+		{(unsigned int*)positionList.index,  (unsigned int)positionList.index_size}
+	);
 
 	Vector2 texcoordsList[] = {
 		Vector2(0, 0),
@@ -92,22 +67,17 @@ void App::onCreate()
 		
 	};
 
-	Vertex m_vertexes[] = {
-		{positionList[0], texcoordsList[1]},
-		{positionList[1], texcoordsList[0]},
-		{positionList[2], texcoordsList[2]},
-		{positionList[3], texcoordsList[3]},
-		{positionList[4], texcoordsList[0]},
-		{positionList[5], texcoordsList[2]},
-		{positionList[6], texcoordsList[3]},
-		{positionList[7], texcoordsList[1]}
-	};
+	Vertex* m_vertexes = new Vertex[positionList.vertex_size];
+	for(int i = 0; i < positionList.vertex_size; i++)
+	{
+		m_vertexes[i] = {positionList.vertex[i], texcoordsList[i % 4]};
+	}
 	
 
 	vertexes = GraphicsEngine::createVertexArrayObject({
 		m_vertexes,
 		sizeof(Vertex),
-		sizeof(m_vertexes) / sizeof(Vertex)
+		(unsigned int)positionList.vertex_size
 	});
 }
 
@@ -126,17 +96,18 @@ void  App::Move()
 void App::calculateCameraView()
 {
 	Matrix4x4 temp;
-	camView.setIdentity();
-	camView.setRotationX(rot_y);
+	cam.setIdentity();
+	cam.setRotationX(rot_y);
 	
 	temp.setIdentity();
 	temp.setRotationY(rot_x);
-	camView *= temp;
+	cam *= temp;
 	
 	temp.setIdentity();
 	temp.setTranslation(moveTo);
-	camView *= temp;
+	cam *= temp;
 	
+	camView = cam;
 	camView.inverse();
 }
 
@@ -144,29 +115,51 @@ void App::calculateCameraView()
 void App::onUpdate()
 {
 	//gamelogic
-	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80)
+	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80) //ESC
 	{
 		showCursorParametr = !showCursorParametr;
 		lockCursor = !lockCursor;
 		
 		IOSystem::showCursor(showCursorParametr);
 	}
-	if((IOSystem::getInputState()[2] & 0x80) == 0x80 && (IOSystem::getOldInputState()[2] & 0x80) != 0x80)
+	if((IOSystem::getInputState()[2] & 0x80) == 0x80 && (IOSystem::getOldInputState()[2] & 0x80) != 0x80) //Left Mouse Button
 	{
 		fulscreen = !fulscreen;
 		IOSystem::setFullscreen(fulscreen);
 	}
 	
-	if((getInputState()[46] & 0x80) == 0x80 && (getOldInputState()[46] & 0x80) != 0x80)
+	if((getInputState()[46] & 0x80) == 0x80 && (getOldInputState()[46] & 0x80) != 0x80) //DELETE button
 	{
 		setVSync(!getVSync());
 	}
 	
 	Vector2 cursor(0, 0);
-	if((IOSystem::getInputState()[1] & 0x80) == 0x80 || (lockCursor && focus))
+	if((IOSystem::getInputState()[1] & 0x80) == 0x80 || (lockCursor && focus)) //Right Mouse Button
 	{
 		cursor = IOSystem::deltaCursorPos();
 	}
+	
+	if((IOSystem::getInputState()[65] & 0x80) == 0x80) //A
+	{
+		calculateCameraView();
+		moveTo -= cam.getXDirection() * 0.1f;
+	}
+	else if((IOSystem::getInputState()[68] & 0x80) == 0x80) //D
+	{
+		calculateCameraView();
+		moveTo += cam.getXDirection() * 0.1f;
+	}
+	if((IOSystem::getInputState()[87] & 0x80) == 0x80) //W
+	{
+		calculateCameraView();
+		moveTo -= cam.getZDirection() * 0.1f;
+	}
+	else if((IOSystem::getInputState()[83] & 0x80) == 0x80) //S
+	{
+		calculateCameraView();
+		moveTo += cam.getZDirection() * 0.1f;
+	}
+	
 	
 	rot_x += cursor.x * 0.003f;
 	rot_y -= cursor.y * 0.003f;
