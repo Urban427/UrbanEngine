@@ -43,7 +43,7 @@ void Shader::attach(char* buffer, const ShaderType& type)
 	else {
 		shaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	}
-	glShaderSource(shaderID, 1, &buffer, NULL);
+	glShaderSource(shaderID, 1, &buffer, 0);
 	glCompileShader(shaderID);
 	
 	glAttachShader(programID, shaderID);

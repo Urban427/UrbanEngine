@@ -3,7 +3,7 @@ buildLib: binFile clear libBuilder
 buildApp: binFile clear appBuilder
 
 appBuilder: ${OBJ}
-	${CC} -o ${build}${Target} $^ ${resources} ${Libs} ${LFlags} ${CFlags}
+	${CC} -o ${build}${Target}.exe $^ ${resources} ${Libs} ${LFlags} ${CFlags}
 
 libBuilder: ${OBJ}
 	ar rcs ${libpath}lib${Target}.a ${OBJ}

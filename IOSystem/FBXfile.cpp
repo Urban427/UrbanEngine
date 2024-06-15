@@ -54,14 +54,12 @@ FBXfile::FBXfile(CFile file)
 
 
 
-FBXfile::~FBXfile()
-{
-	
-}
+FBXfile::~FBXfile(){}
 
 
 Node* FBXfile::findChildrenByName(const char* name, Node* node)
 {
+	if(node == nullptr){return nullptr;}
 	char* sName = const_cast<char*>(name);
 	for(int i = 0; i < node->children.size(); i++)
 	{

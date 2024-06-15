@@ -2,16 +2,40 @@
 #include "Rect.h"
 #include "Vector2.h"
 #include "Vector3.h"
+#include "Vector4.h"
 #include "IOstructures.h"
 #include "FBXfile.h"
+#include <math.h>
+#include <vector>
+#define epsilon 0.000000000000000000000000000000000000001f
+
+struct Point
+{
+	int index;
+	int uv_index;
+	Vector3 normal;
+	
+	bool operator==(const Point second)
+	{
+		if(this->uv_index == second.uv_index && 
+		(this->normal.x == second.normal.x) && (this->normal.y == second.normal.y) && (this->normal.z == second.normal.z))
+		{
+			return 1;
+		}
+		return 0;
+	}
+};
 
 struct Mesh
 {
 	int* index;
 	int index_size;
 	
-	Vector3* vertex;
+	Vertex* vertex;
 	int vertex_size;
+	
+	unsigned int* materials;
+	unsigned int  number_of_materials;
 };
 
 #ifdef android

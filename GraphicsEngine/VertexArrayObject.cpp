@@ -46,6 +46,16 @@ void VertexArrayObject::init(const VertexBufferDesc& desc)
 	);
 	glEnableVertexAttribArray(1);
 	
+	glVertexAttribPointer(
+		2, 
+		sizeof(Vector3) / sizeof(float), 
+		GL_FLOAT, 
+		GL_FALSE, 
+		desc.vertexSize,
+		(void*)(sizeof(Vector3) + sizeof(Vector2))
+	);
+	glEnableVertexAttribArray(1);
+	
 	
 	#ifdef glad
 	glBindVertexArray(0);

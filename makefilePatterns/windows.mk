@@ -1,4 +1,4 @@
-CC = g++
+CC = clang++
 
 bin = ./bin/
 folders += ${bin}

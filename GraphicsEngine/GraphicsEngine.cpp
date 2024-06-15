@@ -43,10 +43,11 @@ void GraphicsEngine::setViewPort(const unsigned int& width, const unsigned int& 
 	glViewport(0, 0, width, height);
 }
 
-void GraphicsEngine::drawTriangles(unsigned int vertexCount)
+void GraphicsEngine::drawTriangles(unsigned int vertexCount, void* offset)
 {
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
-	glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, offset);
 }
 
 
@@ -88,6 +89,11 @@ void GraphicsEngine::setProjectionMatrix(Shader* shader, Matrix4x4& matrix)
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.getPtr());
 }
 
+void GraphicsEngine::setCameraViewMatrix(Shader* shader, Matrix4x4& matrix)
+{
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "camView");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.getPtr());
+}
 
 void GraphicsEngine::setCullMode(const CullMode& mode)
 {

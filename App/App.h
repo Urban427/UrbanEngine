@@ -6,9 +6,6 @@
 class App: IOSystem, GraphicsEngine
 {
 public:
-	App();
-	//~App();
-
 	void GraphicInit();
 	void render();
 	void setSize(unsigned int width, unsigned int height);
@@ -37,10 +34,12 @@ private:
 	
 	//material
 	Shader* shader;
+	Shader* shader1;
 	UniformObject* uniform;
-	Texture* texture;
+	Texture* texture[2];
 
 	//world camera
+	float t;
 	Matrix4x4 cam;
 	Matrix4x4 camView;
 	Matrix4x4 projection;

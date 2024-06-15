@@ -35,7 +35,8 @@ public:
 	
 	void setMatrix(Shader* shader, Matrix4x4& matrix);
 	void setProjectionMatrix(Shader* shader, Matrix4x4& matrix);
-	void drawTriangles(unsigned int vertexCount);
+	void setCameraViewMatrix(Shader* shader, Matrix4x4& matrix);
+	void drawTriangles(unsigned int vertexCount, void* offset);
 	
 	void setCullMode(const CullMode& mode);
 public:

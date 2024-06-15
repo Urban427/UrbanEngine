@@ -1,4 +1,5 @@
 ﻿#include <jni.h>
+#include <vector>
 #include <App.h>
 #include "AndroidFileManager.h"
 
@@ -32,7 +33,6 @@ extern "C" JNIEXPORT void JNICALL
 		jobject java_obj) 
 {
 	FileManager::init(env, &java_obj);
-	//app.GraphicInit();
 	app.onCreate();
 }
 

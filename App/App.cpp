@@ -2,17 +2,14 @@
 #include "Color.h"
 #include "Matrix4x4.h"
 #include "Rect.h"
+#include "KeyCodes.h"
 
 #include <math.h>
 #include <cmath>
 #include <malloc.h>
 #include <stdio.h>
 
-App::App()
-{
-}
-
-//App::~App(){}
+unsigned int r = 24;
 
 void App::GraphicInit()
 {
@@ -25,7 +22,6 @@ void App::GraphicInit()
 
 void App::onCreate()
 {
-	
 	fulscreen 	= false;
 	focus 		= true;
 	_running 	= true;
@@ -40,11 +36,11 @@ void App::onCreate()
 	
 	
 	//create texture
-	char* textureData = IOSystem::readFile("test.b").start;
+	char* textureData = IOSystem::readFile("0012.b").start;
 	unsigned int width =  (unsigned int)(*textureData);
 	unsigned int height = (unsigned int)(textureData[4]);
 	unsigned int* image = (unsigned int*)(textureData + 8);
-	texture = GraphicsEngine::createTexture({width, height, image});
+	texture[0] = GraphicsEngine::createTexture({width, height, image});
 
 	
 	//create shader
@@ -53,32 +49,9 @@ void App::onCreate()
 
 	
 	//create shape points
-	Mesh positionList = IOSystem::readFBX("Cube.fbx");
-	
-	vertexes_indexes = GraphicsEngine::createIndexArrayObject(
-		{(unsigned int*)positionList.index,  (unsigned int)positionList.index_size}
-	);
-
-	Vector2 texcoordsList[] = {
-		Vector2(0, 0),
-		Vector2(0, 1),
-		Vector2(1, 0),
-		Vector2(1, 1),
-		
-	};
-
-	Vertex* m_vertexes = new Vertex[positionList.vertex_size];
-	for(int i = 0; i < positionList.vertex_size; i++)
-	{
-		m_vertexes[i] = {positionList.vertex[i], texcoordsList[i % 4]};
-	}
-	
-
-	vertexes = GraphicsEngine::createVertexArrayObject({
-		m_vertexes,
-		sizeof(Vertex),
-		(unsigned int)positionList.vertex_size
-	});
+	Mesh mesh = IOSystem::readFBX("cube.fbx");
+	vertexes_indexes = GraphicsEngine::createIndexArrayObject({ (unsigned int*)mesh.index,  (unsigned int)mesh.index_size });
+	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
 }
 
 void App::setInput(float x, float y)
@@ -113,8 +86,7 @@ void App::calculateCameraView()
 
 
 void App::onUpdate()
-{
-	//gamelogic
+{//gamelogic
 	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80) //ESC
 	{
 		showCursorParametr = !showCursorParametr;
@@ -172,40 +144,34 @@ void App::onUpdate()
 	GraphicsEngine::clear();
 	
 	//calculate new camera projections
-	GraphicsEngine::setProjectionMatrix(shader, projection);
 	calculateCameraView();
-
+	GraphicsEngine::setProjectionMatrix(shader, projection);
+	GraphicsEngine::setCameraViewMatrix(shader, camView);
+	
 	//set material
 	GraphicsEngine::setShaderProgram(shader);
-	GraphicsEngine::setTexture(texture);
+	GraphicsEngine::setTexture(texture[0]);
 	//uniform->setValue(texture->getID());
-	
-	//set shape
-	GraphicsEngine::setVertexArrayObject(vertexes);
-	GraphicsEngine::setIndexArrayObject(vertexes_indexes);
-	
-	
 	
 	//calculate object projection
 	Matrix4x4 world, temp;
 	world.setIdentity();
 	world.setScale(Vector3(0.3f, 0.3f, 0.3f));
-	
 	temp.setIdentity();
 	temp.setRotationY(0 * 3.14f / 180.0f);
 	world *= temp;
-	
 	temp.setIdentity();
 	temp.setTranslation(Vector3(0, 0, -3));
 	world *= temp;
 	
-	world *= camView;
 	
-	
+	//set shape
+	GraphicsEngine::setVertexArrayObject(vertexes);
+	GraphicsEngine::setIndexArrayObject(vertexes_indexes);
 	
 	//draw object 
 	GraphicsEngine::setMatrix(shader, world);
-	GraphicsEngine::drawTriangles(vertexes_indexes->getSize());
+	GraphicsEngine::drawTriangles(36, 0);
 
 
 	//update ioSystem{
@@ -241,7 +207,7 @@ void App::setSize(unsigned int width, unsigned int height)
 	projection.setPerspectiveFovLH(
 	1.17f, 
 	(float)width / (float)height,
-	0.01f, 111);
+	0.01f, 1111);
 }
 
 void App::onDestroy()
@@ -260,7 +226,6 @@ void App::onFocus()
 }
 
 void App::onKillFocus()
-{
-	focus = false;
+{focus = false;
 	IOSystem::showCursor(true);
 }

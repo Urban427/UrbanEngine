@@ -1,12 +1,7 @@
 #pragma once
 //#include <memory>
 #include "Vector3.h"
-
-struct Vertex
-{
-	Vector3 pos;
-	Vector2 ui;
-};
+#include "Vector4.h"
 
 
 typedef struct VertexBufferDesc

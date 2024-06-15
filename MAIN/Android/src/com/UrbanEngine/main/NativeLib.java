@@ -54,11 +54,13 @@ public class NativeLib
 			buffer[1] = (byte) (size >> 16);
 			buffer[2] = (byte) (size >> 8);
 			buffer[3] = (byte) (size     );
+			//Toast.makeText(contect, String.valueOf(size), Toast.LENGTH_SHORT).show();
 		}
 		catch(IOException io) 
 		{
 			buffer = new byte[1];
 		}
+		//Toast.makeText(contect, new String(buffer, StandardCharsets.UTF_8), Toast.LENGTH_SHORT).show();
 		
 		return buffer;
 	}	

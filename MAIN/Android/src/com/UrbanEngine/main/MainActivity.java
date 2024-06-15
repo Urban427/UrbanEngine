@@ -32,10 +32,9 @@ public class MainActivity extends Activity {
 		} 
 		
 		
-		NativeLib.contect = this;
-		NativeLib.AndroidLogicCreate();
-		RendererWrapper rend = new RendererWrapper();
 		
+		RendererWrapper rend = new RendererWrapper();
+		NativeLib.contect = this;
 		
 		rendererSet = true;
 		glSurfaceView = new GLSurfaceView(this);
@@ -67,7 +66,6 @@ public class MainActivity extends Activity {
 				return true;
 			}
 		});
-		
 		
 		glSurfaceView.setEGLContextClientVersion(2);
 		glSurfaceView.setRenderer(rend);

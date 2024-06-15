@@ -1,5 +1,4 @@
 #include "IOSystem.h"
-#include "VertexDictionary.h"
 
 IOSystem::IOSystem() { }
 //IOSystem::~IOSystem() { }
@@ -54,15 +53,15 @@ bool inTrinagle(Vector2 a, Vector2  b, Vector2 c, Vector2 checkPoint)
 }
 
 #include <stdio.h>
-void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_array, bool* removed_vertexes, int* index_array, int number_of_points, int* result_indices, int start_index)
+void TriangulatePolygon(Vector3* vertex_array, Vector3 normal, bool* removed_vertexes, int* index_array, int number_of_points, int* result_indices)
 {
 	switch(number_of_points)
 	{
-		case(2):
+		case(3):
 		{
-			*(result_indices++) = start_index++;
-			*(result_indices++) = start_index++;
-			*result_indices 	= start_index;
+			*(result_indices++) = *(index_array++);
+			*(result_indices++) = *(index_array++);
+			*result_indices = *index_array;
 			return;
 		}
 	}
@@ -99,11 +98,12 @@ void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_a
 		ib = tmp;
 	}
 	
-	Vector2* points_ptr = vector2_array;
+	Vector2* points = new Vector2[number_of_points];
+	Vector2* points_ptr = points;
 	for(int i = 0; i < number_of_points; i++)
 	{
-		points_ptr->x = vertex_array[index_array[i]].pos[ia];
-		points_ptr->y = vertex_array[index_array[i]].pos[ib];
+		points_ptr->x = vertex_array[index_array[i]][ia];
+		points_ptr->y = vertex_array[index_array[i]][ib];
 		points_ptr++;
 		//printf("%d) ", index_array[i]);
 		//printf("%f %f %f\n", vertex_array[index_array[i]][0], vertex_array[index_array[i]][1], vertex_array[index_array[i]][2]);
@@ -127,7 +127,7 @@ void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_a
 			
 			
 			
-			Vector2 a = vector2_array[prev], b = vector2_array[ear], c = vector2_array[next];
+			Vector2 a = points[prev], b = points[ear], c = points[next];
 			if(clockwiseTrio(a, b, c) == 0)
 			{
 				//printf("clockwiseTrio\n", prev, ear, next);
@@ -141,7 +141,7 @@ void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_a
 				{
 					continue;
 				}
-				if(inTrinagle(a, b, c, vector2_array[j]))
+				if(inTrinagle(a, b, c, points[j]))
 				{
 					break;
 				}
@@ -156,10 +156,9 @@ void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_a
 		}
 		
 		
-		*(result_indices++) = index_array[ prev];
-		*(result_indices++) = index_array[ ear ];
-		*(result_indices++) = index_array[ next];
-		//printf("%d %d %d\n", index_array[ prev], index_array[ ear], index_array[ next]);
+		*(result_indices++) = index_array[prev];
+		*(result_indices++) = index_array[ear];
+		*(result_indices++) = index_array[next];
 		//printf("checked: %d %d %d\n", prev, ear, next);
 		removed_vertexes[ear] = 1;
 		number_of_unused_points--;
@@ -188,6 +187,8 @@ void TriangulatePolygon(Vertex* vertex_array, Vector3 normal, Vector2* vector2_a
 
 }
 
+
+
 //files
 Mesh IOSystem::readFBX(const char* filename)
 {
@@ -196,7 +197,7 @@ Mesh IOSystem::readFBX(const char* filename)
 		return Mesh();
 	}
 	FBXfile fbxFile(file);
-	//delete[] file.start;
+	delete[] file.start;
 	
 	
 	
@@ -209,71 +210,100 @@ Mesh IOSystem::readFBX(const char* filename)
 	Node* LayerUV 		= fbxFile.findChildrenByName("LayerElementUV", Geometry);
 	Node* UV 			= fbxFile.findChildrenByName("UV", LayerUV);
 	Node* UVIndex 		= fbxFile.findChildrenByName("UVIndex", LayerUV);
-	Node* LayerMaterial = fbxFile.findChildrenByName("LayerElementMaterial", Geometry);
-	Node* Materials		= fbxFile.findChildrenByName("Materials", LayerMaterial);
 	
+	
+	printf("%s\n", fbxFile.findChildrenByName("MappingInformationType", LayerNormal)->props[0].rawData);
+	for(int i = 0; i < LayerNormal->children.size(); i++)
+	{
+	//	printf("%s\n", LayerNormal->children[i]->name);
+	}
+	
+	
+	//uv
+	int number_of_uv_indexes = UVIndex->props[0].ArrayLength;
+	int* uv_indexes = UVIndex->props[0].IntegerArray;
+	for(int i = 0; i < number_of_uv_indexes; i++)
+	{
+	//	printf("%d ", uv_indexes[i]);
+	}
+	
+	int number_of_uv_vertexes = UV->props[0].ArrayLength / 2;
+	Vector2* uv_vertexes = new Vector2[number_of_uv_vertexes];
+	for(int i = 0, j = 0; i < UV->props[0].ArrayLength; i+=2, j++)
+	{
+		uv_vertexes[j] = Vector2(UV->props[0].DoubleArray[i], UV->props[0].DoubleArray[i + 1]);
+	//	printf("%f %f\n", uv_vertexes[j].x, uv_vertexes[j].y);
+	}
+	
+	
+	//normals
+	int normals_length = Normals->props[0].ArrayLength;
+	Vector3* normals = new Vector3[normals_length / 3];
+	for(int i = 0, j=0; i < normals_length; i += 3, j++)
+	{
+		normals[j] = Vector3(Normals->props[0].DoubleArray[i], Normals->props[0].DoubleArray[i + 2], Normals->props[0].DoubleArray[i + 1]); 
+		///printf("%d)%f %f %f\n", j, normals[j].x, normals[j].y, normals[j].z);
+	}
+	
+	
+	//vertexes
+	int  number_of_vertexes = Vertices->props[0].ArrayLength / 3;
+	Vector3* Vertexes = new Vector3[number_of_vertexes];
+	for(int i = 0, j = 0; i < Vertices->props[0].ArrayLength; i += 3, j++)
+	{
+		Vertexes[j] = Vector3(Vertices->props[0].DoubleArray[i], Vertices->props[0].DoubleArray[i + 2], Vertices->props[0].DoubleArray[i + 1]);
+	}
 	
 	//indexes
 	int* indicies_array = Indecies->props[0].IntegerArray;
 	int  number_of_indicies = Indecies->props[0].ArrayLength;
 	
 	
-	//vertexes
-	int  number_of_vertexes = Vertices->props[0].ArrayLength / 3;
-	Vector3* Vertexes = new Vector3[number_of_vertexes];
-	for(int i = 0, j = 0; i < Vertices->props[0].ArrayLength; i += 3, j++) {
-		Vertexes[j] = Vector3(Vertices->props[0].DoubleArray[i], Vertices->props[0].DoubleArray[i + 2], Vertices->props[0].DoubleArray[i + 1]);
-	}
-	
-	//normals
-	int normals_length 	= Normals->props[0].ArrayLength / 3;
-	Vector3* normals = new Vector3[normals_length];
-	for(int i = 0, j = 0; j < normals_length; i += 3, j++) {
-		normals[j] = Vector3(Normals->props[0].DoubleArray[i], Normals->props[0].DoubleArray[i + 2], Normals->props[0].DoubleArray[i + 1]); 
-	}
-	
-	//uv
-	int number_of_uv_indexes = UVIndex->props[0].ArrayLength;
-	int* uv_indexes = UVIndex->props[0].IntegerArray;
-	int number_of_uv_vertexes = UV->props[0].ArrayLength / 2;
-	Vector2* uv_vertexes = new Vector2[number_of_uv_vertexes];
-	for(int i = 0, j = 0; i < UV->props[0].ArrayLength; i+=2, j++) {
-		uv_vertexes[j] = Vector2(UV->props[0].DoubleArray[i], UV->props[0].DoubleArray[i + 1]);
-	}
-	
-	
-	
 	//count real number of indecies for trinagles
 	bool* removed_vertexes  = new bool[number_of_vertexes];
-	int* helping_indicies = new int[number_of_indicies];
-	VertexDictionary<Point> dictionary(number_of_vertexes);
+	
+	
+	FILE* f = fopen("./knife.txt", "w");
+	fprintf(f, "number of indecies = %d\n", number_of_indicies);
+	fprintf(f, "number of points = %d\n", number_of_vertexes);
+	printf("number of normals  = %d\n", normals_length / 3);
+	
+	
+	//printf("number of uv index = %d\n", normals_length / 3);
+	//printf("number of uv points= %d\n", normals_length / 3);
+	
+	
+	fprintf(f, "\n");for(int i = 0; i < number_of_vertexes; i++) 	{ fprintf(f, "{%f, %f, %f},\n", Vertexes[i].x, Vertexes[i].y, Vertexes[i].z); } fprintf(f, "\n");
+	fprintf(f, "\n");for(int i = 0; i < number_of_indicies; i++) 	{ fprintf(f, "%d, ", indicies_array[i]); } fprintf(f, "\n");
+	
 	int real_first = 0;
 	int first = 0;
 	int number_of_points;
 	int real_number_of_indicies = 0;
-	int max_number_of_points_per_polygon = 0;
+	
+	
+	
 	for(int i = 0; i < number_of_indicies; i++)
 	{
 		//check the end of the polygon
 		if(!(indicies_array[i] & 0x80'00'00'00)) {
-			helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], normals[i]}, indicies_array[i]);
 			continue;
 		}
-		helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], normals[i]}, -indicies_array[i] - 1);
 		
 		//get the number of points
 		number_of_points = i - first + 1;
 		if(number_of_points < 3) {first = i + 1; continue;}
-		if(max_number_of_points_per_polygon < number_of_points) { max_number_of_points_per_polygon = number_of_points;}
 		real_number_of_indicies += number_of_points * 3 - 6;
 		first = i + 1;
 	}
+	//printf("number of indicies = %d\n\n", real_number_of_indicies);
+	//printf("number of read vertexes = %d\n", number_of_duplicated_vertexes);
 	
-	Vertex* result_vertexes = new Vertex[dictionary.getNumberOfElements()];
-	Vector2* vector_array = new Vector2[max_number_of_points_per_polygon];
+	
 	int* result_indices = new int[real_number_of_indicies];
+	memset(result_indices, 0, real_number_of_indicies * 4);
+	//printf("\n");for(int i = 0; i < real_number_of_indicies; i++) 	{ printf("%d ", result_indices[i]); } printf("\n");
 	first = 0;
-	int vertex_index = 0;
 	for(int i = 0; i < number_of_indicies; i++)
 	{
 		//check the end of the polygon
@@ -292,27 +322,24 @@ Mesh IOSystem::readFBX(const char* filename)
 		memset(removed_vertexes, 0, number_of_points);
 		
 		
-		for(int j = first; j < i; j++)
-		{
-			if(j == helping_indicies[j]) {
-				result_vertexes[vertex_index] = {Vertexes[indicies_array[j]], uv_vertexes[uv_indexes[j]], normals[j]};
-				indicies_array[j] = vertex_index++;
-			}
-			else {
-				indicies_array[j] = indicies_array[helping_indicies[j]];
-			}
-		}
-		
-		
-		TriangulatePolygon(result_vertexes, normals[i - 1], vector_array, removed_vertexes, indicies_array + first, number_of_points, result_indices + real_first, 0);
+		TriangulatePolygon(Vertexes, normals[i - 1], removed_vertexes, indicies_array + first, number_of_points, result_indices + real_first);
 		
 		
 		real_first += number_of_points * 3 - 6; 
 		first = i;
 	}
 	delete[] removed_vertexes;
-	delete[] helping_indicies;
-	delete[] vector_array;
 	
-	return {result_indices, real_number_of_indicies, result_vertexes, dictionary.getNumberOfElements(), nullptr, 0};
+	
+	fprintf(f, "number of trinagles: %d\n", real_number_of_indicies / 3);
+	fprintf(f, "\n");for(int i = 0; i < real_number_of_indicies; i++) 	{ fprintf(f, "%d, ", result_indices[i]); } fprintf(f, "\n");
+	
+	Mesh res;
+	res.index = result_indices;
+	res.index_size = real_number_of_indicies;
+	res.vertex = Vertexes;
+	res.vertex_size = number_of_vertexes;
+	
+	
+	return res;
 }

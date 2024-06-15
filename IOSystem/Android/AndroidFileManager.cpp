@@ -24,7 +24,7 @@ void FileManager::init(JNIEnv* env, jobject* java_obj)
 }
 
 
-char* FileManager::readFile(const char* fileName)
+CFile FileManager::readFile(const char* fileName)
 {	
 	//count size of filename
 	int filename_size = 0;
@@ -46,8 +46,27 @@ char* FileManager::readFile(const char* fileName)
 					(res[2]) << 8  |
 					(res[3])	   );
 	res += 4;
-	res[size - 1] = 0;
+	res[size] = 0;
 	
+	CFile file;
+	file.start = res;
+	file.pointer = res;
+	file.size = size;
 	
-	return res;
+	return file;
+}
+
+void FileManager::print(const char* text)
+{
+	int text_size = 0;
+	while(1) {
+		text_size++;
+		if(text[text_size] == 0) {
+			break;
+		}
+	}
+	
+	jbyteArray textArray = androidFileManager->env->NewByteArray(text_size);
+	androidFileManager->env->SetByteArrayRegion(textArray, 0, text_size, (jbyte*)text);
+	androidFileManager->env->CallStaticObjectMethod(androidFileManager->cls, androidFileManager->printTextID, textArray);
 }

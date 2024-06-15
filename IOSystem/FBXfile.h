@@ -32,7 +32,6 @@ struct Node
 	char* name;
 	std::vector<AllProps> props;
 	std::vector<Node*> children;
-	
 };
 
 
