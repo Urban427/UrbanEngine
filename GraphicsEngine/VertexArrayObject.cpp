@@ -54,7 +54,7 @@ void VertexArrayObject::init(const VertexBufferDesc& desc)
 		desc.vertexSize,
 		(void*)(sizeof(Vector3) + sizeof(Vector2))
 	);
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	
 	
 	#ifdef glad

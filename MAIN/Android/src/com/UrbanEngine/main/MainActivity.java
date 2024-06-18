@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
 		
 		RendererWrapper rend = new RendererWrapper();
 		NativeLib.contect = this;
+		//NativeLib.AndroidGraphicInit();
 		
 		rendererSet = true;
 		glSurfaceView = new GLSurfaceView(this);

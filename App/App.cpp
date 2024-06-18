@@ -49,9 +49,10 @@ void App::onCreate()
 
 	
 	//create shape points
+	char buffer[64];
 	Mesh mesh = IOSystem::readFBX("cube.fbx");
 	vertexes_indexes = GraphicsEngine::createIndexArrayObject({ (unsigned int*)mesh.index,  (unsigned int)mesh.index_size });
-	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
+	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3), (unsigned int)mesh.vertex_size });
 }
 
 void App::setInput(float x, float y)
@@ -86,7 +87,9 @@ void App::calculateCameraView()
 
 
 void App::onUpdate()
-{//gamelogic
+{
+	t+=0.01f;
+	//gamelogic
 	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80) //ESC
 	{
 		showCursorParametr = !showCursorParametr;
@@ -158,7 +161,7 @@ void App::onUpdate()
 	world.setIdentity();
 	world.setScale(Vector3(0.3f, 0.3f, 0.3f));
 	temp.setIdentity();
-	temp.setRotationY(0 * 3.14f / 180.0f);
+	temp.setRotationY(t);
 	world *= temp;
 	temp.setIdentity();
 	temp.setTranslation(Vector3(0, 0, -3));
