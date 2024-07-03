@@ -4,7 +4,6 @@
 #include "Color.h"
 #include "VertexArrayObject.h"
 #include "IndexArrayObject.h"
-#include "UniformObject.h"
 #include "Shader.h"
 #include "Texture.h"
 
@@ -31,7 +30,7 @@ public:
 	void setIndexArrayObject(IndexArrayObject* iao);
 	void setVertexArrayObject(VertexArrayObject* vao);
 	void setShaderProgram(Shader* program);
-	void setTexture(Texture* texture);
+	void setTexture(Texture* texture, Shader* shader);
 	
 	void setMatrix(Shader* shader, Matrix4x4& matrix);
 	void setProjectionMatrix(Shader* shader, Matrix4x4& matrix);
@@ -40,10 +39,9 @@ public:
 	
 	void setCullMode(const CullMode& mode);
 public:
-	UniformObject* createUniformObject(const UniformDesc& desc); 
 	VertexArrayObject* createVertexArrayObject(const VertexBufferDesc& desc); 
 	IndexArrayObject* createIndexArrayObject(const IndexArrayDesc& desc);
 	Shader* createShaderProgram(const ShaderDesc& desc);
-	Texture* createTexture(const TextureDesc& desc);
+	Texture* createTexture(const TextureStruct desc);
 };
 

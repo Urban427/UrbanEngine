@@ -35,7 +35,6 @@ private:
 	//material
 	Shader* shader;
 	Shader* shader1;
-	UniformObject* uniform;
 	Texture* texture[2];
 
 	//world camera

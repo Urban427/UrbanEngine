@@ -1,18 +1,11 @@
 #pragma once
-
-struct TextureDesc
-{
-	unsigned int width;
-	unsigned int height;
-	
-	unsigned int* image;
-};
+#include "structures.h"
 
 class Texture
 {
 public:
-	Texture(const TextureDesc& desc);
-	void init(const TextureDesc& desc);
+	Texture(const TextureStruct desc);
+	void init(const TextureStruct desc);
 	//~Texture();
 	
 	unsigned int getID();

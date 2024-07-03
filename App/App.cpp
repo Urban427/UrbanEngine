@@ -36,23 +36,17 @@ void App::onCreate()
 	
 	
 	//create texture
-	char* textureData = IOSystem::readFile("0012.b").start;
-	unsigned int width =  (unsigned int)(*textureData);
-	unsigned int height = (unsigned int)(textureData[4]);
-	unsigned int* image = (unsigned int*)(textureData + 8);
-	texture[0] = GraphicsEngine::createTexture({width, height, image});
+	texture[0] = GraphicsEngine::createTexture(IOSystem::readBMP("ghost2.bmp"));
 
 	
 	//create shader
 	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh").start, IOSystem::readFile("shader.fsh").start});
-	uniform = GraphicsEngine::createUniformObject({shader->getID(), "u_TextureUnit", 0});
 
 	
 	//create shape points
-	char buffer[64];
 	Mesh mesh = IOSystem::readFBX("cube.fbx");
 	vertexes_indexes = GraphicsEngine::createIndexArrayObject({ (unsigned int*)mesh.index,  (unsigned int)mesh.index_size });
-	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vector3) + sizeof(Vector2) + sizeof(Vector3), (unsigned int)mesh.vertex_size });
+	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
 }
 
 void App::setInput(float x, float y)
@@ -153,18 +147,18 @@ void App::onUpdate()
 	
 	//set material
 	GraphicsEngine::setShaderProgram(shader);
-	GraphicsEngine::setTexture(texture[0]);
+	GraphicsEngine::setTexture(texture[0], shader);
 	//uniform->setValue(texture->getID());
 	
 	//calculate object projection
 	Matrix4x4 world, temp;
 	world.setIdentity();
-	world.setScale(Vector3(0.3f, 0.3f, 0.3f));
+	world.setScale(Vector3(0.1f, 0.1f, 0.1f));
 	temp.setIdentity();
 	temp.setRotationY(t);
 	world *= temp;
 	temp.setIdentity();
-	temp.setTranslation(Vector3(0, 0, -3));
+	temp.setTranslation(Vector3(0, 0, -1));
 	world *= temp;
 	
 	

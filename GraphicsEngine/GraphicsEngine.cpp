@@ -71,28 +71,31 @@ void GraphicsEngine::setShaderProgram(Shader* program)
 	glUseProgram(program->getID());
 }
 
-void GraphicsEngine::setTexture(Texture* texture)
+void GraphicsEngine::setTexture(Texture* texture, Shader* shader)
 {
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_MainTex");
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture->getID()); 
+	glUniform1i(transformLoc, 0);
 }
 
 void GraphicsEngine::setMatrix(Shader* shader, Matrix4x4& matrix)
 {
-	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.getPtr());
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_transform");
+	glUniform4fv(transformLoc, 4, matrix.getPtr());
+	//glUniformMatrix4fv(transformLoc, 1, false, matrix.getPtr());
 }
 
 void GraphicsEngine::setProjectionMatrix(Shader* shader, Matrix4x4& matrix)
 {
-	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "projection");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.getPtr());
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_projection");
+	glUniform4fv(transformLoc, 4, matrix.getPtr());
 }
 
 void GraphicsEngine::setCameraViewMatrix(Shader* shader, Matrix4x4& matrix)
 {
-	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "camView");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, matrix.getPtr());
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_camView");
+	glUniform4fv(transformLoc, 4, matrix.getPtr());
 }
 
 void GraphicsEngine::setCullMode(const CullMode& mode)
@@ -119,15 +122,6 @@ void GraphicsEngine::setCullMode(const CullMode& mode)
 	}
 }
 
-
-
-UniformObject* GraphicsEngine::createUniformObject(const UniformDesc& desc)
-{
-	UniformObject* m = (UniformObject*)malloc(sizeof(UniformObject));
-	m->init(desc);
-	return m;
-}
-
 VertexArrayObject* GraphicsEngine::createVertexArrayObject(const VertexBufferDesc& desc)
 {
 	VertexArrayObject* m = (VertexArrayObject*)malloc(sizeof(VertexArrayObject));
@@ -149,7 +143,7 @@ IndexArrayObject* GraphicsEngine::createIndexArrayObject(const IndexArrayDesc& d
 	return m;
 }
 
-Texture* GraphicsEngine::createTexture(const TextureDesc& desc)
+Texture* GraphicsEngine::createTexture(const TextureStruct desc)
 {
 	Texture* m = (Texture*)malloc(sizeof(Texture));
 	m->init(desc);

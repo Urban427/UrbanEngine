@@ -2,6 +2,11 @@
 #include "Vector2.h"
 #include "string.h"
 
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
+
+
 //input
 struct WindowInputs
 {
@@ -25,3 +30,4 @@ struct CFile
 
 
 char readCFile(void* value, int value_size, CFile& file);
+void seekCFile(CFile& file, int offset, int origin);

@@ -12,3 +12,29 @@ char readCFile(void* value, int value_size, CFile& file)
 	file.pointer += value_size;
 	return 0;
 }
+
+void seekCFile(CFile& file, int offset, int origin)
+{
+	switch(origin)
+	{
+		case(SEEK_SET):
+		{
+			if(offset < 0)
+			{
+				offset = 0;
+			}
+			file.pointer = file.start + offset;
+			return;
+		}
+		case(SEEK_END):
+		{
+			file.pointer = file.start + file.size + offset;
+			return;
+		}
+		case(SEEK_CUR):
+		{
+			file.pointer += offset;
+			return;
+		}
+	}
+}

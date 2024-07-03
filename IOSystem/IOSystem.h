@@ -7,6 +7,7 @@
 #include "FBXfile.h"
 #include <math.h>
 #include <vector>
+#include "structures.h"
 #define epsilon 0.000000000000000000000000000000000000001f
 
 struct Point
@@ -69,5 +70,6 @@ public:
 	void setCenterCursorPos();
 	
 	Mesh readFBX(const char* filename);
+	TextureStruct readBMP(const char* filename);
 };
 

@@ -2,13 +2,6 @@
 #include "Vector2.h"
 #include "Vector3.h"
 
-struct Vertex
-{
-	Vector3 pos;
-	Vector2 ui;
-	Vector3 normal;
-};
-
 class Vector4
 {
 public:

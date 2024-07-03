@@ -38,7 +38,7 @@ void VertexArrayObject::init(const VertexBufferDesc& desc)
 	
 	glVertexAttribPointer(
 		1, 
-		sizeof(Vector2) / sizeof(float), 
+		sizeof(Vector3) / sizeof(float), 
 		GL_FLOAT, 
 		GL_FALSE, 
 		desc.vertexSize,
@@ -48,11 +48,11 @@ void VertexArrayObject::init(const VertexBufferDesc& desc)
 	
 	glVertexAttribPointer(
 		2, 
-		sizeof(Vector3) / sizeof(float), 
+		sizeof(Vector2) / sizeof(float), 
 		GL_FLOAT, 
 		GL_FALSE, 
 		desc.vertexSize,
-		(void*)(sizeof(Vector3) + sizeof(Vector2))
+		(void*)(sizeof(Vector3) + sizeof(Vector3))
 	);
 	glEnableVertexAttribArray(2);
 	

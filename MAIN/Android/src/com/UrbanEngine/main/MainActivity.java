@@ -22,12 +22,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-		//check open gl es 2 support
+		//check open gl es 3 support
 		ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		final boolean supportsEs2 = activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x20000;
-		if (!supportsEs2) 
+		final boolean supportsEs3 = activityManager.getDeviceConfigurationInfo().reqGlEsVersion >= 0x30000;
+		if (!supportsEs3) 
 		{
-			Toast.makeText(this, "This device does not support OpenGL ES 2.0.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "This device does not support OpenGL ES 3.0.", Toast.LENGTH_LONG).show();
 			return;
 		} 
 		
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		glSurfaceView.setEGLContextClientVersion(2);
+		glSurfaceView.setEGLContextClientVersion(3);
 		glSurfaceView.setRenderer(rend);
 		setContentView(glSurfaceView);
 		
