@@ -1,4 +1,4 @@
-#include "winFileManager.h"
+#include "../IOstructures.h"
 #include <stdio.h>
 #include <cstdlib>
 
@@ -30,7 +30,7 @@ char* combineTwoWords(const char* text1, const char* text2)
 	return summ;
 }
 
-CFile FileManager::readFile(const char* name)
+CFile openCFile(const char* name)
 {
 	//get file full name
 	const char* folderName = "./Assets/";
@@ -55,10 +55,5 @@ CFile FileManager::readFile(const char* name)
 	data[size] = '\0';
 	fclose(f);
 	
-	CFile file;
-	file.start = data;
-	file.pointer = data;
-	file.size = size + 1;
-	
-	return file;
+	return CFile(data, size + 1);
 }

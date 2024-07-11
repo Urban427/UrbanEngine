@@ -1,5 +1,5 @@
 #pragma once
-#include "structures.h"
+#include "umath.h"
 
 class Texture
 {

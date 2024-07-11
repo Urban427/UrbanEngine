@@ -40,13 +40,14 @@ void App::onCreate()
 
 	
 	//create shader
-	shader = GraphicsEngine::createShaderProgram({IOSystem::readFile("shader.vsh").start, IOSystem::readFile("shader.fsh").start});
+	shader = GraphicsEngine::createShaderProgram({openCFile("shader.vsh").getPtr(), openCFile("shader.fsh").getPtr()});
 
 	
 	//create shape points
 	Mesh mesh = IOSystem::readFBX("cube.fbx");
 	vertexes_indexes = GraphicsEngine::createIndexArrayObject({ (unsigned int*)mesh.index,  (unsigned int)mesh.index_size });
 	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
+	//freeMesh(mesh);
 }
 
 void App::setInput(float x, float y)
@@ -168,7 +169,7 @@ void App::onUpdate()
 	
 	//draw object 
 	GraphicsEngine::setMatrix(shader, world);
-	GraphicsEngine::drawTriangles(36, 0);
+	GraphicsEngine::drawTriangles(vertexes_indexes->getNumberOfMaterials(), 0);
 
 
 	//update ioSystem{

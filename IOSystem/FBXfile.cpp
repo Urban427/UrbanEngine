@@ -26,8 +26,10 @@ bool Check2Strings(char* a, char* b)
 
 
 
-FBXfile::FBXfile(CFile file)
+FBXfile::FBXfile(CFile& file)
 {
+	
+	
 	//head
 	char Kaydara_FBX_Binary[22] = { 0 };
 	readCFile(Kaydara_FBX_Binary, 21, file);
@@ -52,9 +54,64 @@ FBXfile::FBXfile(CFile file)
 	while(1);
 }
 
+void deleteNode(Node* node)
+{
+	delete[] node->name;
+	for(int i = 0; i < node->props.size(); i++)
+	{
+		switch(node->props[i].parametr) {
+			case(6):
+			{
+				delete[] node->props[i].rawData;
+				break;
+			}
+			case(8):
+			{
+				delete[] node->props[i].IntegerArray;
+				break;
+			}
+			case(10):
+			{
+				delete[] node->props[i].DoubleArray;
+				break;
+			}
+		}
+	}
+	for(int i = 0; i < node->children.size(); i++)
+	{
+		deleteNode(node->children[i]);
+	}
+}
 
 
-FBXfile::~FBXfile(){}
+FBXfile::~FBXfile()
+{
+	//delete[] root.name;
+	for(int i = 0; i < root.props.size(); i++)
+	{
+		switch(root.props[i].parametr) {
+			case(6):
+			{
+				delete[] root.props[i].rawData;
+				break;
+			}
+			case(8):
+			{
+				delete[] root.props[i].IntegerArray;
+				break;
+			}
+			case(10):
+			{
+				delete[] root.props[i].DoubleArray;
+				break;
+			}
+		}
+	}
+	for(int i = 0; i < root.children.size(); i++)
+	{
+		deleteNode(root.children[i]);
+	}
+}
 
 
 Node* FBXfile::findChildrenByName(const char* name, Node* node)
@@ -201,13 +258,7 @@ AllProps FBXfile::getProperties(char type, CFile& file)
 
 int FBXfile::readFBXNode(CFile& file, int offset, Node* parent)
 {
-	if(file.pointer < file.start + offset)
-	{
-		file.pointer = file.start + offset;
-	}
-	
-	
-	
+	seekCFile(file, offset, SEEK_SET);
 	
 	int bytesRead = 13;
 	

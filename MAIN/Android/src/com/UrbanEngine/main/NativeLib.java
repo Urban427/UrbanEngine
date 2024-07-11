@@ -41,12 +41,13 @@ public class NativeLib
 	//readFile
 	public static byte[] readFile(byte[] filename)
 	{
+		//Toast.makeText(contect, new String(filename, StandardCharsets.UTF_8), Toast.LENGTH_SHORT).show();
 		String filenm = new String(filename, StandardCharsets.UTF_8);
 		byte buffer[];
 		try{
 			InputStream is = contect.getResources().getAssets().open(filenm);
 			int size = is.available();
-			buffer = new byte[size + 4];
+			buffer = new byte[size + 5];
 			is.read(buffer, 4, size);
 			is.close();
 			
@@ -54,6 +55,7 @@ public class NativeLib
 			buffer[1] = (byte) (size >> 16);
 			buffer[2] = (byte) (size >> 8);
 			buffer[3] = (byte) (size     );
+			buffer[size + 4] = (byte)0;
 			//Toast.makeText(contect, String.valueOf(size), Toast.LENGTH_SHORT).show();
 		}
 		catch(IOException io) 

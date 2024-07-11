@@ -34,7 +34,7 @@ unsigned int IndexArrayObject::getID()
 
 unsigned int IndexArrayObject::getNumberOfMaterials()
 {
-	return this->number_of_materials;
+	return this->size;
 }
 
 unsigned int IndexArrayObject::getMaterialSize(unsigned int index)

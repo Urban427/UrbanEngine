@@ -1,6 +1,6 @@
 #include "MeshRenderer.h"
 
-void RenderSystem::AddLOD(const LOD lod, size_t entity)
+void RenderSystem::AddLOD(const LOD lod, unsigned int entity)
 {
 	//if(entity.hasLOD)
 	{
@@ -15,27 +15,27 @@ void RenderSystem::AddLOD(const LOD lod, size_t entity)
 	
 }
 
-void RenderSystem::AddMeshRenderer(const MeshRenderer meshRenderer, size_t entity)
+void RenderSystem::AddMeshRenderer(const MeshRenderer meshRenderer, unsigned int entity)
 {
 	
 }
 
-LOD* RenderSystem::GetLOD(size_t entity)
+LOD* RenderSystem::GetLOD(unsigned int entity)
 {
 	return nullptr;
 }
 
-MeshRenderer* RenderSystem::GetMeshRenderer(size_t entity)
+MeshRenderer* RenderSystem::GetMeshRenderer(unsigned int entity)
 {
 	return nullptr;
 }
 
-void RenderSystem::RemoveLOD(size_t entity)
+void RenderSystem::RemoveLOD(unsigned int entity)
 {
 	
 }
 
-void RenderSystem::RemoveMeshRenderer(size_t entity)
+void RenderSystem::RemoveMeshRenderer(unsigned int entity)
 {
 	
 }

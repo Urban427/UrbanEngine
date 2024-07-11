@@ -1,4 +1,5 @@
 #include "AndroidFileManager.h"
+#include "../IOstructures.h"
 #include <malloc.h>
 #include <memory.h>
 
@@ -46,14 +47,8 @@ CFile FileManager::readFile(const char* fileName)
 					(res[2]) << 8  |
 					(res[3])	   );
 	res += 4;
-	res[size] = 0;
 	
-	CFile file;
-	file.start = res;
-	file.pointer = res;
-	file.size = size;
-	
-	return file;
+	return CFile(res, size);
 }
 
 void FileManager::print(const char* text)
@@ -69,4 +64,9 @@ void FileManager::print(const char* text)
 	jbyteArray textArray = androidFileManager->env->NewByteArray(text_size);
 	androidFileManager->env->SetByteArrayRegion(textArray, 0, text_size, (jbyte*)text);
 	androidFileManager->env->CallStaticObjectMethod(androidFileManager->cls, androidFileManager->printTextID, textArray);
+}
+
+CFile openCFile(const char* name)
+{
+	return FileManager::readFile(name);
 }

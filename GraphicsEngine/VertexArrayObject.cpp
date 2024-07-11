@@ -15,11 +15,6 @@ VertexArrayObject::VertexArrayObject(const VertexBufferDesc& desc)
 
 void VertexArrayObject::init(const VertexBufferDesc& desc)
 {
-	#ifdef glad
-	glGenVertexArrays(1, &vertexArrayObjectID);
-	glBindVertexArray(vertexArrayObjectID);
-	#endif
-	
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, desc.vertexSize * desc.listSize, desc.verticlesList, GL_STATIC_DRAW);
@@ -55,23 +50,13 @@ void VertexArrayObject::init(const VertexBufferDesc& desc)
 		(void*)(sizeof(Vector3) + sizeof(Vector3))
 	);
 	glEnableVertexAttribArray(2);
-	
-	
-	#ifdef glad
-	glBindVertexArray(0);
-	#endif
-	
 	vertexBufferData = desc;
-	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 VertexArrayObject::~VertexArrayObject()
 {
-	#ifdef glad
-	glDeleteBuffers(1, &vertexBufferID);
-	glDeleteVertexArrays(1, &vertexArrayObjectID);
-	#endif
+
 }
 
 unsigned int VertexArrayObject::getID()

@@ -7,7 +7,7 @@
 #include "FBXfile.h"
 #include <math.h>
 #include <vector>
-#include "structures.h"
+#include <umath.h>
 #define epsilon 0.000000000000000000000000000000000000001f
 
 struct Point
@@ -27,18 +27,6 @@ struct Point
 	}
 };
 
-struct Mesh
-{
-	int* index;
-	int index_size;
-	
-	Vertex* vertex;
-	int vertex_size;
-	
-	unsigned int* materials;
-	unsigned int  number_of_materials;
-};
-
 #ifdef android
 	#include "AndroidInputManager.h"
 	#include "AndroidFilter.h"
@@ -48,12 +36,11 @@ struct Mesh
 #elif windows
 	#include "Window.h"
 	#include "KeyBoard.h"
-	#include "winFileManager.h"
 	#define _Window Window 
 	#define _Input keyBoard
 #endif
 
-class IOSystem: public _Input, public _Window, public FileManager
+class IOSystem: public _Input, public _Window
 {
 public:
 	IOSystem();

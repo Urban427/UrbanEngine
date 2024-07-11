@@ -26,6 +26,8 @@ void Texture::init(const TextureStruct desc)
 	
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	delete[] desc.pixels;
 }
 
 //Texture::~Texture() {}

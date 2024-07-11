@@ -6,6 +6,32 @@
 
 
 //files
+CFile::CFile(){}
+
+CFile::CFile(char* ptr, int size)
+{
+	start = ptr;
+	pointer = ptr;
+	this->size = size;
+}
+
+CFile::~CFile()
+{
+	#ifdef glad
+		delete[] start;
+	#endif
+}
+
+bool CFile::isEmpty()
+{
+	return pointer == nullptr;
+}
+
+char* CFile::getPtr()
+{
+	return pointer;
+}
+
 char readCFile(void* value, int value_size, CFile& file)
 {
 	memcpy(value, file.pointer, value_size);

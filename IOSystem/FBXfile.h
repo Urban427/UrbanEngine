@@ -40,7 +40,7 @@ struct Node
 class FBXfile
 {
 public:
-	FBXfile(CFile file);
+	FBXfile(CFile& file);
 	~FBXfile();
 	
 	unsigned char* readArray(int& ArrayLength, int typeSize, CFile& file);

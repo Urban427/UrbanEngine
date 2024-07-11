@@ -21,13 +21,24 @@ struct WindowInputs
 
 
 //files
-struct CFile
+class CFile
 {
+	friend char readCFile(void* value, int value_size, CFile& file);
+    friend void seekCFile(CFile& file, int offset, int origin);
+public:
+	CFile();
+	CFile(char* ptr, int size);
+	~CFile();
+	
+	char* getPtr();
+	bool isEmpty();
+private:
 	char* start = nullptr;
 	char* pointer = nullptr;
 	unsigned int size = 0;
 };
 
 
+CFile openCFile(const char* name);
 char readCFile(void* value, int value_size, CFile& file);
 void seekCFile(CFile& file, int offset, int origin);
