@@ -17,6 +17,8 @@ public:
 	unsigned char* getOldInputState();
 
 	//cursor
+	Vector2* getPos();
+	Vector2* getOldPos();
 	Vector2 getCursorPos();
 	void setCursorPos(int x, int y);
 	void setCursorPosWithoutMoving();

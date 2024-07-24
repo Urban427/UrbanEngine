@@ -19,11 +19,11 @@ windows: binFile
 	@echo ${MAKE} platform=${target} -C ${helperDir}
 	@echo ${MAKE} platform=${target} -C ${PhysicLibrary}
 	
-	@echo ${MAKE} platform=${target} -C ${MathDir}
-	@echo ${MAKE} platform=${target} -C ${IOSystemDir}
-	@echo ${MAKE} platform=${target} -C ${GraphicLibrary}
+	${MAKE} platform=${target} -C ${MathDir}
+	${MAKE} platform=${target} -C ${IOSystemDir}
+	 ${MAKE} platform=${target} -C ${GraphicLibrary}
 	${MAKE} platform=${target} -C ${LogicLibrary}
-	@echo ${MAKE} platform=${target} -C ${AppDir}
+	${MAKE} platform=${target} -C ${AppDir}
 	${MAKE} platform=${target} -C ${MAINDir}${${target}API} buildApp
 
 

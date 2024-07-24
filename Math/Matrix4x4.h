@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "Quaternion.h"
 
 class Matrix4x4
 {
@@ -16,6 +17,7 @@ public:
 	void setRotationX(const float x);
 	void setRotationY(const float y);
 	void setRotationZ(const float z);
+	void setRotation(const Quaternion rotation);
 
 	void setOrthoLH(float width, float height, float nearPlane, float farPlane);
 	void setPerspectiveFovLH(float fov, float aspect, float nearPlane, float farPlane);

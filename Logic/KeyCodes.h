@@ -1,17 +1,22 @@
 #pragma once
+#include "Vector2.h"
 
-#define KeyCode_RightMouseButton 1
-#define KeyCode_LeftMouseButton 2
+#define KeyCode_LeftMouseButton 	1
+#define KeyCode_RightMouseButton 	2
+#define KeyCode_MiddleMouseButton 	4
 
-#define KeyCode_Enter 13
-#define KeyCode_Escape 27
-#define KeyCode_Space 32
+#define KeyCode_Enter 		13
+#define KeyCode_Left_Shift 	16
+#define KeyCode_Left_CTRL	17
+#define KeyCode_Left_ALT 	18
+#define KeyCode_Escape 		27
+#define KeyCode_Space 		32
 
-#define KeyCode_LeftArrow 37
-#define KeyCode_UpArrrow 38
-#define KeyCode_RightArrow 39
-#define KeyCode_DownArrow  40
-#define KeyCode_Delete  46
+#define KeyCode_LeftArrow 	37
+#define KeyCode_UpArrrow 	38
+#define KeyCode_RightArrow 	39
+#define KeyCode_DownArrow  	40
+#define KeyCode_Delete  	46
 
 #define KeyCode_Alpha0  48
 #define KeyCode_Alpha1  49
@@ -50,3 +55,9 @@
 #define KeyCode_X  88
 #define KeyCode_Y  89
 #define KeyCode_Z  90
+
+void initKeyCodes(unsigned char* state, unsigned char* old_state, Vector2* pose, Vector2* oldPose);
+bool GetKey(unsigned char key);
+bool GetKeyDown(unsigned char key);
+bool GetKeyUp(unsigned char key);
+Vector2 mousePositionDelta();

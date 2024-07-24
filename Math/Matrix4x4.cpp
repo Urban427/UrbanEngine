@@ -114,7 +114,41 @@ void Matrix4x4::setRotationZ(const float z)
 	mat[1][0] = -mat[0][1];
 	mat[1][1] = mat[0][0];
 }
-	
+
+void Matrix4x4::setRotation(const Quaternion rotation)
+{
+	float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+	x2 = rotation.x + rotation.x;
+	y2 = rotation.y + rotation.y;
+	z2 = rotation.z + rotation.z;
+
+	xx = rotation.x * x2; 
+	xy = rotation.x * y2;  
+	xz = rotation.x * z2;
+
+	yy = rotation.y * y2; 
+	yz = rotation.y * z2; 
+	zz = rotation.z * z2;
+
+	wx = rotation.w * x2;
+	wy = rotation.w * y2;  
+	wz = rotation.w * z2;
+
+	mat[0][0] = 1 - (yy + zz);
+	mat[0][1] = xy + wz;
+	mat[0][2] = xz - wy;
+	mat[1][0] = xy - wz; 
+	mat[1][1] = 1.0f - (xx + zz);
+	mat[1][2] = yz + wx;
+	mat[2][0] = xz + wy;
+	mat[2][1] = yz - wx;   
+	mat[2][2] = 1.0f - (xx + yy);
+
+	mat[0][3] = mat[1][3] = mat[2][3] = 0;
+	mat[3][0] = mat[3][1] = mat[3][2] = 0;
+	mat[3][3] = 1;
+}
+
 float* Matrix4x4::getPtr()
 {
 	return &mat[0][0];

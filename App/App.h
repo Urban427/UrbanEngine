@@ -2,6 +2,9 @@
 #include "IOSystem.h"
 #include "GraphicsEngine.h"
 #include "Matrix4x4.h"
+#include "Player.h"
+
+#define number_of_objects  1400
 
 class App: IOSystem, GraphicsEngine
 {
@@ -28,6 +31,10 @@ public:
 private:
 	void calculateCameraView();
 private:
+	//logic
+	Transform transform[number_of_objects];
+	FirstPersonController player = {&transform[0], &transform[1], 0.1f, 0, 0};
+
 	//shape
 	VertexArrayObject* vertexes;
 	IndexArrayObject* vertexes_indexes;
@@ -46,7 +53,6 @@ private:
 	//cube transdtorm data
 	float rot_x = 0;
 	float rot_y = 0;
-	Vector3 moveTo;
 	
 	//system paramerts
 	bool focus = true;

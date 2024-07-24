@@ -26,11 +26,13 @@ IFlags += -I ../../IOSystem/Android/
 IFlags += -I ../../IOSystem/
 IFlags += -I ../../Math/
 IFlags += -I ../../App/
+IFlags += -I ../../Logic/
 
 CFlags += -L ./
 CFlags += -lGLESv2
 CFlags += -L ../../libs/
 CFlags += -lApp
+CFlags += -l Logic
 CFlags += -lIOSystem
 CFlags += -lGraphicsEngine
 CFlags += -lMath

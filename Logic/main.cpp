@@ -1,4 +1,5 @@
 #include "ECS.h"
+/*
 
 struct Player
 {
@@ -45,4 +46,4 @@ int main()
 	printf("ecs  pools   number = %d\n", ecs.pools.size());
 	
 	return 0;
-}
+}*/

@@ -85,3 +85,13 @@ Vector2 keyBoard::deltaCursorPos()
 {
 	return (*windowInput.poses) - (*windowInput.oldPoses);
 }
+
+Vector2* keyBoard::getPos()
+{
+	return windowInput.poses;
+}
+
+Vector2* keyBoard::getOldPos()
+{
+	return windowInput.oldPoses;
+}

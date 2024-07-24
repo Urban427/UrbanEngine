@@ -3,6 +3,7 @@
 #include "Matrix4x4.h"
 #include "Rect.h"
 #include "KeyCodes.h"
+#include "Physic.h"
 
 #include <math.h>
 #include <cmath>
@@ -30,6 +31,7 @@ void App::onCreate()
 
 	//create input/output system
 	IOSystem::onCreate("Sanya lol", 500 , 200, fulscreen);
+	initKeyCodes(IOSystem::getInputState(), IOSystem::getOldInputState(), IOSystem::getPos(), IOSystem::getOldPos());
 	
 	//create graphics egine
 	GraphicInit();
@@ -44,10 +46,13 @@ void App::onCreate()
 
 	
 	//create shape points
-	Mesh mesh = IOSystem::readFBX("cube.fbx");
+	Mesh mesh = IOSystem::readFBX("sphere.fbx");
 	vertexes_indexes = GraphicsEngine::createIndexArrayObject({ (unsigned int*)mesh.index,  (unsigned int)mesh.index_size });
 	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
 	//freeMesh(mesh);
+	
+	player.transform->position 	= Vector3(5, 5, 5);
+	player.camera->rotation 	= Quaternion(0, 0.33f, 0, 1) * Quaternion(-0.3f, 0, 0, 1);
 }
 
 void App::setInput(float x, float y)
@@ -57,7 +62,7 @@ void App::setInput(float x, float y)
 
 void  App::Move()
 {
-	moveTo.x += 0.03f;
+	player.transform->position.z -= 0.1f;
 }
 
 
@@ -65,15 +70,14 @@ void  App::Move()
 void App::calculateCameraView()
 {
 	Matrix4x4 temp;
-	cam.setIdentity();
-	cam.setRotationX(rot_y);
+	temp.setRotation(player.transform->rotation);
 	
-	temp.setIdentity();
-	temp.setRotationY(rot_x);
+	cam.setIdentity();
+	cam.setRotation(player.camera->rotation);
 	cam *= temp;
 	
 	temp.setIdentity();
-	temp.setTranslation(moveTo);
+	temp.setTranslation(player.transform->position);
 	cam *= temp;
 	
 	camView = cam;
@@ -83,58 +87,28 @@ void App::calculateCameraView()
 
 void App::onUpdate()
 {
-	t+=0.01f;
 	//gamelogic
-	if((IOSystem::getInputState()[27] & 0x80) == 0x80 && (IOSystem::getOldInputState()[27] & 0x80) != 0x80) //ESC
-	{
+	t+=0.01f;
+	
+	if(GetKeyDown(KeyCode_Escape)) {
 		showCursorParametr = !showCursorParametr;
 		lockCursor = !lockCursor;
-		
 		IOSystem::showCursor(showCursorParametr);
 	}
-	if((IOSystem::getInputState()[2] & 0x80) == 0x80 && (IOSystem::getOldInputState()[2] & 0x80) != 0x80) //Left Mouse Button
-	{
+	
+	if(GetKeyDown(KeyCode_RightMouseButton)) {
 		fulscreen = !fulscreen;
 		IOSystem::setFullscreen(fulscreen);
 	}
 	
-	if((getInputState()[46] & 0x80) == 0x80 && (getOldInputState()[46] & 0x80) != 0x80) //DELETE button
-	{
+	if(GetKeyDown(KeyCode_Delete)) {
 		setVSync(!getVSync());
 	}
 	
-	Vector2 cursor(0, 0);
-	if((IOSystem::getInputState()[1] & 0x80) == 0x80 || (lockCursor && focus)) //Right Mouse Button
-	{
-		cursor = IOSystem::deltaCursorPos();
-	}
+	UpdateFPSO(&player, 1);
+	calculatePhysic(transform, number_of_objects);
 	
-	if((IOSystem::getInputState()[65] & 0x80) == 0x80) //A
-	{
-		calculateCameraView();
-		moveTo -= cam.getXDirection() * 0.1f;
-	}
-	else if((IOSystem::getInputState()[68] & 0x80) == 0x80) //D
-	{
-		calculateCameraView();
-		moveTo += cam.getXDirection() * 0.1f;
-	}
-	if((IOSystem::getInputState()[87] & 0x80) == 0x80) //W
-	{
-		calculateCameraView();
-		moveTo -= cam.getZDirection() * 0.1f;
-	}
-	else if((IOSystem::getInputState()[83] & 0x80) == 0x80) //S
-	{
-		calculateCameraView();
-		moveTo += cam.getZDirection() * 0.1f;
-	}
-	
-	
-	rot_x += cursor.x * 0.003f;
-	rot_y -= cursor.y * 0.003f;
-	if(lockCursor && focus)
-	{
+	if(lockCursor && focus) {
 		IOSystem::setCenterCursorPos();
 	}
 	
@@ -146,30 +120,37 @@ void App::onUpdate()
 	GraphicsEngine::setProjectionMatrix(shader, projection);
 	GraphicsEngine::setCameraViewMatrix(shader, camView);
 	
-	//set material
-	GraphicsEngine::setShaderProgram(shader);
-	GraphicsEngine::setTexture(texture[0], shader);
-	//uniform->setValue(texture->getID());
 	
-	//calculate object projection
-	Matrix4x4 world, temp;
-	world.setIdentity();
-	world.setScale(Vector3(0.1f, 0.1f, 0.1f));
-	temp.setIdentity();
-	temp.setRotationY(t);
-	world *= temp;
-	temp.setIdentity();
-	temp.setTranslation(Vector3(0, 0, -1));
-	world *= temp;
+	
 	
 	
 	//set shape
 	GraphicsEngine::setVertexArrayObject(vertexes);
 	GraphicsEngine::setIndexArrayObject(vertexes_indexes);
 	
+	
+	//set material
+	GraphicsEngine::setShaderProgram(shader);
+	GraphicsEngine::setTexture(texture[0], shader);
+	
 	//draw object 
-	GraphicsEngine::setMatrix(shader, world);
-	GraphicsEngine::drawTriangles(vertexes_indexes->getNumberOfMaterials(), 0);
+	for(int i = 1; i < number_of_objects; i++)
+	{
+		//calculate object projection
+		Matrix4x4 world, temp;
+		world.setIdentity();
+		world.setScale(Vector3(0.1f, 0.1f, 0.1f));
+		temp.setIdentity();
+		//temp.setRotation(transform->rotation);
+		world *= temp;
+		temp.setIdentity();
+		temp.setTranslation(transform[i].position);
+		world *= temp;
+		//printf("%f %f %f\n", transform[i].position.x, transform[i].position.y, transform[i].position.z);
+
+		GraphicsEngine::setMatrix(shader, world);
+		GraphicsEngine::drawTriangles(vertexes_indexes->getNumberOfMaterials(), 0);
+	}
 
 
 	//update ioSystem{

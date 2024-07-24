@@ -41,3 +41,33 @@ void TriangulatePolygon(
 	int* result_indices);
 
 void freeMesh(Mesh& mesh);
+
+
+
+inline float clamp(float a, float b, float value)
+{
+	if(value < a)
+	{
+		return a;
+	}
+	if(value > b)
+	{
+		return b;
+	}
+	return value;
+}
+
+
+inline float Q_rsqrt( float number )
+{	
+	const float x2 = number * 0.5F;
+	const float threehalfs = 1.5F;
+
+	union {
+		float f;
+		unsigned int i;
+	} conv = {number}; // member 'f' set to value of 'number'.
+	conv.i = 0x5f3759df - ( conv.i >> 1 );
+	conv.f *= threehalfs - x2 * conv.f * conv.f;
+	return conv.f;
+}

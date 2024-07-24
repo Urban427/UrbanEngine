@@ -6,30 +6,25 @@ AppDir = ../../App/
 MathDir = ../../Math/
 IOSystemDir = ../../IOSystem/
 WindowsDir = ../../IOSystem/Windows/
-AndroidDir = ../../IOSystem/Android/Filter/
-OpenGlDib = ../../OpenGL37/
-GameDib = ../../Game/
-PhysicLib = ../../Physic/
 GraphicsEngineDir = ../../GraphicsEngine/
+LogicDir = ../../Logic/
 
 
 Libs += -L../../libs
 Libs += -l App
+Libs += -l Logic
 Libs += -l IOSystem
 Libs += -l GraphicsEngine
 Libs += -l glad
 Libs += -l Math
-Libs += -l Physic
 Libs += -lz
 
 IFlags += -I ${AppDir}
-IFlags += -I ${PhysicLib}
-IFlags += -I ${GameDib}
 IFlags += -I ${MathDir}
 IFlags += -I ${IOSystemDir}
-IFlags += -I ${AndroidDir}
 IFlags += -I ${WindowsDir}
 IFlags += -I ${GraphicsEngineDir}
+IFlags += -I ${LogicDir}
 
 
 LFlags += -lgdi32

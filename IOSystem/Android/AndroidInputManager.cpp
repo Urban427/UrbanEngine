@@ -44,3 +44,13 @@ Vector2 AndroidInputManager::deltaCursorPos()
 {
 	return Vector2(0, 0);
 }
+
+Vector2* AndroidInputManager::getPos()
+{
+	return windowInput.poses;
+}
+
+Vector2* AndroidInputManager::getOldPos()
+{
+	return windowInput.oldPoses;
+}
