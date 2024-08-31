@@ -8,7 +8,7 @@
 #include <math.h>
 #include <vector>
 #include <umath.h>
-#define epsilon 0.000000000000000000000000000000000000001f
+//#define epsilon 0.000000000000000000000000000000000000001f
 
 struct Point
 {
@@ -27,7 +27,7 @@ struct Point
 	}
 };
 
-#ifdef android
+#ifdef Android
 	#include "AndroidInputManager.h"
 	#include "AndroidFilter.h"
 	#include "AndroidFileManager.h"

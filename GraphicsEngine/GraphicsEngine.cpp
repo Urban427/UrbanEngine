@@ -50,14 +50,22 @@ void GraphicsEngine::drawTriangles(unsigned int vertexCount, void* offset)
 	glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, offset);
 }
 
-
 void GraphicsEngine::setVertexArrayObject(VertexArrayObject* vao)
 {
-#ifdef glad
-	glBindVertexArray(vao->getID());
-#elif gles2
-	glBindBuffer(GL_ARRAY_BUFFER, vao->getID());
-#endif
+	
+	 glBindBuffer(GL_ARRAY_BUFFER, vao->getID());
+	 
+	 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Vector3));
+    glEnableVertexAttribArray(1);
+
+    // UV attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
 }
 
 

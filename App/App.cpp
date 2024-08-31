@@ -3,12 +3,12 @@
 #include "Matrix4x4.h"
 #include "Rect.h"
 #include "KeyCodes.h"
-#include "Physic.h"
 
 #include <math.h>
 #include <cmath>
 #include <malloc.h>
 #include <stdio.h>
+#include <chrono>
 
 unsigned int r = 24;
 
@@ -51,8 +51,23 @@ void App::onCreate()
 	vertexes = GraphicsEngine::createVertexArrayObject({ mesh.vertex, sizeof(Vertex), (unsigned int)mesh.vertex_size });
 	//freeMesh(mesh);
 	
-	player.transform->position 	= Vector3(5, 5, 5);
-	player.camera->rotation 	= Quaternion(0, 0.33f, 0, 1) * Quaternion(-0.3f, 0, 0, 1);
+	
+	physicHouse = IOSystem::readFBX("testMesh.fbx");
+	vertexes_indexes2 = GraphicsEngine::createIndexArrayObject({ (unsigned int*)physicHouse.index,  (unsigned int)physicHouse.index_size });
+	vertexes2 = GraphicsEngine::createVertexArrayObject({ physicHouse.vertex, sizeof(Vertex), (unsigned int)physicHouse.vertex_size });
+	
+	//player.transform->position 	= Vector3(5, 5, 5);
+	//player.transform->rotation  = Quaternion(0, -0.33f, 0, 1);
+	player.camera->rotation 	=  Quaternion(0, sin(45 * 0.5f * (M_PI / 180)), 0, cos(45 * 0.5f * (M_PI / 180.0f))); 
+	player.camera->rotation.normalize();
+	for(unsigned int i = 0; i <  number_of_objects; i++)
+	{
+		collisions[i].offset = Vector3(static_cast<float>(rand()), static_cast<float>(rand()), static_cast<float>(rand())).normalized() * 0.1f;
+		collisions[i].radius = static_cast<float>(rand() % 1000) / 20000 + 0.01;
+		transform[i].scale = Vector3(collisions[i].radius, collisions[i].radius, collisions[i].radius);
+		aabb[i] = {Vector3(-collisions[i].radius, -collisions[i].radius, -collisions[i].radius), Vector3(collisions[i].radius, collisions[i].radius, collisions[i].radius), i};
+		collisions[i].radius /= 2;
+	}
 }
 
 void App::setInput(float x, float y)
@@ -70,14 +85,15 @@ void  App::Move()
 void App::calculateCameraView()
 {
 	Matrix4x4 temp;
-	temp.setRotation(player.transform->rotation);
+	//temp.setRotation(player.transform->rotation);
 	
 	cam.setIdentity();
 	cam.setRotation(player.camera->rotation);
-	cam *= temp;
+	//printf("%f %f %f %f\n", player.camera->rotation.x, player.camera->rotation.y, player.camera->rotation.z, player.camera->rotation.w);
+	//cam *= temp;
 	
 	temp.setIdentity();
-	temp.setTranslation(player.transform->position);
+	temp.setTranslation(Vector3(3, 0, 3));
 	cam *= temp;
 	
 	camView = cam;
@@ -87,6 +103,7 @@ void App::calculateCameraView()
 
 void App::onUpdate()
 {
+	 auto start = std::chrono::high_resolution_clock::now();
 	//gamelogic
 	t+=0.01f;
 	
@@ -106,7 +123,8 @@ void App::onUpdate()
 	}
 	
 	UpdateFPSO(&player, 1);
-	calculatePhysic(transform, number_of_objects);
+	calculatePhysic(transform, collisions, aabb, number_of_objects);
+
 	
 	if(lockCursor && focus) {
 		IOSystem::setCenterCursorPos();
@@ -114,6 +132,11 @@ void App::onUpdate()
 	
 	//clear render target
 	GraphicsEngine::clear();
+	
+	//set material
+	GraphicsEngine::setShaderProgram(shader);
+	GraphicsEngine::setTexture(texture[0], shader);
+	
 	
 	//calculate new camera projections
 	calculateCameraView();
@@ -129,32 +152,39 @@ void App::onUpdate()
 	GraphicsEngine::setIndexArrayObject(vertexes_indexes);
 	
 	
-	//set material
-	GraphicsEngine::setShaderProgram(shader);
-	GraphicsEngine::setTexture(texture[0], shader);
-	
 	//draw object 
-	for(int i = 1; i < number_of_objects; i++)
-	{
-		//calculate object projection
+	for(int i = 1; i < number_of_objects; i++) {
 		Matrix4x4 world, temp;
 		world.setIdentity();
-		world.setScale(Vector3(0.1f, 0.1f, 0.1f));
-		temp.setIdentity();
-		//temp.setRotation(transform->rotation);
-		world *= temp;
+		world.setScale(transform[i].scale);
+		
 		temp.setIdentity();
 		temp.setTranslation(transform[i].position);
 		world *= temp;
-		//printf("%f %f %f\n", transform[i].position.x, transform[i].position.y, transform[i].position.z);
-
+		
 		GraphicsEngine::setMatrix(shader, world);
 		GraphicsEngine::drawTriangles(vertexes_indexes->getNumberOfMaterials(), 0);
 	}
+	
+	Matrix4x4 world1;
+	world1.setIdentity();
+	world1.setRotationY(t);
+	
+	GraphicsEngine::setVertexArrayObject(vertexes2);
+	GraphicsEngine::setIndexArrayObject(vertexes_indexes2);
+	GraphicsEngine::setMatrix(shader, world1);
+	GraphicsEngine::drawTriangles(vertexes_indexes2->getNumberOfMaterials(), 0);
 
-
-	//update ioSystem{
+	//update ioSystem
 	IOSystem::onUpdate();
+	
+	auto end = std::chrono::high_resolution_clock::now();
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    // Output the duration in milliseconds
+    std::cout << "Time taken: " << duration.count() << " milliseconds" << std::endl;
+
 }
 
 

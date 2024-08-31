@@ -3,8 +3,9 @@
 #include "GraphicsEngine.h"
 #include "Matrix4x4.h"
 #include "Player.h"
+#include "Physic.h"
 
-#define number_of_objects  1400
+#define number_of_objects  10000
 
 class App: IOSystem, GraphicsEngine
 {
@@ -33,11 +34,18 @@ private:
 private:
 	//logic
 	Transform transform[number_of_objects];
-	FirstPersonController player = {&transform[0], &transform[1], 0.1f, 0, 0};
+	SphereCollision collisions[number_of_objects];
+	AABB aabb[number_of_objects];
+	FirstPersonController player = {&transform[1], &transform[1], 0.1f, 0, 0};
 
 	//shape
 	VertexArrayObject* vertexes;
 	IndexArrayObject* vertexes_indexes;
+	
+	//Physic
+	Mesh physicHouse;
+	VertexArrayObject* vertexes2;
+	IndexArrayObject* vertexes_indexes2;
 	
 	//material
 	Shader* shader;

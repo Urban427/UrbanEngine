@@ -24,7 +24,6 @@ public:
 	unsigned int getVertexSize();
 private:
 	unsigned int vertexBufferID;
-	unsigned int vertexArrayObjectID;
 	VertexBufferDesc vertexBufferData;
 };
 

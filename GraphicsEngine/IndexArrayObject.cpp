@@ -22,7 +22,7 @@ void IndexArrayObject::init(const IndexArrayDesc& desc)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, desc.size * sizeof(unsigned int), desc.indices, GL_STATIC_DRAW); 
 	
 	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 //IndexArrayObject::~IndexArrayObject(){	}

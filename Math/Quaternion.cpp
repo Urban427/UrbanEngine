@@ -50,10 +50,15 @@ Quaternion Quaternion::operator*(const Quaternion b)
 
 void Quaternion::operator*=(const Quaternion b)
 {
-	this->x =  x * b.w + y * b.z - z * b.y + w * b.x;
-	this->y = -x * b.z + y * b.w + z * b.x + w * b.y;
-	this->z =  x * b.y - y * b.x + z * b.w + w * b.z;
-	this->w = -x * b.x - y * b.y - z * b.z + w * b.w;
+	float newX =   x * b.w + y * b.z - z * b.y + w * b.x;
+	float newY =  -x * b.z + y * b.w + z * b.x + w * b.y;
+	float newZ =   x * b.y - y * b.x + z * b.w + w * b.z;
+	float newW =  -x * b.x - y * b.y - z * b.z + w * b.w;
+	
+	this->x = newX;
+	this->y = newY;
+	this->z = newZ;
+	this->w = newW;
 }
 
 

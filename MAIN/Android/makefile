@@ -1,12 +1,11 @@
 Target=AndroidApp
 
-CC = clang++
-sysroot = C:/Users/leoza/AppData/Local/Android/Sdk/ndk/21.4.7075529/toolchains/llvm/prebuilt/windows-x86_64/sysroot
+CC = "C:\Program Files\android-ndk-r27\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++"
+sysroot = "C:\\Program Files\\android-ndk-r27\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot"
 tar = aarch64-none-linux-android21
 QFLAGS += -funwind-tables
-QFLAGS += -D android
-QFLAGS += -stdlib=libc++ -dwarf-version=4 -fstack-protector -Bdynamic -Bstatic
-
+QFLAGS += -D Android
+QFLAGS +=  -stdlib=libc++ -fPIC -fstack-protector -Bdynamic -Bstatic -fuse-ld=lld
 
 buildPath = ../../build/Android
 bin = bin
@@ -49,9 +48,9 @@ javaCompiler:
 	d8 --output=${bin}/apk/ ${bin}\obj\com\UrbanEngine\main\\*.class
 
 CCompiler:
-	${CC} --target=${tar} --sysroot=${sysroot} -c -o ./bin/AndroidFilter.o ./jni/AndroidFilter.cpp  ${QFLAGS}  -fPIE ${IFlags}
-	${CC} --target=${tar} --sysroot=${sysroot} -shared -o ${bin}/apk/lib/arm64-v8a/libFilter.so  ./bin/AndroidFilter.o  ${QFLAGS}  -fPIE -lc++_static ${CFlags}
-	"C:\\Users\\leoza\\AppData\\Local\\Android\\Sdk\\ndk\\21.4.7075529\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-strip" --strip-unneeded ${bin}/apk/lib/arm64-v8a/libFilter.so
+	${CC} --target=${tar} --sysroot=${sysroot} -c ./jni/AndroidFilter.cpp -o ./bin/AndroidFilter.o   ${QFLAGS} ${IFlags}
+	${CC} --target=${tar} --sysroot=${sysroot} -shared -o ${bin}/apk/lib/arm64-v8a/libFilter.so  ./bin/AndroidFilter.o  ${QFLAGS} -lc++_static ${CFlags}
+	llvm-strip --strip-unneeded ${bin}/apk/lib/arm64-v8a/libFilter.so
 
 apkCreator:
 	aapt package -f -M ./AndroidManifest.xml -S .\res -I ./lib/android.jar -F ${bin}/${Target}.unsigned.apk ${bin}\apk

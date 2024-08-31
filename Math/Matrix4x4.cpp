@@ -2,10 +2,7 @@
 #include "Vector4.h"
 #include <math.h>
 
-Matrix4x4::Matrix4x4()
-{
-	
-}
+Matrix4x4::Matrix4x4() {}
 
 //Matrix4x4::~Matrix4x4() {}
 
