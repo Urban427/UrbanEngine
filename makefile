@@ -19,9 +19,9 @@ windows: binFile
 	@echo ${MAKE} platform=${target} -C ${helperDir}
 	@echo ${MAKE} platform=${target} -C ${PhysicLibrary}
 	
-	${MAKE} platform=${target} -C ${MathDir}
+	@echo ${MAKE} platform=${target} -C ${MathDir}
 	${MAKE} platform=${target} -C ${IOSystemDir}
-	 ${MAKE} platform=${target} -C ${GraphicLibrary}
+	@echo  ${MAKE} platform=${target} -C ${GraphicLibrary}
 	${MAKE} platform=${target} -C ${LogicLibrary}
 	${MAKE} platform=${target} -C ${AppDir}
 	${MAKE} platform=${target} -C ${MAINDir}${${target}API} buildApp

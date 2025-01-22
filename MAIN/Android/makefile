@@ -1,7 +1,7 @@
 Target=AndroidApp
 
-CC = "C:\Program Files\android-ndk-r27\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++"
-sysroot = "C:\\Program Files\\android-ndk-r27\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot"
+CC = clang++
+sysroot = "C:\\Program Files\\android-ndk-r27b\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot"
 tar = aarch64-none-linux-android21
 QFLAGS += -funwind-tables
 QFLAGS += -D Android

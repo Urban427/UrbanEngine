@@ -10,13 +10,13 @@
 #include <umath.h>
 //#define epsilon 0.000000000000000000000000000000000000001f
 
-struct Point
+struct VertexWithNormal
 {
 	int index;
 	int uv_index;
 	Vector3 normal;
 	
-	bool operator==(const Point second)
+	bool operator==(const VertexWithNormal second)
 	{
 		if(this->uv_index == second.uv_index && 
 		(this->normal.x == second.normal.x) && (this->normal.y == second.normal.y) && (this->normal.z == second.normal.z))
@@ -27,6 +27,21 @@ struct Point
 	}
 };
 
+
+struct VertexWithoutNormal
+{
+	int index;
+	int uv_index;
+	int normal_index;
+	
+	bool operator==(const VertexWithoutNormal second)
+	{
+		if(this->uv_index == second.uv_index && this->normal_index == second.normal_index) {
+			return 1;
+		}
+		return 0;
+	}
+};
 #ifdef Android
 	#include "AndroidInputManager.h"
 	#include "AndroidFilter.h"

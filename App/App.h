@@ -33,6 +33,9 @@ private:
 	void calculateCameraView();
 private:
 	//logic
+	Transform transform_static[1];
+	MeshCollider static_meshes[1];
+	
 	Transform transform[number_of_objects];
 	SphereCollision collisions[number_of_objects];
 	AABB aabb[number_of_objects];

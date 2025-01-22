@@ -56,8 +56,8 @@ void App::onCreate()
 	vertexes_indexes2 = GraphicsEngine::createIndexArrayObject({ (unsigned int*)physicHouse.index,  (unsigned int)physicHouse.index_size });
 	vertexes2 = GraphicsEngine::createVertexArrayObject({ physicHouse.vertex, sizeof(Vertex), (unsigned int)physicHouse.vertex_size });
 	
-	//player.transform->position 	= Vector3(5, 5, 5);
-	//player.transform->rotation  = Quaternion(0, -0.33f, 0, 1);
+	player.transform->position 	= Vector3(5, 5, 5);
+	player.transform->rotation  = Quaternion(0, -0.33f, 0, 1);
 	player.camera->rotation 	=  Quaternion(0, sin(45 * 0.5f * (M_PI / 180)), 0, cos(45 * 0.5f * (M_PI / 180.0f))); 
 	player.camera->rotation.normalize();
 	for(unsigned int i = 0; i <  number_of_objects; i++)
@@ -123,7 +123,7 @@ void App::onUpdate()
 	}
 	
 	UpdateFPSO(&player, 1);
-	calculatePhysic(transform, collisions, aabb, number_of_objects);
+	simulatePhysic(transform, collisions, aabb, number_of_objects, transform_static, static_meshes, 1);
 
 	
 	if(lockCursor && focus) {
@@ -168,12 +168,14 @@ void App::onUpdate()
 	
 	Matrix4x4 world1;
 	world1.setIdentity();
-	world1.setRotationY(t);
+	world1.setRotationY(t);		
 	
+	GraphicsEngine::setMatrix(shader, world1);
 	GraphicsEngine::setVertexArrayObject(vertexes2);
 	GraphicsEngine::setIndexArrayObject(vertexes_indexes2);
-	GraphicsEngine::setMatrix(shader, world1);
 	GraphicsEngine::drawTriangles(vertexes_indexes2->getNumberOfMaterials(), 0);
+
+	
 
 	//update ioSystem
 	IOSystem::onUpdate();

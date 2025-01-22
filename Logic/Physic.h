@@ -3,11 +3,6 @@
 #include <iostream>
 #include <algorithm>
 
-struct SphereCollision
-{
-	Vector3 offset;
-	float radius = 1;
-};
 
 struct AABB
 {
@@ -15,6 +10,26 @@ struct AABB
 	Vector3 max;
 	unsigned int index;
 };
+
+struct SphereCollision
+{
+	Vector3 offset;
+	float radius = 1;
+};
+
+struct MeshCollider
+{
+	Vector3* verticies;
+	int* indices;
+	unsigned int verticies_size;
+	unsigned int indices_size;
+};
+
+
+
+
+
+
 
 inline void solveSphereToSphere(Vector3& a, Vector3& b,  SphereCollision s1, SphereCollision s2)
 {	
@@ -49,6 +64,14 @@ inline void solveSphereToSphere(Vector3& a, Vector3& b,  SphereCollision s1, Sph
 	}
 }
 
+inline void solveSphereToMesh(Vector3& a, Vector3& b,  SphereCollision s1, MeshCollider s2)
+{
+	for(int i = 0; i < s2.indices_size; i+=3)
+	{
+		
+	}
+}
+
 inline bool checkAABBtoAABB(const AABB box1, const AABB box2)
 {	
 	if(box1.max.x < box2.min.x || box1.min.x > box2.max.x) { return 0; }
@@ -59,7 +82,12 @@ inline bool checkAABBtoAABB(const AABB box1, const AABB box2)
 };
 
 
-inline void simulatePhysicStep(Transform* transform, SphereCollision* collisions, AABB* aabb, int size)
+inline void calculatePhysic(Transform& transform)
+{
+	transform.position += Vector3(0, -0.03, 0);
+}
+
+inline void simulatePhysicStep(Transform* transform, SphereCollision* collisions, AABB* aabb, int size, Transform* transform2, MeshCollider* meshes2, int size2)
 {
 	for (int i = 0; i < size; ++i) {
         float r = collisions[aabb[i].index].radius * 2;
@@ -72,7 +100,7 @@ inline void simulatePhysicStep(Transform* transform, SphereCollision* collisions
         return a.min.x < b.min.x;
     });
 
-    // Detect collisions
+    // Detect collisions for dynamic x dynamic
     for (int i = 0; i < size; ++i) {
         AABB objA = aabb[i];
         for (int j = i + 1; j < size; ++j) {
@@ -89,11 +117,20 @@ inline void simulatePhysicStep(Transform* transform, SphereCollision* collisions
                     collisions[objB.index]
                 );
             }
-		}	
-		transform[i].position += Vector3(0, -0.003, 0);
-		transform[i].position.x = clamp(-10, 10, transform[i].position.x);
-		transform[i].position.y = clamp(  0, 10, transform[i].position.y);
-		transform[i].position.z = clamp(-10, 10, transform[i].position.z);
+		}
+		calculatePhysic(transform[i]);
+	}
+	
+	//detect collsions for dynamic x static
+	for (int i = 0; i < size; ++i) {
+		AABB objA = aabb[i];
+        for (int j = 0; j < size2; ++j) {
+			solveSphereToMesh(
+			transform[objA.index].position,
+			transform2[j].position,
+			collisions[objA.index],
+			meshes2[j]);
+		}
 	}
 }
 
@@ -115,11 +152,11 @@ inline void simulateSlowestPhysicStep(Transform* transform, SphereCollision* col
 	}
 }
 
-inline void calculatePhysic(Transform* transform, SphereCollision* collisions, AABB* aabbs, int size)
+inline void simulatePhysic(Transform* transform, SphereCollision* collisions, AABB* aabbs, int size, Transform* transform_static, MeshCollider* static_meshes, int static_size)
 {
     //for(int i = 0; i < 8; i++)
 	{
-		simulatePhysicStep(transform, collisions, aabbs, size);
+		simulatePhysicStep(transform, collisions, aabbs, size, transform_static, static_meshes, static_size);
 		//simulateSlowestPhysicStep(transform, collisions, aabbs, size);
 	}   
 }
