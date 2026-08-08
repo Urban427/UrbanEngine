@@ -1,8 +1,8 @@
 @echo off
 SET IMAGE_NAME=windows_builder
-SET PROJECT_NAME=project
 SET PROJECT_PATH=%~dp0
 SET PLATFORM=windows
+set PROJECT_NAME=%~1
 
 
 if "%~1"=="clean" (
@@ -15,9 +15,17 @@ if "%~1"=="clean" (
     exit /b
 )
 
+set ENGINE_PATH=%~dp0 
+set PROJECT_PATH=%~dp0..\Projects\%PROJECT_NAME% 
+set BUILD_PATH=%~dp0..\build\%PROJECT_NAME%
+set BUILD_PATH=%~dp0..\build
 
-if not "%~1"=="" set PLATFORM=%~1
-
+if not exist "%PROJECT_PATH%" ( 
+    echo Project not found: 
+    echo %PROJECT_PATH% 
+    exit /b 1 
+) 
+if not exist "%BUILD_PATH%" ( mkdir "%BUILD_PATH%" )
 
 echo Build for %PLATFORM%
 
@@ -44,7 +52,7 @@ IF ERRORLEVEL 1 (
 podman image inspect %IMAGE_NAME% >nul 2>&1
 IF ERRORLEVEL 1 (
     echo Image not found. Building new image.
-    podman build -t %IMAGE_NAME% .
+    podman build -t %IMAGE_NAME% "%ENGINE_PATH%"
 ) ELSE (
     echo Image found
 )
@@ -59,6 +67,18 @@ IF ERRORLEVEL 1 (
 )
 
 echo Start building
-podman run --rm -v "%PROJECT_NAME%:/workspace" -v "%PROJECT_PATH%:/host_project" %IMAGE_NAME% bash /host_project/tools/build.sh %PLATFORM%
+podman run --rm ^
+    -v "project:/workspace" ^
+    -v "%ENGINE_PATH%:/engine" ^
+    -v "%PROJECT_PATH%:/project" ^
+    -v "%BUILD_PATH%:/build" ^
+    %IMAGE_NAME% ^
+    bash /engine/tools/build.sh %PLATFORM% /project /engine /build  %PROJECT_NAME% 
+
+if errorlevel 1 ( 
+    echo Build failed. 
+    exit /b 1 
+)
+
 @REM start "" "./build/GlassWars/GlassWars.exe"
-"./build/GlassWars/GlassWars.exe"
+"%BUILD_PATH%\%PROJECT_NAME%\%PROJECT_NAME%.exe"
