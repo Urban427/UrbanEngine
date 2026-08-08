@@ -1,3 +1,30 @@
-bin
-build
-README
+# IDE and editors
+.vscode/
+.idea/
+
+# Build
+bin/
+build/
+.CMakeFiles/
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# System files
+.DS_Store
+Thumb.db
+
+# Binary files
+*.exe
+*.out
+*.o
+*.obj
+*.so
+*.dll
+*.a
