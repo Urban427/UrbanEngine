@@ -127,7 +127,8 @@ public:
 		return glyphs[characterIndex].width();
 	}
 	inline Rect getBoundingBox() { return { (float)head.xMin, (float)head.yMin, (float)head.xMax, (float)head.yMax }; }
-	 int toTexture();
+	TextureStruct toTexture(int imageWidth = 1024, int imageHeight = 1024, int fontSize = 64);
+	void calculateLayout(int imageWidth = 1024, int imageHeight = 1024, int fontSize = 64);
 private:
 	char drawGlyph(Layer& layer, Glyph& glyph, float scale, float padding);
 public:

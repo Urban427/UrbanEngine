@@ -11,6 +11,7 @@ public:
 	static Quaternion Inverse(const Quaternion q);
 	static Quaternion FromEuler(float pitch, float yaw, float roll);
 	static Quaternion FromAxisAngle(const Vector3& axis, float angle);
+	static Quaternion LookRotation(Vector3 direction, Vector3 up);
 
 public:
 	Quaternion operator+(const Quaternion q);
@@ -28,7 +29,55 @@ public:
 };
 
 
+inline Quaternion Quaternion::LookRotation(Vector3 direction, Vector3 up) {
+	Vector3 right = Vector3::Cross(up, direction);
+    up = Vector3::Cross(direction, right);
 
+    float m00 = right.x;
+    float m01 = right.y;
+    float m02 = right.z;
+
+    float m10 = up.x;
+    float m11 = up.y;
+    float m12 = up.z;
+
+    float m20 = direction.x;
+    float m21 = direction.y;
+    float m22 = direction.z;
+
+    float trace = m00 + m11 + m22;
+
+    Quaternion q;
+    if (trace > 0.0f) {
+        float s = sqrt(trace + 1.0f) * 2.0f;
+        q.w = 0.25f * s;
+        q.x = (m21 - m12) / s;
+        q.y = (m02 - m20) / s;
+        q.z = (m10 - m01) / s;
+    }
+    else if (m00 > m11 && m00 > m22) {
+        float s = sqrt(1.0f + m00 - m11 - m22) * 2.0f;
+        q.w = (m21 - m12) / s;
+        q.x = 0.25f * s;
+        q.y = (m01 + m10) / s;
+        q.z = (m02 + m20) / s;
+    }
+    else if (m11 > m22) {
+        float s = sqrt(1.0f + m11 - m00 - m22) * 2.0f;
+        q.w = (m02 - m20) / s;
+        q.x = (m01 + m10) / s;
+        q.y = 0.25f * s;
+        q.z = (m12 + m21) / s;
+    }
+    else {
+        float s = sqrt(1.0f + m22 - m00 - m11) * 2.0f;
+        q.w = (m10 - m01) / s;
+        q.x = (m02 + m20) / s;
+        q.y = (m12 + m21) / s;
+        q.z = 0.25f * s;
+    }
+    return q;
+}
 
 inline Quaternion Quaternion::FromAxisAngle(const Vector3& axis, float angle)
 {
@@ -48,7 +97,7 @@ inline Quaternion Quaternion::FromAxisAngle(const Vector3& axis, float angle)
 
 inline Quaternion Quaternion::FromEuler(float pitch, float yaw, float roll)
 {
-    float d2r = 3.14159265f / 180.0f;
+    float d2r = Math::PI / 180.0f;
 
     pitch *= d2r;
     yaw   *= d2r;

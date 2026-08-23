@@ -55,3 +55,16 @@ void FrameBuffer::resize(int newWidth, int newHeight) {
 	destroy();
 	init();
 }
+
+
+TextureStruct FrameBuffer::getTextureData() {
+	TextureStruct texture;
+	texture.width = width;
+	texture.height = height;
+	texture.pixels = new int[width * height];
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, texture.pixels);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return texture;
+}

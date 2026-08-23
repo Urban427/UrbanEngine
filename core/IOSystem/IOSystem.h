@@ -3,7 +3,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "IOstructures.h"
+#include "FileSystem.h"
 #include "FBXfile.h"
 #include "umath.h"
 #include "Mesh.h"
@@ -29,6 +29,7 @@ struct Input {
 	Vector2 pointerPosition = Vector2(0, 0);
 	Vector2 pointerDelta = Vector2(0, 0);
 	float scroll = 0.0f;
+	int  hotbarSlot = -1;
 	bool pointerPressed = false;
 	bool pointerReleased = false;
 	bool pointerHold = false;
@@ -158,6 +159,37 @@ public:
 		if(GetKey(KeyCode_LeftMouseButton)) {
 			input.pointerHold = true;
 		}
+
+		if (GetKeyDown(KeyCode_Alpha1)) {
+			input.hotbarSlot = 0;
+		}
+		else if (GetKeyDown(KeyCode_Alpha2)) {
+			input.hotbarSlot = 1;
+		}
+		else if (GetKeyDown(KeyCode_Alpha3)) {
+			input.hotbarSlot = 2;
+		}
+		else if (GetKeyDown(KeyCode_Alpha4)) {
+			input.hotbarSlot = 3;
+		}
+		else if (GetKeyDown(KeyCode_Alpha5)) {
+			input.hotbarSlot = 4;
+		}
+		else if (GetKeyDown(KeyCode_Alpha6)) {
+			input.hotbarSlot = 5;
+		}
+		else if (GetKeyDown(KeyCode_Alpha7)) {
+			input.hotbarSlot = 6;
+		}
+		else if (GetKeyDown(KeyCode_Alpha8)) {
+			input.hotbarSlot = 7;
+		}
+		else if (GetKeyDown(KeyCode_Alpha9)) {
+			input.hotbarSlot = 8;
+		}
+		else if (GetKeyDown(KeyCode_Alpha0)) {
+			input.hotbarSlot = 9;
+		}
 	}
 private:
 	unsigned char keyBoardState[256];
@@ -226,13 +258,16 @@ public:
 	void create();
 	void update();
 
-	static std::vector<Mesh> readFBX(const char* filename);
-	static bool readTTF(TTFAtlas& out, const char* filename);
-	static bool readBMP(TextureStruct& out, const char* filename);
-	static bool readPNG(TextureStruct& out, const char* filename);
-	static bool readImage(TextureStruct& out, const char* filename) {
-		if(readPNG(out, filename)) return true;
-		if(readBMP(out, filename)) return true;
+	static bool writeBMP(const TextureStruct& texture, CFile& file);
+
+	static std::vector<Mesh> readFBX(CFile& f);
+	static bool readTTF(TTFAtlas& out, CFile& f);
+	static bool readBMP(TextureStruct& out, CFile& f);
+	static bool readPNG(TextureStruct& out, CFile& f);
+	static bool readImage(TextureStruct& out, CFile& f) {
+		if(readPNG(out, f)) return true;
+		seekCFile(f, 0, SEEK_SET);
+		if(readBMP(out, f)) return true;
 		return false;
 	}
 

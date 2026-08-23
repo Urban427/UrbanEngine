@@ -20,14 +20,18 @@ public:
 	inline Vector3 normalized()
 	{
 		float l = sqrt(x * x + y * y + z * z);
-		if (l == 0)
-		{
+		if (l == 0) {
 			return Vector3(0, 0, 0);
 		}
 		return Vector3(x / l, y / l, z / l);
 	}
 
 public:
+	static Vector3 Bezier(Vector3& p0, Vector3& p1, Vector3& p2, float t) {
+		float u = 1.0f - t;
+		return p0 * (u * u) + p1 * (2.0f * u * t) + p2 * (t * t);
+	}
+
 	static float Dot(Vector3 a, Vector3 b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 	static float Distance(Vector3 a, Vector3 b);
 	static inline Vector3 ProjectOnPlane(Vector3 v, Vector3 normal) {
@@ -42,7 +46,13 @@ public:
 	inline static Vector3 Cross(Vector3 a, Vector3 b) {
 		return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
 	}
+	static Vector3 min(const Vector3& a, const Vector3& b) {
+		return Vector3(std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z));
+	}
 
+	static Vector3 max(const Vector3& a, const Vector3& b) {
+		return Vector3(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z));
+	}
 public:
 	Vector3 operator*(const float b);
 	inline Vector3 operator/(const float b) { return {x / b, y / b, z / b}; }

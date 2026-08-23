@@ -194,8 +194,7 @@ Glyph readGlypth(CFile& file) {
 }
 
 
-bool IOSystem::readTTF(TTFAtlas& out, const char* filename) {
-	CFile f = openCFile(filename);
+bool IOSystem::readTTF(TTFAtlas& out, CFile& f) {
 	if(f.isEmpty()) return false;
 	f.setEndian(Endian::Big);
 
@@ -438,21 +437,48 @@ char TTFAtlas::drawGlyph(Layer& layer, Glyph& glyph, float scale, float padding)
 	return 0;
 }
 
-
-
-int TTFAtlas::toTexture() {	
+void TTFAtlas::calculateLayout(int imageWidth, int imageHeight, int fontSize) {
 	size_t glyphsSize = getGlyphsSize();
-	Rect bbox = getBoundingBox();
+	const float padding = 3.0f;
+	int numInARow = imageWidth / fontSize;
+	int startPosX = 0;
+	int startPosY = 0;
+	for(size_t i = 0; i < glyphsSize; ++i) {
+		Glyph& glyph = getGlyph(i);
+		Vector2 available{ fontSize - padding * 2.0f, fontSize - padding * 2.0f };
+		Vector2 glyphSize{ glyph.width(), glyph.height() };
 
-	int sizer = 64;
-	int ImageWidth = 1024;
-	int ImageHeight = 1024;
-	int fontSize = sizer;
-	int numInARow = ImageWidth / fontSize;
+		char mainAxis = glyphSize.y > glyphSize.x;
 
-	Image image(ImageWidth, ImageHeight);
-	Layer *layers = new Layer[glyphsSize];
-	float padding = 3;
+		if(glyphSize[mainAxis] < 0.001f) continue;
+
+		float scale = available[mainAxis] / glyphSize[mainAxis];
+
+		glyphSize *= scale;
+
+		float paddingX2 = padding * 2.0f;
+		float layerWidth = paddingX2 + glyphSize[0];
+		float layerHeight = paddingX2 + glyphSize[1];
+
+		if(startPosX + layerWidth >= imageWidth) {
+			startPosX = 0;
+			startPosY += fontSize;
+		}
+		glyph.uv = {
+			(float)startPosX / imageWidth,
+			(float)startPosY / imageHeight,
+			(float)(startPosX + layerWidth) / imageWidth,
+			(float)(startPosY + layerHeight) / imageHeight
+		};
+		startPosX += layerWidth;
+	}
+}
+
+TextureStruct TTFAtlas::toTexture(int imageWidth, int imageHeight, int fontSize) {	
+	size_t glyphsSize = getGlyphsSize();
+	const float padding = 3.0f;
+	Image image(imageWidth, imageHeight);
+	Layer* layers = new Layer[glyphsSize];
 	int startPosX = 0;
 	int startPosY = 0;
 	for(size_t i = 0; i < glyphsSize; ++i) {
@@ -462,27 +488,22 @@ int TTFAtlas::toTexture() {
 		char mainAxis = glyphSize.y > glyphSize.x;
 		if(glyphSize[mainAxis] < 0.001f) continue;
 
-		
 		float scale = available[mainAxis] / glyphSize[mainAxis];
 		glyphSize *= scale;
 		float paddingX2 = padding * 2.0f;
-		float layerWidth  = paddingX2 + glyphSize[0];
+		float layerWidth = paddingX2 + glyphSize[0];
 		float layerHeight = paddingX2 + glyphSize[1];
-		if(startPosX + layerWidth >= ImageWidth) {
+		if(startPosX + layerWidth >= imageWidth) {
 			startPosX = 0;
 			startPosY += fontSize;
 		}
-		layers[i].init(startPosX, startPosY, layerWidth, layerHeight);
 
+		layers[i].init(startPosX, startPosY, layerWidth, layerHeight);
 		drawGlyph(layers[i], glyph, scale, padding);
-		glyph.uv = { 
-			(float)startPosX / ImageWidth,
-			(float)startPosY / ImageHeight,
-			(float)(startPosX + layerWidth) / ImageWidth, 
-			(float)(startPosY + layerHeight) / ImageHeight };
 		image.addLayer(&layers[i]);
 		startPosX += layerWidth;
 	}
-	return image.convertToTexture();
-	//printf("glyphIndex: %d\n", getCharacterIndex('M'));
+	TextureStruct result = image.convertToTexture();
+	delete[] layers;
+	return result;
 }

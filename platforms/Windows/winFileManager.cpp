@@ -1,42 +1,11 @@
-#include "../IOstructures.h"
+#include "FileSystem.h"
 #include <stdio.h>
 #include <cstdlib>
-
-int getTextSize(const char* text)
-{
-	int size = 0;
-	while(1) {
-		if(text[size] == 0) {
-			break;
-		}
-		size++;
-	}
-	return size;
-}
-
-char* combineTwoWords(const char* text1, const char* text2)
-{
-	int text1_size = getTextSize(text1);
-	int text2_size = getTextSize(text2);
-	char* summ = new char[text1_size + text2_size + 1];
-	int i = 0;
-	for(; i < text1_size; i++) {
-		summ[i] = text1[i];
-	}
-	for(int j = 0; j < text2_size; j++, i++) {
-		summ[i] = text2[j];
-	}
-	summ[i] = 0;
-	return summ;
-}
+#include <sys/stat.h>
 
 CFile openCFile(const char* name)
 {
-	//get file full name
-	const char* folderName = "./Assets/";
-	char* fullName = combineTwoWords(folderName, name);
-	FILE* f = fopen(fullName, "rb");
-	delete[] fullName;
+	FILE* f = fopen(name, "rb");
 	
 	//end if file not found
 	if(f == NULL) {
@@ -59,11 +28,23 @@ CFile openCFile(const char* name)
 }
 
 void saveCFile(const char* name, CFile& file) {
-	const char* folderName = "./Assets/";
-    char* fullName = combineTwoWords(folderName, name);
-    FILE* f = fopen(fullName, "wb");
-    delete[] fullName;
+    FILE* f = fopen(name, "wb");
     if (!f) return;
-    fwrite(file.start, 1, file.size, f);
+    fwrite(file.start, 1, file._size, f);
     fclose(f);
+}
+
+bool getFileModificationTime(const char* name, time_t& time) {
+    struct stat info;
+    if (stat(name, &info) != 0) return false;
+    time = info.st_mtime;
+    return true;
+}
+
+bool isFileOlder(const char* file, const char* reference) {
+    time_t fileTime;
+    time_t referenceTime;
+    if (!getFileModificationTime(file, fileTime)) return true;
+    if (!getFileModificationTime(reference, referenceTime)) return false;
+    return fileTime < referenceTime;
 }

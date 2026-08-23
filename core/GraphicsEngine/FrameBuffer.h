@@ -1,5 +1,6 @@
 #pragma once
 #include "stdlibInclude.h"
+#include "umath.h"
 
 class FrameBuffer
 {
@@ -11,6 +12,7 @@ public:
 	inline unsigned int getColorTexture() const	{ return colorTexture; }
 	inline std::pair<int, int>  getSize() const	{ return {width, height}; }
 	
+	TextureStruct getTextureData();
 	void bind();
 	void unbind();
 	void resize(int width, int height);

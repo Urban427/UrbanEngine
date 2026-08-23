@@ -16,7 +16,7 @@ public:
 	inline int  getHeight() { return height; }
 	inline void addLayer(Layer* layer) { layers.push_back(layer); }
 
-	unsigned int convertToTexture();
+	TextureStruct convertToTexture();
 	char saveImage(const char* filename);
 private:
 	int width;

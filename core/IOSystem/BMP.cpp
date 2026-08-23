@@ -1,45 +1,34 @@
 #include "IOSystem.h"
 
-bool IOSystem::readBMP(TextureStruct& out, const char* filename) {
-	CFile f = openCFile(filename);
+bool IOSystem::readBMP(TextureStruct& out, CFile& f) {
 	if(f.isEmpty()) return false;
 
-	short  bfType;
-	int    bfSize;
-	short  bfReserved1;
-	short  bfReserved2;
-	int    bfOffBits;
-    readCFile(&bfType, sizeof(short), f);
-    readCFile(&bfSize, sizeof(int), f);
-    readCFile(&bfReserved1, sizeof(short), f);
-    readCFile(&bfReserved2, sizeof(short), f);
-    readCFile(&bfOffBits, sizeof(int), f);
+	const uint16_t bfType       = f.read<uint16_t>();
+	const uint32_t bfSize       = f.read<uint32_t>();
+	const uint16_t bfReserved1  = f.read<uint16_t>();
+	const uint16_t bfReserved2  = f.read<uint16_t>();
+	const uint32_t bfOffBits    = f.read<uint32_t>();
 	
+	if(bfType != 0x4D42) return false;
 	
-	int    biSize;
-	int    biWidth;
-	int    biHeight;
-	short   biPlanes;
-	short   biBitCount;
-	int    biCompression;
-	int    biSizeImage; 
-	int    biXPelsPerMeter;
-	int    biYPelsPerMeter;
-	int    biClrUsed;     
-	int    biClrImportant;
-	
-	readCFile(&biSize, sizeof(int), f);
-    readCFile(&biWidth, sizeof(int), f);
-    readCFile(&biHeight, sizeof(int), f);
-    readCFile(&biPlanes, sizeof(short), f);
-    readCFile(&biBitCount, sizeof(short), f);
-    readCFile(&biCompression, sizeof(int), f);
-    readCFile(&biSizeImage, sizeof(int), f);
-    readCFile(&biXPelsPerMeter, sizeof(int), f);
-    readCFile(&biYPelsPerMeter, sizeof(int), f);
-    readCFile(&biClrUsed, sizeof(int), f);
-    readCFile(&biClrImportant, sizeof(int), f);
-	
+	const uint32_t biSize            = f.read<uint32_t>();
+	const int32_t  biWidth           = f.read<int32_t>();
+	const int32_t  biHeight          = f.read<int32_t>();
+	const uint16_t biPlanes          = f.read<uint16_t>();
+	const uint16_t biBitCount        = f.read<uint16_t>();
+	const uint32_t biCompression     = f.read<uint32_t>();
+	const uint32_t biSizeImage       = f.read<uint32_t>();
+	const int32_t  biXPelsPerMeter   = f.read<int32_t>();
+	const int32_t  biYPelsPerMeter   = f.read<int32_t>();
+	const uint32_t biClrUsed         = f.read<uint32_t>();
+	const uint32_t biClrImportant    = f.read<uint32_t>();
+
+	if(biSize != 40) return false;
+	if(biWidth <= 0 || biHeight == 0) return false;
+	if(biPlanes != 1) return false;
+	if(biBitCount != 24 && biBitCount != 32) return false;
+	if(biCompression != 0)  return false;
+
 	
 	//move to main data
 	seekCFile(f, bfOffBits, SEEK_SET);
@@ -75,5 +64,48 @@ bool IOSystem::readBMP(TextureStruct& out, const char* filename) {
 		seekCFile(f, padding, SEEK_CUR);
     }
 	
+	return true;
+}
+
+bool IOSystem::writeBMP(const TextureStruct& texture, CFile& file) {
+	if(texture.pixels == nullptr || texture.width <= 0 || texture.height <= 0) {
+		return false;
+	}
+	file = createCFile();
+
+	const uint16_t bitsPerPixel = 32;
+	const uint32_t bytesPerPixel = bitsPerPixel / 8;
+
+	const uint32_t rowSize = texture.width * bytesPerPixel;
+	const uint32_t imageSize = rowSize * texture.height;
+	const uint32_t pixelOffset = 14 + 40;
+	const uint32_t fileSize = pixelOffset + imageSize;
+
+	file.write<uint16_t>(0x4D42);
+	file.write<uint32_t>(fileSize);
+	file.write<uint16_t>(0);
+	file.write<uint16_t>(0);
+	file.write<uint32_t>(pixelOffset);
+
+	file.write<uint32_t>(40); 
+	file.write<int32_t>(texture.width);
+	file.write<int32_t>(texture.height);
+
+	file.write<uint16_t>(1);
+	file.write<uint16_t>(bitsPerPixel);
+	file.write<uint32_t>(0); 
+	file.write<uint32_t>(imageSize);
+
+	file.write<int32_t>(0); 
+	file.write<int32_t>(0);
+	file.write<uint32_t>(0); 
+	file.write<uint32_t>(0);
+
+	for(int y = 0; y < texture.height; ++y) {
+		for(int x = 0; x < texture.width; ++x) {
+			uint32_t pixel = static_cast<uint32_t>(texture.pixels[y * texture.width + x]);
+			file.write<uint32_t>(pixel);
+		}
+	}
 	return true;
 }

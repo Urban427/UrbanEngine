@@ -50,13 +50,12 @@ char Image::saveImage(const char* filename) {
 	return 0;
 }
 
-unsigned int Image::convertToTexture() {
+TextureStruct Image::convertToTexture() {
     int* buffer = new int[width * height];
 	// memset(buffer, 0xff'ff'ff'ff, width * height * 4);
 	for(int i = 0; i < layers.size(); i++) {
 		writeLayersToPixelsBuffer(layers[i], width, height, buffer);
 	}
-    unsigned int textureID = TextureManager::CreateTexture({width, height, buffer});
-    return textureID; 
+    return {width, height, buffer}; 
 }
 	

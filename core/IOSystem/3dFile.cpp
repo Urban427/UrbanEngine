@@ -6,10 +6,12 @@
 struct VertexWithNormal {
 	int index;
 	int uv_index;
+	int uv1_index;
 	Vector3 normal;
 
 	bool operator==(const VertexWithNormal second) {
 		if(this->uv_index == second.uv_index && 
+		  (this->uv1_index == second.uv1_index) && 
 		  (this->normal.x == second.normal.x) && 
 		  (this->normal.y == second.normal.y) && 
 		  (this->normal.z == second.normal.z)) return 1;
@@ -21,10 +23,11 @@ struct VertexWithNormal {
 struct VertexWithoutNormal {
 	int index;
 	int uv_index;
+	int uv1_index;
 	int normal_index;
 
 	bool operator==(const VertexWithoutNormal second) {
-		if(this->uv_index == second.uv_index && this->normal_index == second.normal_index) return 1;
+		if(this->uv_index == second.uv_index && this->uv1_index == second.uv1_index && this->normal_index == second.normal_index) return 1;
 		return 0;
 	}
 };
@@ -33,6 +36,7 @@ Mesh createMeshWithIndexNormals(
 	int* indicies_array, int number_of_indicies,
 	Vector3* Vertexes, int  number_of_vertexes,
 	Vector2* uv_vertexes,	int* uv_indexes,		int number_of_uv_indexes,
+	Vector2* uv1_vertexes,	int* uv1_indexes,		int number_of_uv1_indexes,
 	Vector3* normals,		int* normal_indexes,	int normals_length,
 	int* material_indexes, int number_of_materials,	bool byVertex)
 {
@@ -57,10 +61,12 @@ Mesh createMeshWithIndexNormals(
 	for(int i = 0; i < number_of_indicies; i++) {
 		//check the end of the polygon
 		if(!(indicies_array[i] & 0x80'00'00'00)) {
-			helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], normal_indexes[i]}, indicies_array[i]);
+			int realIndex = indicies_array[i];
+			helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], uv1_indexes[i], normal_indexes[realIndex]}, indicies_array[i]);
 			continue;
 		}
-		helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], normal_indexes[i]}, -indicies_array[i] - 1);
+		int realIndex = -indicies_array[i] - 1;
+		helping_indicies[i] = dictionary.addElement({i, uv_indexes[i], uv1_indexes[i], normal_indexes[realIndex]}, realIndex);
 		
 		//get the number of points
 		number_of_points = i - first + 1;
@@ -68,6 +74,7 @@ Mesh createMeshWithIndexNormals(
 		if(max_number_of_points_per_polygon < number_of_points) { max_number_of_points_per_polygon = number_of_points;}
 		real_number_of_indicies += number_of_points * 3 - 6;
 		first = i + 1;
+		// printf("wallker %d) %d\n", 3, i);
 		if(number_of_used_materials > 1) { materials_counter[*material_indexes] += number_of_points * 3 - 6; ++material_indexes; }
 	}
 	
@@ -104,10 +111,10 @@ Mesh createMeshWithIndexNormals(
 		for(int j = first; j < i; j++) {
 			if(j == helping_indicies[j]) {
 				if(byVertex) {
-					result_vertexes[vertex_index] = {Vertexes[indicies_array[j]], normals[normal_indexes[   indicies_array[j]  ]], uv_vertexes[uv_indexes[j]]};
+					result_vertexes[vertex_index] = {Vertexes[indicies_array[j]], normals[normal_indexes[   indicies_array[j]  ]], uv_vertexes[uv_indexes[j]], uv1_vertexes[uv1_indexes[j]]};
 				}
 				else {
-					result_vertexes[vertex_index] = {Vertexes[indicies_array[j]], normals[normal_indexes[j]], uv_vertexes[uv_indexes[j]]};
+					result_vertexes[vertex_index] = {Vertexes[indicies_array[j]], normals[normal_indexes[j]], uv_vertexes[uv_indexes[j]], uv1_vertexes[uv1_indexes[j]]};
 				}
 				indicies_array[j] = vertex_index++;
 			}
@@ -143,23 +150,33 @@ Mesh readObject(Node* geometry) {
 	Node* NormalsIndex 	= FBXfile::findChildByName("NormalsIndex", LayerNormal);
 	Node* MappInfoType 	= FBXfile::findChildByName("MappingInformationType", LayerNormal);
 	Node* RefInfoType	= FBXfile::findChildByName("ReferenceInformationType", LayerNormal);
-	Node* LayerUV		= FBXfile::findChildByName("LayerElementUV", geometry);
-	Node* UV 			= FBXfile::findChildByName("UV", LayerUV);
-	Node* UVIndex 		= FBXfile::findChildByName("UVIndex", LayerUV);
+
+	std::vector<Node*> LayerUV = FBXfile::findChildrenByName("LayerElementUV", geometry);
+	Node* UV[2];
+	Node* UVIndex[2];
+
+	UV[0] = FBXfile::findChildByName("UV", LayerUV[0]);
+	UVIndex[0] = FBXfile::findChildByName("UVIndex", LayerUV[0]);
+	if(LayerUV.size() > 1) {
+		UV[1] = FBXfile::findChildByName("UV", LayerUV[1]);
+		UVIndex[1] = FBXfile::findChildByName("UVIndex", LayerUV[1]);
+	}
+
 	Node* LayerMaterial	= FBXfile::findChildByName("LayerElementMaterial", geometry);
 	Node* Materials		= FBXfile::findChildByName("Materials", LayerMaterial);
 	
 	// if(1) {
-		// Node* toPrint = Materials;
-		// for(int i = 0; i < toPrint->children.size(); i++) {
-			// //if(!strcmp(toPrint->children[i]->name, "Material")) { continue; } 
-			// //printf("%s\n\tproperties:\n", toPrint->children[i]->name); for(int j = 0; j < toPrint->children[i]->props.size(); j++) { printf("\t\t%d\n", toPrint->children[i]->props[j].parametr); }
-			// printf("\tchildren:\n");
-			// for(int j = 0; j < toPrint->children[i]->children.size(); j++) {
-				// printf("\t\t%s\n", toPrint->children[i]->children[j]->name);
-			// }
-			// printf("\n");
-		// }
+	// 	printf("%d\n", LayerUV.size());
+	// 	// Node* toPrint = geometry;
+	// 	// for(int i = 0; i < toPrint->children.size(); i++) {
+	// 	// 	//if(!strcmp(toPrint->children[i]->name, "Material")) { continue; } 
+	// 	// 	//printf("%s\n\tproperties:\n", toPrint->children[i]->name); for(int j = 0; j < toPrint->children[i]->props.size(); j++) { printf("\t\t%d\n", toPrint->children[i]->props[j].parametr); }
+	// 	// 	printf("\t%d) children name %s:\n", i, toPrint->children[i]->name);
+	// 	// 	// for(int j = 0; j < toPrint->children[i]->children.size(); j++) {
+	// 	// 		// printf("\t\t%s\n", toPrint->children[i]->children[j]->name);
+	// 	// 	// }
+	// 	// 	printf("\n");
+	// 	// }
 	// }
 	
 	//indexes
@@ -171,7 +188,7 @@ Mesh readObject(Node* geometry) {
 	int  number_of_vertexes = Vertices->props[0].ArrayLength / 3;
 	Vector3* Vertexes = new Vector3[number_of_vertexes];
 	for(int i = 0, j = 0; i < Vertices->props[0].ArrayLength; i += 3, j++) {
-		Vertexes[j] = Vector3(Vertices->props[0].DoubleArray[i], Vertices->props[0].DoubleArray[i + 2], Vertices->props[0].DoubleArray[i + 1]);
+		Vertexes[j] = Vector3(-Vertices->props[0].DoubleArray[i], Vertices->props[0].DoubleArray[i + 2], Vertices->props[0].DoubleArray[i + 1]);
 	}
 	
 	//normals
@@ -180,7 +197,7 @@ Mesh readObject(Node* geometry) {
 	Vector3* normals = new Vector3[normals_length];
 	bool byVertex = true;
 	for(int i = 0, j = 0; j < normals_length; i += 3, j++) {
-		normals[j] = Vector3(Normals->props[0].DoubleArray[i], Normals->props[0].DoubleArray[i + 2], Normals->props[0].DoubleArray[i + 1]); 
+		normals[j] = Vector3(-Normals->props[0].DoubleArray[i], Normals->props[0].DoubleArray[i + 2], Normals->props[0].DoubleArray[i + 1]); 
 	}
 	if(NormalsIndex != nullptr) {
 		normal_indexes = NormalsIndex->props[0].IntegerArray;
@@ -196,12 +213,51 @@ Mesh readObject(Node* geometry) {
 	}
 	
 	//uv
-	int number_of_uv_indexes = UVIndex->props[0].ArrayLength;
-	int* uv_indexes = UVIndex->props[0].IntegerArray;
-	int number_of_uv_vertexes = UV->props[0].ArrayLength / 2;
-	Vector2* uv_vertexes = new Vector2[number_of_uv_vertexes];
-	for(int i = 0, j = 0; i < UV->props[0].ArrayLength; i+=2, j++) {
-		uv_vertexes[j] = Vector2(UV->props[0].DoubleArray[i], UV->props[0].DoubleArray[i + 1]);
+	int number_of_uv_indexes;
+	int* uv_indexes;
+	int number_of_uv_vertexes;
+	Vector2* uv_vertexes;
+	if(LayerUV.size() > 0) {
+		number_of_uv_indexes = UVIndex[0]->props[0].ArrayLength;
+		uv_indexes = UVIndex[0]->props[0].IntegerArray;
+		number_of_uv_vertexes = UV[0]->props[0].ArrayLength / 2;
+		uv_vertexes = new Vector2[number_of_uv_vertexes];
+		for(int i = 0, j = 0; i < UV[0]->props[0].ArrayLength; i+=2, j++) {
+			uv_vertexes[j] = Vector2(UV[0]->props[0].DoubleArray[i], UV[0]->props[0].DoubleArray[i + 1]);
+		}
+	}
+	else {
+		number_of_uv_indexes = number_of_indicies;
+		uv_indexes = new int[number_of_uv_indexes];
+		for(int i = 0; i < number_of_uv_indexes; i++) {
+			uv_indexes[i] = 0;
+		}
+		number_of_uv_vertexes = 1;
+		uv_vertexes = new Vector2[number_of_uv_vertexes];
+	}
+	
+
+	int number_of_uv1_indexes;
+	int* uv1_indexes;
+	int number_of_uv1_vertexes;
+	Vector2* uv1_vertexes;
+	if(LayerUV.size() > 1) {
+		number_of_uv1_indexes = UVIndex[1]->props[0].ArrayLength;
+		uv1_indexes = UVIndex[1]->props[0].IntegerArray;
+		number_of_uv1_vertexes = UV[1]->props[0].ArrayLength / 2;
+		uv1_vertexes = new Vector2[number_of_uv1_vertexes];
+		for(int i = 0, j = 0; i < UV[1]->props[0].ArrayLength; i+=2, j++) {
+			uv1_vertexes[j] = Vector2(UV[1]->props[0].DoubleArray[i], UV[1]->props[0].DoubleArray[i + 1]);
+		}
+	}
+	else {
+		number_of_uv1_indexes = number_of_indicies;
+		uv1_indexes = new int[number_of_uv1_indexes];
+		for(int i = 0; i < number_of_uv1_indexes; i++) {
+			uv1_indexes[i] = 0;
+		}
+		number_of_uv1_vertexes = 1;
+		uv1_vertexes = new Vector2[number_of_uv1_vertexes];
 	}
 	
 	//material
@@ -215,7 +271,8 @@ Mesh readObject(Node* geometry) {
 	Mesh mesh = createMeshWithIndexNormals(
 			indicies_array, number_of_indicies, 
 			Vertexes, number_of_vertexes, 
-			uv_vertexes, uv_indexes, number_of_uv_indexes, 
+			uv_vertexes,  uv_indexes,  number_of_uv_indexes, 
+			uv1_vertexes, uv1_indexes, number_of_uv1_indexes, 
 			normals, normal_indexes, normals_length, 
 			material_indexes, number_of_materials, 
 		byVertex
@@ -226,8 +283,7 @@ Mesh readObject(Node* geometry) {
 	return mesh;
 }
 
-std::vector<Mesh> IOSystem::readFBX(const char* filename) {
-	CFile f = openCFile(filename);;
+std::vector<Mesh> IOSystem::readFBX(CFile& f) {
 	if(f.isEmpty()) { return std::vector<Mesh>(); }
 	FBXfile fbxFile(f);
 	

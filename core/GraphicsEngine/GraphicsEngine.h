@@ -28,6 +28,7 @@ namespace  GraphicsEngine
 	void setVertexArrayObject(VertexArrayObject* vao);
 	void setShaderProgram(Shader* program);
 	void setTexture(unsigned int textureID, Shader* shader);
+	void setTexture1(unsigned int textureID, Shader* shader);
 	void setRenderTargetWindow();
 	
 	void setVector4(Shader* shader, Vector4 vector4);

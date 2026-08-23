@@ -3,6 +3,11 @@
 #include "Vector3.h"
 #include "GraphicsEngine.h"
 
+struct BoundingBox {
+    Vector3 min;
+    Vector3 max;
+};
+
 struct Vertex {
 	Vector3 pos;
 	Vector3 normal;
@@ -20,11 +25,14 @@ public:
 
 	void syncWithGPU();
 	void setMeshOnPipeline();
+	void combineMaterials(int uniqueMaterials);
 	int getNumberOfMaterials() { return materials.size(); }
 	unsigned int getMaterialSize(int id) { 
 		if(id >= materials.size()) return 0;
 		return materials[id]; 
 	};
+
+    BoundingBox getBoundingBox() const;
 public:
     std::vector<uint32_t> indices;
     std::vector<Vertex> vertices;

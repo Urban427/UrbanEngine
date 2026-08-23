@@ -57,7 +57,7 @@ void TriangulatePolygon3D(
     Vertex* vertex_array, Vector3 normal, Vector2* vector2_array,
     bool* removed_vertexes, int* index_array, int number_of_points, int* result_indices)
 {
-    normal = normal * -1;
+    // normal = normal * -1;
     Vector3 summ = normal;
     if (summ.x < 0) summ.x = -summ.x;
     if (summ.y < 0) summ.y = -summ.y;

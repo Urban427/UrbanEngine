@@ -11,6 +11,7 @@
 #include "ClientServerSystem.h"
 #include "Settings.h"
 #include "GameplayGenerator.h"
+#include "InventoryManager.h"
 
 void createMainSimulation() {
 	Object cube = ECS::createObject();
@@ -18,29 +19,131 @@ void createMainSimulation() {
 	cube.AddComponent<RenderView>().mesh_index = MESH_Sphere;
 	cube.GetComponent<RenderView>().materals[0] = PrefabSystem::getInstance().FloortexMaterial;
 
-	for(int i = 0; i < 12; i++){
-		Object entity = PrefabSystem::getInstance().createBall();;
-		entity.transform.position = Vector3(22 + i * 2, 15, 4);
+	for(int i = 0; i < 5; i++) {
+		PrefabSystem::getInstance().createCapsule().transform.position = Vector3(22 + i * 3, 15, 62);
 	}
 
-	for(int i = 0; i < 5; i++) {
-		PrefabSystem::getInstance().createBox().transform.position = Vector3(22 + i * 2, 14, -10);
-	}
+	float startPos = -14;
+	Object axe = PrefabSystem::getInstance().createAxe();
+	axe.transform.position = Vector3(startPos++, 1, 10);
+	axe.transform.rotation = Quaternion::FromEuler(0, -180, 0);
 
-	for(int i = 0; i < 5; i++) {
-		PrefabSystem::getInstance().createCylinder().transform.position = Vector3(22 + i * 2, 15, 22);
-	}
+	Object ball = PrefabSystem::getInstance().createBall();
+	ball.transform.position = Vector3(startPos++, 1, 10);
 
-	for(int i = 0; i < 5; i++) {
-		PrefabSystem::getInstance().createCapsule().transform.position = Vector3(22 + i * 3, 15, 12);
-	}
+	PrefabSystem::getInstance().createBoards( Vector3(startPos++, 1, 10), Quaternion::FromEuler(0, -90, 0));
+	startPos++;
+	
+	Object bed = PrefabSystem::getInstance().createBed();
+	bed.transform.position = Vector3(startPos++, 0, 10);
+	bed.transform.rotation = Quaternion::FromEuler(0, -180, 0);
+
+	Object battary = PrefabSystem::getInstance().createBattery();
+	battary.transform.position = Vector3(startPos++, 1, 10);
+
+	Object bolt = PrefabSystem::getInstance().createBolt();
+	bolt.transform.position = Vector3(startPos++, 1, 10);
+
+	Object bookshelf = PrefabSystem::getInstance().createBookshelf();
+	bookshelf.transform.position = Vector3(startPos++, 0, 10);
+	bookshelf.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object bookshelf2 = PrefabSystem::getInstance().createBookshelf2();
+	bookshelf2.transform.position = Vector3(startPos++, 0, 10);
+	bookshelf2.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object bookshelf3 = PrefabSystem::getInstance().createBookshelf3();
+	bookshelf3.transform.position = Vector3(startPos++, 0, 10);
+	bookshelf3.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object bookshelf4 = PrefabSystem::getInstance().createBookshelf4();
+	bookshelf4.transform.position = Vector3(startPos++, 0, 10);
+	bookshelf4.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+		
+	Object box = PrefabSystem::getInstance().createBox();
+	box.transform.position = Vector3(startPos++, 1, 10);
+
+	Object bucket = PrefabSystem::getInstance().createBucket();
+	bucket.transform.position = Vector3(startPos++, 1, 10);
+
+	Object catVase = PrefabSystem::getInstance().createCatVase();
+	catVase.transform.position = Vector3(startPos++, 1, 10);
+	catVase.transform.rotation = Quaternion::FromEuler(0, -180, 0);
+
+	Object chair = PrefabSystem::getInstance().createChair();
+	chair.transform.position = Vector3(startPos++, 1, 10);
+	chair.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object clock = PrefabSystem::getInstance().createClock();
+	clock.transform.position = Vector3(startPos++, 1, 10);
+	clock.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object coin = PrefabSystem::getInstance().createCoin();
+	coin.transform.position = Vector3(startPos++, 1, 10);
+	coin.transform.rotation = Quaternion::FromEuler(-90, 0, 0);
+
+	Object computerSystem = PrefabSystem::getInstance().createComputerSystem();
+	computerSystem.transform.position = Vector3(startPos++, 1, 10);
+	computerSystem.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+	startPos++;
+
+	Object cupboard = PrefabSystem::getInstance().createBookshelf5();
+	cupboard.transform.position = Vector3(startPos++, 1, 10);
+	cupboard.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+	startPos++;
+	
+	Object door = PrefabSystem::getInstance().createDoor();
+	door.transform.position = Vector3(startPos++, 0, 10);
+	door.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+	startPos++;
+	
+	Object eshield = PrefabSystem::getInstance().createEshield();
+	eshield.transform.position = Vector3(startPos++, 1, 10);
+	eshield.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+	
+	Object fireextinguisher = PrefabSystem::getInstance().createFireextinguisher();
+	fireextinguisher.transform.position = Vector3(startPos++, 1, 10);
+	fireextinguisher.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object gasmask = PrefabSystem::getInstance().createGasMask();
+	gasmask.transform.position = Vector3(startPos++, 1, 10);
+	gasmask.transform.rotation = Quaternion::FromEuler(0, 180, 0);
+
+	Object hammer = PrefabSystem::getInstance().createHammer();
+	hammer.transform.position = Vector3(startPos++, 1, 10);
+	hammer.transform.rotation = Quaternion::FromEuler(0, 180, 0);
+
+	Object ladder = PrefabSystem::getInstance().createLadder(7);
+	ladder.transform.position = Vector3(startPos++, 1, 10);
+	ladder.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object locker = PrefabSystem::getInstance().createLocker();
+	locker.transform.position = Vector3(startPos++, 1, 10);
+	locker.transform.rotation = Quaternion::FromEuler(0, 180, 0);
+
+	Object key = PrefabSystem::getInstance().createKey();
+	key.transform.position = Vector3(startPos++, 1, 10);
+	key.transform.rotation = Quaternion::FromEuler(0, 0, 0);
+
+	Object picture1 = PrefabSystem::getInstance().createPicture(0);
+	picture1.transform.position = Vector3(startPos++, 1, 10);
+	picture1.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object valve = PrefabSystem::getInstance().createValve();
+	valve.transform.position = Vector3(startPos++, 1, 10);
+	valve.transform.rotation = Quaternion::FromEuler(0, 90, 0);
+
+	Object wardrobe = PrefabSystem::getInstance().createWardrobe();
+	wardrobe.transform.position = Vector3(startPos++, 0, 10);
+	wardrobe.transform.rotation = Quaternion::FromEuler(0, 90, 0);
 
 	OverlayManager::Create();
 	Object player = PrefabSystem::getInstance().createPlayer(true);
 	player.GetComponent<CameraControlSystem>().obj = cube;
+	player.GetComponent<CameraControlSystem>().Start();
 	Object mainCamera = player.getChild(0);
 
-	Object terrain = PrefabSystem::getInstance().createTerrain(10);
+	Object terrain = PrefabSystem::getInstance().createTerrain(0);
 	terrain.transform.scale = 4;
 	terrain.transform.scale.y = 1;
 	terrain.transform.position -= Vector3(50, 0, 50);
@@ -53,8 +156,8 @@ void createMainSimulation() {
 	text3d.GetComponent<TextView>().buildMesh();
 
 
-	short botMat = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Ghost1, 0, 0xff));
-	short maskMat = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Ghost, 0, 0xff));
+	short botMat = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Axe, 0, 0xff));
+	short maskMat = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Axe, 0, 0xff));
 	for (int i = 0; i < -3; i++) {
 		Object Bot = ECS::createObject();
 		Bot.transform.scale = 1;
@@ -233,10 +336,11 @@ void createMainSimulation() {
 			sol.transform.position = center + Vector3(-19 + x, 0, z);
 			sol.AddComponent<Rigidbody>();
 			sol.AddComponent<CubeCollider>();
+			sol.AddComponent<Takeable>();
 			sol.AddComponent<SolutionObstacle>().isObstacle = false;
 			sol.GetComponent<SolutionObstacle>().mask = solutions[solutionsToObstacle[i].id].mask;
 			sol.AddComponent<RenderView>().mesh_index = MESH_Cube;
-			sol.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, 0, 0, Color::HSV(hue, 1.0f, 1.0f)));
+			sol.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_White, 0, Color::HSV(hue, 1.0f, 1.0f)));
 
 			Object solchild = ECS::createObject();
 			solchild.transform.scale = 0.7f;
@@ -301,7 +405,7 @@ void createMainSimulation() {
 			obs.AddComponent<SolutionObstacle>().isObstacle = true;
 			obs.GetComponent<SolutionObstacle>().mask = obstacles[i].mask;
 			obs.AddComponent<RenderView>().mesh_index = MESH_Cube;
-			obs.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, 0, 0, Color::HSV(hue, 1.0f, 1.0f)));
+			obs.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_White, 0, Color::HSV(hue, 1.0f, 1.0f)));
 
 			Object obschild = ECS::createObject();
 			float base = 0.5f;
@@ -334,6 +438,12 @@ void createMainSimulation() {
 	generatable.transform.scale = 3;
 	generatable.AddComponent<RenderView>().mesh_index = MESH_Cube;
 	generatable.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Atlas, 0, 0xff));
+
+	generatable = ECS::createObject();
+	generatable.transform.position = {0, 5, 0};
+	generatable.transform.scale = 3;
+	generatable.AddComponent<RenderView>().mesh_index = MESH_Cube;
+	generatable.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, 0, 0, 0xff));
 }
 
 
@@ -381,6 +491,7 @@ void Scene::Update() {
 		cameraControlSystems[i].Update();
 	}
 
+	InventoryManager::getInstance().Update();
 	UISystem::getInstance().Update();
 }
 

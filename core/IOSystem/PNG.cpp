@@ -43,8 +43,7 @@ struct IHDR {
 	uint8_t  interlaceMethod;
 };
 
-bool IOSystem::readPNG(TextureStruct& out, const char* filename) {
-	CFile f = openCFile(filename);
+bool IOSystem::readPNG(TextureStruct& out, CFile& f) {
 	if(f.isEmpty()) return false;
 
     bool isReading = true;

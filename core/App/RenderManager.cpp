@@ -9,10 +9,16 @@
 #include "Voxels.h"
 #include "ResourceManager.h"
 #include "AtlasManager.h"
-
-RenderManager *RenderManager::renderManager = new RenderManager();
+#include "archiver.h"
 
 void RenderManager::init() {
+	Color noneTex(0, 0, 0, 0);
+	TextureStruct noneTexture;
+	noneTexture.width = 1;
+	noneTexture.height = 1;
+	noneTexture.pixels = (int*)&noneTex;
+	TextureManager::CreateTexture(noneTexture);
+	
 	Color white(255);
 	TextureStruct whiteTexture;
 	whiteTexture.width = 1;
@@ -21,18 +27,109 @@ void RenderManager::init() {
 	TextureManager::CreateTexture(whiteTexture);
 
 
+	const char* assetArchiveFilename = "assetArchive.pck";
+	Archive assetArchive;
+	#define Debug
 
-	TTFAtlas atlas;
-	IOSystem::readTTF(atlas, "fonts/MyriadWeb.ttf");
-	atlas.toTexture();
-	AtlasManager::SetAtlas(atlas);
+	#ifdef Debug 
+		CFile atlasFile = openCFile("Fonts/MyriadWeb.ttf");
+		assetArchive.addFile(std::move(atlasFile));
+		
+		CFile atlasMapFile = openCFile("Textures/atlas.bmp"); \
+		if(atlasMapFile.isEmpty() || isFileOlder("Textures/atlas.bmp", "Fonts/MyriadWeb.ttf")) { \
+			TTFAtlas atlas;
+			IOSystem::readTTF(atlas, assetArchive.getFile(0));
+			seekCFile(assetArchive.getFile(0), 0, SEEK_SET);
+			atlas.calculateLayout();
 
+			TextureStruct texture = atlas.toTexture();
+			IOSystem::writeBMP(texture, atlasMapFile);
+			saveCFile("Textures/atlas.bmp", atlasMapFile);
+		}
+		assetArchive.addFile(std::move(atlasMapFile));
+
+
+		#define FIELD(name, combineMode) \
+			{ \
+				CFile blendFile = openCFile("./Models/" #name ".blend"); \
+				if(blendFile.isEmpty()) return; \
+				CFile checkfile = openCFile("./Models/fbx/" #name ".fbx"); \
+				if(checkfile.isEmpty() || isFileOlder("./Models/fbx/" #name ".fbx", "./Models/" #name ".blend")) { \
+					std::string command =                                                  \
+						"cmd /c \"\""                                                       \
+						"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Blender\\blender.exe\"" \
+						" \"./Models/" #name ".blend\""                                          \
+						" --python-expr "                                                  \
+						"\"import bpy; bpy.ops.export_scene.fbx(filepath='./Models/fbx/" #name ".fbx')\"" \
+						" -b\"";                                                           \
+					int result = std::system(command.c_str()); \
+					checkfile = openCFile("./Models/fbx/" #name ".fbx"); \
+				} \
+				assetArchive.addFile(std::move(checkfile));           \
+			}
+		MESHES
+		#undef FIELD
+	#else
+	{
+		#define FIELD(name) \
+			{ \
+				std::string command =                                                  \
+					"cmd /c \"\""                                                       \
+					"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Blender\\blender.exe\"" \
+					" \"./Models/box.blend\""                                          \
+					" --python-expr "                                                  \
+					"\"import bpy; bpy.ops.export_scene.fbx(filepath='./Models/fbx/" \
+					#name ".fbx')\""                                                   \
+					" -b\"";                                                           \
+				int result = std::system(command.c_str()); \
+				assetArchive.addFile("./Models/fbx/" #name ".fbx");           \
+			}
+		MESHES
+		#undef FIELD
+		
+		CFile archiveFile = assetArchive.toFile();
+		saveCFile(assetArchiveFilename, archiveFile);
+
+		if(!Archive::loadFromFile(assetArchive, assetArchiveFilename)) {
+			return;
+		}
+	}
+	#endif
+
+
+	int fileIndex = 0;
+	TTFAtlas atlasFinal;
+	IOSystem::readTTF(atlasFinal, assetArchive.getFile(fileIndex++));
+	atlasFinal.calculateLayout();
+	AtlasManager::SetAtlas(atlasFinal);
+
+	TextureStruct atlasTexture;
+	if (IOSystem::readImage(atlasTexture, assetArchive.getFile(fileIndex++))) {
+		TextureManager::CreateTexture(atlasTexture);
+	}
+
+	// create shape points
+	MeshManager::addMesh(CreatePlane());
+	MeshManager::addMesh(CreateCube());
+	MeshManager::addMesh(CreateSphere(0.5f, 32, 32));
+	MeshManager::addMesh(CreateCylinder(32));
+	MeshManager::addMesh(CreateCapsule(1.0f, 0.5f, 32, 32));
+
+	#define FIELD(name, combineMode) \
+		{ \
+			std::vector<Mesh> meshes = IOSystem::readFBX(assetArchive.getFile(fileIndex++)); \
+			for(auto& mesh : meshes) mesh.combineMaterials(combineMode); \
+			MeshManager::addMeshes(meshes); \
+		}
+	MESHES
+	#undef FIELD
 
 	// create texture
 	#define FIELD(name) \
 		{ \
 			TextureStruct temp; \
-			if (IOSystem::readImage(temp, "Textures/" #name ".png")) { \
+			CFile file = openCFile("Textures/" #name ".png"); \
+			if (IOSystem::readImage(temp, file)) { \
 				TextureManager::CreateTexture(temp); \
 			} \
 		}
@@ -48,22 +145,13 @@ void RenderManager::init() {
 	SHADERS
 	#undef FIELD
 
-	// create shape points
-	MeshManager::addMesh(CreatePlane());
-	MeshManager::addMesh(CreateCube());
-	MeshManager::addMesh(CreateSphere(0.5f, 32, 32));
-	MeshManager::addMesh(CreateCylinder(32));
-	MeshManager::addMesh(CreateCapsule(1.0f, 0.5f, 32, 32));
 
-	#define FIELD(name) \
-		{ \
-			std::vector<Mesh> meshes = IOSystem::readFBX("Models/" #name ".fbx"); \
-			for (auto& mesh : meshes) { \
-				MeshManager::addMesh(mesh); \
-			} \
-		}
-	MESHES
-	#undef FIELD
+	#ifdef Debug 
+		CFile itemsFile;
+		TextureStruct items = renderItemAtlas();
+		IOSystem::writeBMP(items, itemsFile);
+		saveCFile("Textures/items.bmp", itemsFile);
+	#endif
 }
 
 Quaternion getWorldRotation(int objectID) {
@@ -90,6 +178,95 @@ Matrix4x4 getCameraView(Matrix4x4 world, int cameraID) {
     T.setIdentity();
     T.setTranslation(-pos);
     return R * T;
+}
+
+TextureStruct RenderManager::renderItemAtlas() {
+	int width = 1024;
+	int height = 1024;
+	int iconSize = 128;
+	const int columns = width / iconSize;
+	
+    int frameBufferMain = TextureManager::CreateFrameBuffer(width, height);
+	TextureManager::SetRenderTarget(frameBufferMain);
+	
+	GraphicsEngine::clear(255);
+	GraphicsEngine::clearColorDepthBuffer();
+
+	Matrix4x4 camView;
+	camView.setIdentity();
+	Matrix4x4 projection;
+	projection.setIdentity();
+	projection.setOrthoLH(0.0f, iconSize, 0.0f, iconSize, -100.0f, 100.0f);
+	
+	Matrix4x4 rot;
+	Matrix4x4 world;
+	GraphicsEngine::setShaderProgram(shaders[SHADER_icons]);
+	GraphicsEngine::setProjectionMatrix(shaders[SHADER_icons], projection);
+	GraphicsEngine::setCameraViewMatrix(shaders[SHADER_icons], camView);
+	GraphicsEngine::setTexture(TextureManager::GetTextureByID(0), shaders[SHADER_icons]);
+	GraphicsEngine::setVector4(shaders[SHADER_icons], Color(0).ToVector4());
+	for(size_t i = 0; i < MeshManager::getOffsetsCount(); i++) {
+		int column = i % columns;
+		int row = i / columns;
+		int x = column * iconSize;
+		int y = row * iconSize;
+		GraphicsEngine::setViewPort( x, y, x + iconSize, y + iconSize);
+
+		int meshID = MeshManager::getMeshID(i);
+		auto aabb = MeshManager::getMeshByID(meshID).getBoundingBox();
+
+		float angle = 0.0f;
+		Vector3 axis;
+		Vector2 planeSize;
+		Vector2 planeMin;
+		
+		Vector3 size = aabb.max - aabb.min;
+		float areaXY = size.x * size.y;
+		float areaXZ = size.x * size.z;
+		float areaYZ = size.y * size.z;
+
+		if (areaXY >= areaXZ && areaXY >= areaYZ) {
+    		axis = Vector3(1, 0, 0);
+   			angle = 0.0f;
+			planeSize = Vector2(size.x, size.y);
+			planeMin  = Vector2(aabb.min.x, aabb.min.y);
+		}
+		else if (areaXZ >= areaXY && areaXZ >= areaYZ) {
+			axis = Vector3(1, 0, 0);
+    		angle = Math::PI * 0.5f;
+			planeSize = Vector2(size.x, size.z);
+			planeMin  = Vector2(aabb.min.x, aabb.min.z);
+		}
+		else {
+			axis = Vector3(0, 1, 0);
+			angle = Math::PI * 0.5f;
+    		planeSize = Vector2(size.y, size.z);
+    		planeMin  = Vector2(aabb.min.y, aabb.min.z);
+		}
+
+		float maxAxis = std::max(planeSize.x, planeSize.y);
+		float scaleFactor = (float)(iconSize * 0.9f) / maxAxis;
+		Quaternion rotation = Quaternion::FromAxisAngle(axis, angle);
+		rot.setIdentity();
+		rot.setRotation(rotation);
+
+		world.setIdentity();
+		world.setScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+		Vector3 center = aabb.min + size * 0.5f;
+		world.setTranslation(Vector3(
+			-center.x * scaleFactor,
+			-center.y * scaleFactor,
+			-center.z * scaleFactor
+		));
+		world = world * rot;
+		GraphicsEngine::setMatrix(shaders[SHADER_icons], world);
+
+		unsigned int number_of_mats = MeshManager::setMeshById(meshID);
+		int number_of_triangles = MeshManager::getNumberOfPolygonsByMaterialID(meshID, 0);
+		GraphicsEngine::drawTriangles(number_of_triangles, nullptr);
+	}
+
+	return TextureManager::getTextureData(frameBufferMain);
 }
 
 void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
@@ -135,6 +312,7 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 			GraphicsEngine::setCameraViewMatrix(shader_ptr, camView);
 
 			GraphicsEngine::setTexture(TextureManager::GetTextureByID(texture_index), shader_ptr);
+			GraphicsEngine::setTexture1(TextureManager::GetTextureByID(texture_index1), shader_ptr);
 			GraphicsEngine::setVector4(shader_ptr, material.color.ToVector4());
 			GraphicsEngine::setMatrix(shader_ptr, worlds[objectID]);
 			if(renderView.object.HasComponent<Voxels>()) {

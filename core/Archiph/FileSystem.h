@@ -35,6 +35,11 @@ class CFile {
 public:
 	CFile();
 	CFile(char* ptr, int size);
+    CFile(const CFile&) = delete;
+    CFile& operator=(const CFile&) = delete;
+    CFile(CFile&& other) noexcept;
+    CFile& operator=(CFile&& other) noexcept;
+	
 	~CFile();
 	
 	template<class T>
@@ -48,13 +53,23 @@ public:
 	template<class T>
 	T read() { T value; read(value); return value; }
 
+	template<class T>
+	void write(const T& value) {
+		T temp = value;
+		if constexpr (sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8) {
+			if (endian != Endian::Little) temp = byteswap(temp);
+		}
+		writeCFile(&temp, sizeof(T), *this);
+	}
+
 	inline void setEndian(Endian newEndian) { endian = newEndian; }
 	inline char* getPtr() { return pointer; }
 	inline bool isEmpty() { return pointer == nullptr; };
+	inline int size() const { return _size; }
 private:
 	char* start = nullptr;
 	char* pointer = nullptr;
-	unsigned int size = 0;
+	unsigned int _size = 0;
     unsigned int capacity = 0;
 	Endian endian = Endian::Little;
 };
@@ -67,3 +82,4 @@ void seekCFile(CFile& file, int offset, int origin);
 CFile createCFile();
 void writeCFile(const void* data, int size, CFile& file);
 void saveCFile(const char* name, CFile& file);
+bool isFileOlder(const char* file, const char* reference);

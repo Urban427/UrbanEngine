@@ -92,6 +92,14 @@ void GraphicsEngine::setTexture(unsigned int textureID, Shader *shader)
 	glUniform1i(transformLoc, 0);
 }
 
+void GraphicsEngine::setTexture1(unsigned int textureID, Shader *shader)
+{
+	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_DetailTex");
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glUniform1i(transformLoc, 1);
+}
+
 void GraphicsEngine::setVector4(Shader *shader, Vector4 vector4)
 {
 	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "diff_color");
@@ -131,10 +139,6 @@ void GraphicsEngine::setCameraViewMatrix(Shader *shader, Matrix4x4 &matrix)
 	unsigned int transformLoc = glGetUniformLocation(shader->getID(), "_camView");
 	glUniform4fv(transformLoc, 4, matrix.getPtr());
 }
-
-// void GraphicsEngine::setText(Shader* shader, TextRender& text) {
-
-// }
 
 void GraphicsEngine::setCullMode(const CullMode &mode)
 {

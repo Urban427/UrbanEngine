@@ -68,3 +68,26 @@ void Mesh::setMeshOnPipeline() {
     GraphicsEngine::setVertexArrayObject(vao);
     GraphicsEngine::setIndexArrayObject(iao);
 }
+
+void Mesh::combineMaterials(int uniqueMaterials) {
+    const size_t targetSize = 1 + uniqueMaterials;
+    if (materials.size() <= targetSize) return;
+    
+    for (size_t i = materials.size() - 1; i >= targetSize; --i) {
+        materials[i - 1] += materials[i];
+    }
+    materials.resize(targetSize);
+}
+
+BoundingBox Mesh::getBoundingBox() const {
+    BoundingBox box;
+    if (vertices.empty()) return box;
+
+    box.min = vertices[0].pos;
+    box.max = vertices[0].pos;
+    for (const Vertex& vertex : vertices) {
+        box.min = Vector3::min(box.min, vertex.pos);
+        box.max = Vector3::max(box.max, vertex.pos);
+    }
+    return box;
+}
