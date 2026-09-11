@@ -21,7 +21,7 @@ public:
 		HDC screen = GetDC(NULL);
 		double hPixelsPerInch = GetDeviceCaps(screen,LOGPIXELSX);
 		double vPixelsPerInch = GetDeviceCaps(screen,LOGPIXELSY);
-		ReleaseDC(NULL, screen);
+		ReleaseDC(NULL, screen); 
 		return { hPixelsPerInch, vPixelsPerInch };
 	}
     inline Vector2 getCursorPosition() { 

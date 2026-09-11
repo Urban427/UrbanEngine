@@ -45,13 +45,10 @@ void DepthTexture::unbind() {
 
 TextureStruct DepthTexture::getTextureData()
 {
-    TextureStruct texture;
-    texture.width = width;
-    texture.height = height;
-    texture.pixels = new int[width * height];
+    TextureStruct texture(width, height);
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, texture.pixels);
+    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, texture.getData());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return texture;

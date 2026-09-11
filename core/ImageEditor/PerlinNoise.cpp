@@ -88,7 +88,8 @@ double fractalNoise(double x, double y, double z, int octaves, double persistenc
 
 // Generate cloud-like texture
 TextureStruct PerlinNoise(const int width, const int height, double scale, int octaves, double persistence, float amplitude, unsigned int seed) {
-    int* pixels = new int[width * height];
+	TextureStruct texture(width, height);
+    int* pixels = texture.getData();
     initializePermutation(seed);
 	double d_width  = static_cast<double>(width);
 	double d_height = static_cast<double>(height);
@@ -101,7 +102,7 @@ TextureStruct PerlinNoise(const int width, const int height, double scale, int o
             pixels[y * width + x] = RGB_TO_INT(color, 0, color);
         }
     }
-	return {width, height, pixels};
+	return texture;
 }
 
 Mesh PerlinNoiseMesh(const int width, const int height, double scale, int octaves, double persistence, float amplitude, unsigned int seed) {
@@ -135,13 +136,13 @@ Mesh PerlinNoiseMesh(const int width, const int height, double scale, int octave
 
             // Triangle 1
             indices[k++] = topLeft;
-            indices[k++] = topRight;
             indices[k++] = bottomLeft;
+            indices[k++] = topRight;
 
             // Triangle 2
             indices[k++] = topRight;
-            indices[k++] = bottomRight;
             indices[k++] = bottomLeft;
+            indices[k++] = bottomRight;
         }
     }
 

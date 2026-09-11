@@ -6,10 +6,11 @@
 class TextureManager {
 public:
 	static unsigned int GetTextureByID		(unsigned int id);
-	static unsigned int	CreateTexture 		(const TextureStruct desc);
+	static unsigned int	CreateTexture 		(const TextureStruct& desc);
 	static unsigned int	CreateFrameBuffer	(int width, int height);
 	static unsigned int	CreateDepthTexture	(int width, int height);
 	static void			DeleteTexture		(unsigned int id);
+	static void 		SetTextureData		(unsigned int id, TextureStruct& texture);
 	static void 		SetRenderTarget		(unsigned int id);
 	static void 		ResizeFrameBuffer	(unsigned int id, int width, int height);
 	static std::pair<int, int> GetTextureSize(unsigned int id);

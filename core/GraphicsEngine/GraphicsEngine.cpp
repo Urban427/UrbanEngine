@@ -43,9 +43,9 @@ void GraphicsEngine::setViewPort(const unsigned int xOffset, const unsigned int 
 
 void GraphicsEngine::drawTriangles(unsigned int vertexCount, void *offset)
 {
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	// glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
 	glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, offset);
+	// glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
+	glPolygonMode(GL_BACK, GL_LINE);
 }
 
 void GraphicsEngine::setVertexArrayObject(VertexArrayObject *vao)
@@ -143,7 +143,7 @@ void GraphicsEngine::setCameraViewMatrix(Shader *shader, Matrix4x4 &matrix)
 void GraphicsEngine::setCullMode(const CullMode &mode)
 {
 	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	switch (mode)
 	{
 	case (BackFace):
@@ -162,6 +162,7 @@ void GraphicsEngine::setCullMode(const CullMode &mode)
 		break;
 	}
 	}
+	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 }
 

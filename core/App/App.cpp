@@ -9,6 +9,8 @@ void App::onCreate() {
 
 
 void App::onUpdate() {
+    #if defined(PRERELEASE)
+    #else
 	while(IOSystem::getWindow().isRunning()) 
 	{
 		NetworkManager::getInstance().receive();
@@ -18,4 +20,5 @@ void App::onUpdate() {
 		NetworkManager::getInstance().send();
 		client.render();
 	}
+    #endif
 }

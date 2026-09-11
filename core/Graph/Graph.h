@@ -31,7 +31,7 @@ public:
 	std::vector<int> maxBipartiteMatching();
 	void Tarjan();
 protected:
-	void BoruvkaMSTStep(int* parent, std::atomic<T>* cheapestWeight, std::atomic<int>* cheapestVertex, int start, int end); //?
+	void BoruvkaMSTStep(int* parent, std::atomic<T>* cheapestWeight, std::atomic<int>* cheapestFrom, std::atomic<int>* cheapestVertex, int start, int end); //?
 	int findComponent(int vertex, int* parent); //?
     void unionComponents(int u, int v, int* parent, int* rank); //?
 	bool BFS(IGraph<T, Derived>* residualGraph, int source, int sink, int* parent); //?????

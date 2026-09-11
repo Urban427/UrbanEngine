@@ -64,6 +64,27 @@ inline Vector2 operator-(const Vector2 a, const Vector2 b) { return { a.x - b.x,
 inline Vector2 operator+(const Vector2 a, const Vector2 b) { return { a.x + b.x, a.y + b.y }; }
 
 
+
+static bool raySegmentIntersection(const Vector2& rayOrigin, const Vector2& rayDir,  const Vector2& p1, const Vector2& p2, float& rayT) {
+    Vector2 e = p2 - p1;
+    Vector2 r = rayDir;
+    Vector2 q = p1 - rayOrigin;
+    float cross = r.x * e.y - r.y * e.x;
+
+    if (fabsf(cross) < 1e-6f) return false;
+    float t = (q.x * e.y - q.y * e.x) / cross;
+    float u = (q.x * r.y - q.y * r.x) / cross;
+
+    if (t >= 0.0f && u >= 0.0f && u <= 1.0f) {
+        rayT = t;
+        return true;
+    }
+    return false;
+}
+
+
+
+
 inline bool intersectRay(Vector2 p, Vector2 a, Vector2 b) {
     if ((a.y > p.y) == (b.y > p.y)) return false;
     float x = a.x + (p.y - a.y) * (b.x - a.x) / (b.y - a.y);

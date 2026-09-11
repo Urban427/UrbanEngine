@@ -36,6 +36,10 @@ public:
         return offset;
     }
 
+    inline static int getMeshCount() {
+        return getInstance().meshes.size();
+    } 
+
     inline static Mesh& getMeshByID(const int id) {
         return getInstance().meshes[id];
     } 

@@ -11,8 +11,8 @@ Mesh CreatePlane() {
     };
 
     mesh.indices = {
-        0, 2, 1,
-        1, 2, 3
+        0, 1, 2,
+        1, 3, 2
     };
 
     mesh.materials = { 6 };
@@ -62,12 +62,12 @@ Mesh CreateCube() {
     };
 
     mesh.indices = {
-         0,  2,  1,   1,  2,  3,   // Front
-         4,  6,  5,   5,  6,  7,   // Back
-         8, 10,  9,   9, 10, 11,   // Left
-        12, 14, 13,  13, 14, 15,   // Right
-        16, 18, 17,  17, 18, 19,   // Top
-        20, 22, 21,  21, 22, 23    // Bottom
+         0,  1,  2,   1,  3,  2,   // Front
+         4,  5,  6,   5,  7,  6,   // Back
+         8,  9, 10,   9, 11, 10,   // Left
+        12, 13, 14,  13, 15, 14,   // Right
+        16, 17, 18,  17, 19, 18,   // Top
+        20, 21, 22,  21, 23, 22   // Bottom
     };
 
     mesh.materials = { 36 };
@@ -211,8 +211,8 @@ Mesh CreateCapsule(float height, float radius, uint32_t stacks, uint32_t slices)
             uint32_t i3 = i2 + 1;
 
             mesh.indices.insert(mesh.indices.end(), {
-                i0, i2, i1,
-                i1, i2, i3
+                i0, i1, i2,
+                i1, i3, i2
             });
         }
     }

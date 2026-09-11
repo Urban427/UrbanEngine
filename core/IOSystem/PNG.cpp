@@ -180,70 +180,67 @@ bool IOSystem::readPNG(TextureStruct& out, CFile& f) {
     }
 
 
-    out.width = ihdr.width;
-    out.height = ihdr.height;
-    int pixelsCount = out.width * out.height;
-    out.pixels = new int[pixelsCount];
-
+    out.resize(ihdr.width, ihdr.height);
+    int* pixelsData = out.getData();
     const uint8_t* src = pixels.data();
     switch (ihdr.colorType) {
         case 6: { // RGBA 
-            for (uint32_t y = 0; y < out.height; ++y) {
-                uint32_t dstY = out.height - 1 - y;
-                for (uint32_t x = 0; x < out.width; ++x) {
+            for (uint32_t y = 0; y < out.height(); ++y) {
+                uint32_t dstY = out.height() - 1 - y;
+                for (uint32_t x = 0; x < out.width(); ++x) {
                     uint8_t r = *src++;
                     uint8_t g = *src++;
                     uint8_t b = *src++;
                     uint8_t a = *src++;
-                    out.pixels[dstY * out.width + x] = (a << 24) | (b << 16) | (g << 8) | r;
+                    pixelsData[dstY * out.width() + x] = (a << 24) | (b << 16) | (g << 8) | r;
                 }
             }
             break;
         }
 
         case 2: { // RGB
-            for (uint32_t y = 0; y < out.height; ++y) {
-                uint32_t dstY = out.height - 1 - y;
-                for (uint32_t x = 0; x < out.width; ++x) {
+            for (uint32_t y = 0; y < out.height(); ++y) {
+                uint32_t dstY = out.height() - 1 - y;
+                for (uint32_t x = 0; x < out.width(); ++x) {
                     uint8_t r = *src++;
                     uint8_t g = *src++;
                     uint8_t b = *src++;
-                    out.pixels[dstY * out.width + x] = (255 << 24) | (b << 16) | (g << 8) | r;
+                    pixelsData[dstY * out.width() + x] = (255 << 24) | (b << 16) | (g << 8) | r;
                 }
             }
             break;
         }
 
         case 0: { // Grayscale
-            for (uint32_t y = 0; y < out.height; ++y) {
-                uint32_t dstY = out.height - 1 - y;
-                for (uint32_t x = 0; x < out.width; ++x) {
+            for (uint32_t y = 0; y < out.height(); ++y) {
+                uint32_t dstY = out.height() - 1 - y;
+                for (uint32_t x = 0; x < out.width(); ++x) {
                     uint8_t l = *src++;
-                    out.pixels[dstY * out.width + x] = (255 << 24) | (l << 16) | (l << 8) | l;
+                    pixelsData[dstY * out.width() + x] = (255 << 24) | (l << 16) | (l << 8) | l;
                 }
             }
             break;
         }
 
         case 4: { // Grayscale + Alpha
-            for (uint32_t y = 0; y < out.height; ++y) {
-                uint32_t dstY = out.height - 1 - y;
-                for (uint32_t x = 0; x < out.width; ++x) {
+            for (uint32_t y = 0; y < out.height(); ++y) {
+                uint32_t dstY = out.height() - 1 - y;
+                for (uint32_t x = 0; x < out.width(); ++x) {
                     uint8_t l = *src++;
                     uint8_t a = *src++;
-                    out.pixels[dstY * out.width + x] = (a << 24) | (l << 16) | (l << 8) | l;
+                    pixelsData[dstY * out.width() + x] = (a << 24) | (l << 16) | (l << 8) | l;
                 }
             }
             break;
         }
 
         case 3: { // Indexed
-            for (uint32_t y = 0; y < out.height; ++y) {
-                uint32_t dstY = out.height - 1 - y;
-                for (uint32_t x = 0; x < out.width; ++x) {
+            for (uint32_t y = 0; y < out.height(); ++y) {
+                uint32_t dstY = out.height() - 1 - y;
+                for (uint32_t x = 0; x < out.width(); ++x) {
                     uint8_t index = *src++;
                     if (index >= palette.size()) return false;
-                    out.pixels[dstY * out.width + x] = palette[index];
+                    pixelsData[dstY * out.width() + x] = palette[index];
                 }
             }
             break;
@@ -251,8 +248,6 @@ bool IOSystem::readPNG(TextureStruct& out, CFile& f) {
 
         default: {
             printf("34\n");
-            delete[] out.pixels;
-            out.pixels = nullptr;
             return false;
         }
     }

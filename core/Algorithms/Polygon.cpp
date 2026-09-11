@@ -20,30 +20,8 @@ void Polygon::init(std::vector<Vector2>&& points) {
 	int size = n;
 	edges.resize(n);
 	for(int i = 0; i < n; ++i) {
-		edges[i] = i; 
-	}
-	
-	
-	std::sort(edges.begin(), edges.end(), [&n, &points](const int a, const int& b) {
-		int next;
-		
-		const Vector2& A1 = points[a];
-		if(a == n){ next = 0; }
-		else { next = a + 1;}
-		const Vector2& A2 = points[next];
-		
-		const Vector2& B1 = points[b];
-		if(b == n){ next = 0; }
-		else { next = b + 1;}
-		const Vector2& B2 = points[next];
-		
-		float minAx = std::min(A1.x, A2.x);
-		float minAy = std::min(A1.y, A2.y);
-		float minBx = std::min(B1.x, B2.x);
-		float minBy = std::min(B1.y, B2.y);
-		
-		return (minAx == minBx) ? (minAy < minBy) : (minAx < minBx);
-	});	
+		edges[i] = { i, (i + 1) % n }; 
+	}	
 }
 
 void Polygon::rotate(float angle) {
@@ -54,11 +32,9 @@ void Polygon::rotate(float angle) {
 
 bool Polygon::checkPointInside(const Vector2& point) {
 	int crossings = 0;
-	int n = points.size() - 1;
-	
-	for(int i = 0; i < n; i++) {
-		Vector2 a = points[i];
-		Vector2 b = points[i + 1];
+	for(int i = 0; i < edges.size(); i++) {
+		Vector2 a = points[edges[i].first];
+		Vector2 b = points[edges[i].second];
 		
 		if((a.y > point.y) != (b.y > point.y)) {
 			float intersectionX = a.x + (b.x - a.x) * (point.y - a.y) / (b.y - a.y);
@@ -68,17 +44,16 @@ bool Polygon::checkPointInside(const Vector2& point) {
 	return crossings & 0x1;
 }
 
-Polygon generatePlatonicSolid(int n, float radius) {
+Polygon generatePlatonicSolid(int n, float radius, Vector2 center, float angleOffset) {
 	std::vector<Vector2> points;
     points.resize(n);
-    float angle = 0;
+    float angle = angleOffset;
     float delta_angle = 2 * 3.14159265f / n;
 
     for (int i = 0; i < n; i++) {
-        points[i] = radius * Vector2(sin(angle), -cos(angle));
+        points[i] = center + radius * Vector2(sin(angle), -cos(angle));
         angle += delta_angle;
     }
-    
     return Polygon(std::move(points));
 }
 
@@ -231,7 +206,6 @@ void bspSplit(float xMin, float xMax, float yMin, float yMax, int depth, std::ve
     }
 }
 
-
 std::vector<Vector2> sortPointsIntoPolygon(std::vector<Vector2>& points) {
     Vector2 centroid = {0, 0};
     for (const auto& p : points) centroid = centroid + p;
@@ -243,39 +217,78 @@ std::vector<Vector2> sortPointsIntoPolygon(std::vector<Vector2>& points) {
     return points;
 }
 
-#include "Polygon.h"
-#include "Triangulation.h"
+void Polygon::sortEdges() {
+    std::vector<std::pair<int, int>> sortedEdges;
+    sortedEdges.reserve(edges.size());
+    int current = 0;
+    for (size_t i = 0; i < edges.size(); ++i)  {
+        auto it = std::find_if(edges.begin(), edges.end(),
+            [current](const auto& edge) {
+                return edge.first == current;
+            });
+
+        if (it == edges.end()) break;
+        sortedEdges.push_back(*it);
+        current = it->second;
+    }
+
+    edges = std::move(sortedEdges);
+}
 
 Mesh Shapes::Polygon::convertToMesh() {
-	Mesh mesh;
-	
-	int n = points.size();
-	if (n < 3) return mesh;
+    Mesh mesh;
+    int n = static_cast<int>(points.size());
+    if (n < 3) return mesh;
 
-	mesh.vertices.resize(n);
-	for (int i = 0; i < n; i++) {
-		mesh.vertices[i].pos[0] = points[i].x;
-		mesh.vertices[i].pos[1] = points[i].y;
-		mesh.vertices[i].pos[2] = 0.0f;
-	}
-	
-	mesh.indices.resize((n - 2) * 3);
-	std::vector<int> index_array(n);
-	for (int i = 0; i < n; i++) index_array[i] = n - i - 1;
-	
-	std::vector<char> removed(n, false);
-	
-	TriangulatePolygon2D(
-		points.data(),
-		(bool*)removed.data(),
-		index_array.data(),
-		n,
-		(int*)mesh.indices.data()
-	);
+    mesh.vertices.resize(n);
+    float minX = points[0].x;
+    float maxX = points[0].x;
+    float minY = points[0].y;
+    float maxY = points[0].y;
+    for (int i = 1; i < n; ++i) {
+        minX = std::min(minX, points[i].x);
+        maxX = std::max(maxX, points[i].x);
+        minY = std::min(minY, points[i].y);
+        maxY = std::max(maxY, points[i].y);
+    }
 
-	mesh.materials.resize(1, mesh.indices.size());
-	mesh.syncWithGPU();
-	return mesh;
+    float width  = maxX - minX;
+    float height = maxY - minY;
+    if (width == 0.0f) width = 1.0f;
+    if (height == 0.0f) height = 1.0f;
+    for (int i = 0; i < n; ++i) {
+        float x = points[i].x;
+        float y = points[i].y;
+
+        mesh.vertices[i].pos[0] = x;
+        mesh.vertices[i].pos[1] = y;
+        mesh.vertices[i].pos[2] = 0.0f;
+        mesh.vertices[i].uv[0] = (x - minX) / width;
+        mesh.vertices[i].uv[1] = (y - minY) / height;
+    }
+
+    sortEdges();
+    int indiciesSize = edges.size();
+    mesh.indices.resize((indiciesSize - 2) * 3);
+    std::vector<int> index_array(indiciesSize);
+    for (int i = 0; i < indiciesSize; ++i) {
+        // printf("%d %d\n", edges[indiciesSize - 1 - i].first, edges[indiciesSize - 1 - i].second);
+        index_array[i] = edges[indiciesSize - 1 - i].second;
+    }
+
+    bool* removed = new bool[indiciesSize]();
+    TriangulatePolygon2D(
+        points.data(),
+        removed,
+        index_array.data(),
+        indiciesSize,
+        (int*)mesh.indices.data()
+    );
+
+    delete[] removed;
+    mesh.materials.resize(1, mesh.indices.size());
+    mesh.syncWithGPU();
+    return mesh;
 }
 
 bool PointInQuadXZ(float x, float z, Vector3 quad[4]) {
@@ -293,5 +306,151 @@ bool PointInQuadXZ(float x, float z, Vector3 quad[4]) {
         if(positive && negative) return false;
     }
     return true;
+}
+
+
+
+
+bool unionPolygons(Shapes::Polygon& out, Shapes::Polygon& a, Shapes::Polygon& b) {
+    std::vector<Vector2> points;
+    std::vector<std::pair<int, int>> intersectionBelongs;
+
+    int pointsOriginal = a.size() + b.size();
+    intersectionBelongs.reserve(pointsOriginal);
+    points.reserve(pointsOriginal << 1);
+    for(int i = 0; i < a.size(); ++i) points.push_back(a[i]);
+    for(int i = 0; i < b.size(); ++i) points.push_back(b[i]);
+    
+    //findIntersections
+    for (int i = 0; i < a.edgeSize(); ++i) {
+        auto edge = a.getEdge(i);
+        for (int j = 0; j < b.edgeSize(); ++j) {
+            auto otherEdge = b.getEdge(j);
+            Vector2 p1;
+            Vector2 p2;
+            char type = Vector2::linesItersection( p1, p2, edge.first, edge.second, otherEdge.first, otherEdge.second );
+            if (!type) continue;
+
+            intersectionBelongs.push_back({ i, j });
+            points.push_back(p1);
+            if (type == 2) {
+                points.push_back(p2);
+                intersectionBelongs.push_back({ i, j });
+            }
+        }
+    }
+
+    //build segements
+    std::vector<std::pair<int, int>> edges;
+    std::vector<char> inside;
+    std::vector<int> help;
+    help.reserve(intersectionBelongs.size() + 2);
+    for (int i = 0; i < a.edgeSize(); ++i) {
+        auto edge = a.getEdgeIndicies(i);
+        help.clear();
+        help.push_back(edge.first);
+        for (int j = 0; j < intersectionBelongs.size(); ++j) {
+            if(intersectionBelongs[j].first == i) {
+                help.push_back(pointsOriginal + j);
+            }
+        }
+        help.push_back(edge.second);
+
+        Vector2 start = points[edge.first];
+        std::sort( help.begin(), help.end(), [&](const int p1, const int p2) {
+            return Vector2::DistanceSquare(start, points[p1]) < Vector2::DistanceSquare(start,  points[p2]);
+        });
+
+
+        bool isInside = b.checkPointInside(points[help[0]]);
+        for (int j = 0; j + 1 < help.size(); ++j) {
+            edges.push_back({ help[j], help[j + 1] });
+            inside.push_back(isInside);
+            isInside = !isInside;
+        }
+    }
+
+    for (int i = 0; i < b.edgeSize(); ++i) {
+        auto edge = b.getEdgeIndicies(i);
+        edge.first += a.size();
+        edge.second += a.size();
+        help.clear();
+        help.push_back(edge.first);
+        for (int j = 0; j < intersectionBelongs.size(); ++j) {
+            if(intersectionBelongs[j].second == i) {
+                help.push_back(pointsOriginal + j);
+            }
+        }
+        help.push_back(edge.second);
+
+        Vector2 start = points[edge.first];
+        std::sort( help.begin(), help.end(), [&](const int p1, const int p2) {
+            return Vector2::DistanceSquare(start, points[p1]) < Vector2::DistanceSquare(start,  points[p2]);
+        });
+
+
+        bool isInside = a.checkPointInside(points[help[0]]);
+        for (int j = 0; j + 1 < help.size(); ++j) {
+            edges.push_back({ help[j], help[j + 1] });
+            inside.push_back(isInside);
+            isInside = !isInside;
+        }
+    }
+
+    std::vector<std::pair<int, int>> resultEdges;
+    for (size_t i = 0; i < edges.size(); ++i) {
+        if (inside[i]) continue;
+        resultEdges.push_back(edges[i]);
+    }
+
+
+    std::vector<int> remap(points.size(), -1);
+    std::vector<Vector2> newPoints;
+    newPoints.reserve(points.size());
+    for (auto& edge : resultEdges) {
+        if (remap[edge.first] == -1) {
+            remap[edge.first] = static_cast<int>(newPoints.size());
+            newPoints.push_back(points[edge.first]);
+        }
+        edge.first = remap[edge.first];
+        if (remap[edge.second] == -1) {
+            remap[edge.second] = static_cast<int>(newPoints.size());
+            newPoints.push_back(points[edge.second]);
+        }
+        edge.second = remap[edge.second];
+    }
+
+    if (newPoints.size() < 3 || resultEdges.size() < 3) return false;
+    out = Shapes::Polygon( std::move(newPoints), std::move(resultEdges));
+    return true;
+}
+
+void Shapes::Polygon::subdivide(int segments) {
+    if(segments < 2) return;
+
+    int newNumberOfEdges = segments * edges.size();
+    int newPointsCount = (segments - 1) * edges.size();
+    points.reserve(points.size() + newPointsCount);
+    edges.reserve(newNumberOfEdges);
+
+    int n = edges.size();
+    for(int i = 0; i < n; ++i) {
+        auto& e = edges[i];
+        int startIndex = points.size();
+
+        Vector2 start = points[e.first];
+        Vector2 dir = (points[e.second] - start) / segments;
+        for(int j = 1; j < segments; j++) {
+            points.push_back(start + j * dir);
+        }
+
+        int theLast = e.second;
+        e.second = startIndex;
+        for(int j = 1; j < segments; ++j) {
+            edges.push_back({ startIndex, startIndex + 1} );
+            ++startIndex;
+        }
+        edges.back().second = theLast;
+    }
 }
 };

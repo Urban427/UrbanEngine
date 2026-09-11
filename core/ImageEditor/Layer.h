@@ -8,7 +8,10 @@ public:
 	Layer(int width, int height);
 	Layer(int x, int y, int width, int height);
 	Layer(const char* filename);
-	//~Layer();
+	~Layer() {
+		delete[] buffer;
+		delete[] z_buffer;
+	}
 	
 	void init(int x, int y, int width, int height);
 	
@@ -30,6 +33,12 @@ public:
 	char drawLine2D(Vector2 a, Vector2 b, int color);
 	char drawBezier(Vector2 a, Vector2 b, Vector2 c, int color);
 	char drawRectangle(const Rect& rect, int color);
+	inline void drawPolygon(Shapes::Polygon& polygon, int color) {
+		for(int i = 0; i < polygon.edgeSize(); ++i) {
+			auto [v1, v2] = polygon.getEdge(i);
+			drawLine2D(v1, v2, color);
+		}
+	} 
 	Rect getBox(Rect& rbox, Shapes::Polygon& polygon, int imageOffset);
 private:
 	int x;

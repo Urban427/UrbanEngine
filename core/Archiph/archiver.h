@@ -28,8 +28,9 @@ public:
 	void 	addFile(const char* path);
 	void 	addFile(CFile&& file);
 
+	int 	size() { return files.size(); }
 public:
 	static bool loadFromFile(Archive& archive, const char* filename);
 private:
-	std::vector<CFile> 			files;
+	std::vector<CFile> files;
 };

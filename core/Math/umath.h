@@ -3,10 +3,26 @@
 
 #define RGB_TO_INT(r, g, b) (((r) << 16) + ((g) << 8) + (b))
 
-struct TextureStruct
-{
-	int width;
-	int height;
+class TextureStruct {
+public:
+	TextureStruct(): _width(0), _height(0) { pixels = nullptr; };
+	TextureStruct(int width, int height): _width(width), _height(height) { pixels = new int[width * height]; };
+	~TextureStruct() { delete[] pixels; }
+
+	void resize(int width, int height) {
+		delete[] pixels;
+		_width = width;
+		_height = height;
+		pixels = new int[width * height];
+	}
+
+	bool valid() const { return _width > 0 && _height > 0 && pixels != nullptr; }
+	int* getData() const { return pixels; }
+	int width() const { return _width; }
+	int height() const { return _height; }
+private:
+	int _width;
+	int _height;
 	int* pixels;
 };
 
@@ -33,6 +49,10 @@ namespace Math {
 		if(value < a) return a;
 		if(value > b) return b;
 		return value;
+	}
+	
+	inline float lerp(float a, float b, float t) {
+		return a + (b - a) * t;
 	}
 };
 

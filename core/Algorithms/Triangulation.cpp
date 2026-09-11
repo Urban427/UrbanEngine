@@ -33,7 +33,53 @@ void TriangulatePolygon2D(
                 if (++numFound == 2)
                     break;
 
-            Vector2 a = vector2_array[prev], b = vector2_array[ear], c = vector2_array[next];
+            Vector2 a = vector2_array[index_array[prev]];
+            Vector2 b = vector2_array[index_array[ear]];
+            Vector2 c = vector2_array[index_array[next]];
+            if (clockwise(a, b, c) == 0) { continue; }
+
+            int j = 0;
+            for (; j < number_of_points; j++) {
+                if (j == ear || j == prev || j == next) continue;
+                if (inTriangle(a, b, c, vector2_array[index_array[j]])) break;
+            }
+            if (j != number_of_points) continue;
+            break;
+        }
+
+        *(result_indices++) = index_array[prev];
+        *(result_indices++) = index_array[ear];
+        *(result_indices++) = index_array[next];
+        removed_vertexes[ear] = 1;
+        number_of_unused_points--;
+        ear = next;
+    }
+}
+
+
+
+void TriangulatePolygon2DSpecial(
+    Vector2* vector2_array, bool* removed_vertexes, int* index_array,
+    int number_of_points, int* result_indices)
+{
+    int number_of_unused_points = number_of_points;
+    int next = 0;
+    int prev = number_of_points - 1;
+    int ear;
+    int numFound = 0;
+
+    while (number_of_unused_points >= 3) {
+        numFound = 0;
+        for (ear = next;; prev = ear, ear = next) {
+            // find next point
+            for (next = ear + 1; removed_vertexes[(next >= number_of_points ? next = 0 : next)]; next++);
+            if (next < ear)
+                if (++numFound == 2)
+                    break;
+
+            Vector2 a = vector2_array[prev];
+            Vector2 b = vector2_array[ear];
+            Vector2 c = vector2_array[next];
             if (clockwise(a, b, c) == 0) { continue; }
 
             int j = 0;
@@ -50,6 +96,7 @@ void TriangulatePolygon2D(
         *(result_indices++) = index_array[next];
         removed_vertexes[ear] = 1;
         number_of_unused_points--;
+        ear = next;
     }
 }
 
@@ -78,7 +125,6 @@ void TriangulatePolygon3D(
         int tmp = ia; ia = ib; ib = tmp;
     }
 	
-	
     Vector2* points_ptr = vector2_array;
     for (int i = 0; i < number_of_points; i++) {
         points_ptr->x = vertex_array[index_array[i]].pos[ia];
@@ -87,5 +133,5 @@ void TriangulatePolygon3D(
     }
 	
 	
-    TriangulatePolygon2D(vector2_array, removed_vertexes, index_array, number_of_points, result_indices);
+    TriangulatePolygon2DSpecial(vector2_array, removed_vertexes, index_array, number_of_points, result_indices);
 }

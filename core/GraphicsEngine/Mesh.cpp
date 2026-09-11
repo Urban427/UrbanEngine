@@ -91,3 +91,59 @@ BoundingBox Mesh::getBoundingBox() const {
     }
     return box;
 }
+
+void Mesh::seperateMeshWithVoxels(int width, int height, int depth) {
+    
+}
+
+void Mesh::splitTriangleAtCenter(int triangleIndex) {
+    const size_t indexOffset = static_cast<size_t>(triangleIndex) * 3;
+    uint32_t ia = indices[indexOffset];
+    uint32_t ib = indices[indexOffset + 1];
+    uint32_t ic = indices[indexOffset + 2];
+
+    const Vector3& a = vertices[ia].pos;
+    const Vector3& b = vertices[ib].pos;
+    const Vector3& c = vertices[ic].pos;
+    Vector3 center = (a + b + c) / 3.0;
+    Vertex centerVertex = vertices[ia];
+    centerVertex.pos = center;
+
+    uint32_t centerIndex = static_cast<uint32_t>(vertices.size());
+    vertices.push_back(centerVertex);
+    indices[indexOffset]     = ia;
+    indices[indexOffset + 1] = ib;
+    indices[indexOffset + 2] = centerIndex;
+
+    indices.push_back(ib);
+    indices.push_back(ic);
+    indices.push_back(centerIndex);
+
+    indices.push_back(ic);
+    indices.push_back(ia);
+    indices.push_back(centerIndex);
+
+    materials[0] += 6;
+}
+
+ListGraph<float> Mesh::buildGraph() {
+    ListGraph<float> graph(trianglesSize(), true);
+    for (int i = 0; i < trianglesSize(); ++i) {
+        uint32_t a0 = indices[i * 3 + 0];
+        uint32_t a1 = indices[i * 3 + 1];
+        uint32_t a2 = indices[i * 3 + 2];
+        for (int j = i + 1; j < trianglesSize(); ++j) {
+            uint32_t b0 = indices[j * 3 + 0];
+            uint32_t b1 = indices[j * 3 + 1];
+            uint32_t b2 = indices[j * 3 + 2];
+            int sharedVertices = 0;
+            if (a0 == b0 || a0 == b1 || a0 == b2) ++sharedVertices;
+            if (a1 == b0 || a1 == b1 || a1 == b2) ++sharedVertices;
+            if (a2 == b0 || a2 == b1 || a2 == b2) ++sharedVertices;
+            if (sharedVertices == 2) {
+                graph.addEdge(i, j, 1.0f);
+            }
+        }
+    }
+    return graph;
+}

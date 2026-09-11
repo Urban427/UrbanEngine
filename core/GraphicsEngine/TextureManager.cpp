@@ -33,8 +33,6 @@ unsigned int GetIndex(unsigned int id)
 }
 
 
-
-
 unsigned int TextureManager::GetTextureByID(unsigned int id)
 {
 	unsigned int index = GetIndex(id);
@@ -49,7 +47,17 @@ unsigned int TextureManager::GetTextureByID(unsigned int id)
 	return textureManager->textures[0]->getID();
 }
 
-unsigned int TextureManager::CreateTexture(const TextureStruct desc) {
+void TextureManager::SetTextureData(unsigned int id, TextureStruct& texture) {
+	unsigned int index = GetIndex(id);
+	if (GetType(id) == TEXTURE) {
+		if (index < textureManager->textures.size()) {
+			textureManager->textures[index]->destroy();
+			textureManager->textures[index]->init(texture);
+		}
+	}
+}
+
+unsigned int TextureManager::CreateTexture(const TextureStruct& desc) {
 	unsigned int index;
 	if (!textureManager->freeTextureIDs.empty()) {
 		index = textureManager->freeTextureIDs.top();

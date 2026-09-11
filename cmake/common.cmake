@@ -43,8 +43,8 @@ foreach(INDEX RANGE ${NUM_LIBRARIES})
     list(APPEND LINK_LIBS ${LIB})
 endforeach()
 set(LIB "platforms_${CMAKE_SYSTEM_NAME}")
-create_library(LIB "platforms/${CMAKE_SYSTEM_NAME}")
-list(APPEND LINK_LIBS LIB)
+create_library(${LIB} "platforms/${CMAKE_SYSTEM_NAME}")
+list(APPEND LINK_LIBS ${LIB})
 
 
 

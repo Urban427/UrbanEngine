@@ -4,11 +4,12 @@
 class Texture
 {
 public:
-	Texture(const TextureStruct desc) { init(desc); }
-	void init(const TextureStruct desc);
+	Texture(const TextureStruct& desc) { init(desc); }
+	void init(const TextureStruct& desc);
 	
 	inline std::pair<int, int> getSize() { return {width, height}; }
 	inline unsigned int getID() { return textureID; }
+	void destroy();
 public:
 	unsigned int textureID;
 	unsigned int width;

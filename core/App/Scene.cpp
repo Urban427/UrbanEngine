@@ -7,7 +7,6 @@
 #include "BotLogic.h"
 #include "Random.h"
 #include "MaterialManager.h"
-#include "HouseGenerator.h"
 #include "ClientServerSystem.h"
 #include "Settings.h"
 #include "GameplayGenerator.h"
@@ -424,8 +423,22 @@ void createMainSimulation() {
 	obschild.GetComponent<TextView>().buildMesh();
 
 
-	// generatable.AddComponent<HouseGenerator>();
-	// generatable.GetComponent<HouseGenerator>().GenerateHouse(layers[i]);
+	Image image(1024, 1024);
+	Layer layer(1024, 1024);
+	image.addLayer(&layer);
+
+	srand(time(NULL));
+	srand(123);
+	Object house = ECS::createObject();
+	house.transform.position = Vector3(9, 2, 0);
+	int meshID  = MeshManager::addMesh(HouseGenerator::GenerateHouse(layer));
+
+	house.transform.scale = 0.003f;
+	// house.transform.rotation = Quaternion::FromEuler(90, 0, 0);
+	house.transform.rotation = Quaternion::FromEuler(-0, -0, -0);
+	house.AddComponent<RenderView>().mesh_index = meshID;
+	house.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Floortex, 0, 0xff));
+
 	Object generatable = ECS::createObject();
 	generatable.transform.position = {0, 2, 0};
 	generatable.transform.scale = 3;
@@ -434,16 +447,20 @@ void createMainSimulation() {
 
 
 	generatable = ECS::createObject();
-	generatable.transform.position = {3, 2, 0};
+	generatable.transform.position = {3, 5, 0};
 	generatable.transform.scale = 3;
 	generatable.AddComponent<RenderView>().mesh_index = MESH_Cube;
 	generatable.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, TEX_Atlas, 0, 0xff));
 
 	generatable = ECS::createObject();
-	generatable.transform.position = {0, 5, 0};
+	generatable.transform.position = {3, 2, 0};
 	generatable.transform.scale = 3;
 	generatable.AddComponent<RenderView>().mesh_index = MESH_Cube;
-	generatable.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, 0, 0, 0xff));
+	generatable.GetComponent<RenderView>().materals[0] = MaterialManager::CreateMaterial(Material(SHADER_standartShader, 
+		TextureManager::CreateTexture(image.convertToTexture()), 
+		0, 0xff)
+	);
+
 }
 
 

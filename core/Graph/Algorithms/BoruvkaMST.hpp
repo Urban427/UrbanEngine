@@ -29,7 +29,7 @@ void IGraph<T, Derived>::unionComponents(int u, int v, int* parent, int* rank) {
 }
 
 template <class T, typename Derived>
-void IGraph<T, Derived>::BoruvkaMSTStep(int* parent, std::atomic<T>* cheapestWeight, std::atomic<int>* cheapestVertex, int start, int end) {
+void IGraph<T, Derived>::BoruvkaMSTStep(int* parent, std::atomic<T>* cheapestWeight, std::atomic<int>* cheapestFrom, std::atomic<int>* cheapestVertex, int start, int end) {
 	for (int u = start; u < end; ++u) {
 		int uComponent = findComponent(u, parent);
 		auto it = neighbors(u);
@@ -42,11 +42,13 @@ void IGraph<T, Derived>::BoruvkaMSTStep(int* parent, std::atomic<T>* cheapestWei
 				T currentWeight = cheapestWeight[uComponent].load();
 				if (weight < currentWeight) {
 					cheapestWeight[uComponent].store(weight);
+                    cheapestFrom[uComponent].store(u);
 					cheapestVertex[uComponent].store(v);
 				}
 				currentWeight = cheapestWeight[vComponent].load();
 				if (weight < currentWeight) {
 					cheapestWeight[vComponent].store(weight);
+                    cheapestFrom[vComponent].store(v);
 					cheapestVertex[vComponent].store(u);
 				}
 			}
@@ -61,6 +63,7 @@ IGraph<T, Derived>* IGraph<T, Derived>::BoruvkaMST(int numThreads) {
     int* parent = new int[number_of_vertices];
 	int* rank 	= new int[number_of_vertices];
 	std::atomic<T>*   cheapestWeight = new std::atomic<T>  [number_of_vertices];
+    std::atomic<int>* cheapestFrom = new std::atomic<int>[number_of_vertices];
 	std::atomic<int>* cheapestVertex = new std::atomic<int>[number_of_vertices];
 
 	for (int i = 0; i < number_of_vertices; ++i) {
@@ -77,7 +80,8 @@ IGraph<T, Derived>* IGraph<T, Derived>::BoruvkaMST(int numThreads) {
 	while (numComponents > 1) {
 		for (int i = 0; i < number_of_vertices; ++i) {
 			cheapestWeight[i].store(inf);
-			cheapestVertex[i].store(-1);
+			cheapestFrom[i].store(-1);
+        	cheapestVertex[i].store(-1);
 		}
 
 		std::vector<std::thread> threads(numThreads);
@@ -89,7 +93,7 @@ IGraph<T, Derived>* IGraph<T, Derived>::BoruvkaMST(int numThreads) {
 			int end = std::min(start + verticesPerThread, (int)number_of_vertices);
 
 			 threads[threadIndex] = std::thread([=, this]() {
-				this->BoruvkaMSTStep(parent, cheapestWeight, cheapestVertex, start, end);
+				this->BoruvkaMSTStep(parent, cheapestWeight, cheapestFrom, cheapestVertex, start, end);
 			});	
 		}
 
@@ -99,21 +103,22 @@ IGraph<T, Derived>* IGraph<T, Derived>::BoruvkaMST(int numThreads) {
 		
 		//connect all mini mst
 		bool anyEdgeAdded = false;
-		for (int u = 0; u < number_of_vertices; ++u) {
-			int uComponent = findComponent(u, parent);
-			int v = cheapestVertex[uComponent].load();
+		for (int component = 0; component < number_of_vertices; ++component) {
+			if (findComponent(component, parent) != component) continue;
 
-			if (v != -1) {
-				int vComponent = findComponent(v, parent);
+            int from = cheapestFrom[component].load();
+            int to = cheapestVertex[component].load();
+			if (from == -1 || to == -1) continue;
 
-				if (uComponent != vComponent) {
-					T weight = cheapestWeight[uComponent].load();
-					mstGraph->addEdge(u, v, weight);
-					unionComponents(uComponent, vComponent, parent, rank);
-					numComponents--;
-					anyEdgeAdded = true;
-				}
-			}
+			int fromComponent = findComponent(from, parent);
+            int toComponent = findComponent(to, parent);
+            if (fromComponent != toComponent) {
+                T weight = cheapestWeight[component].load();
+                mstGraph->addEdge(from, to, weight);
+                unionComponents( fromComponent, toComponent, parent, rank);
+                numComponents--;
+                anyEdgeAdded = true;
+            }
 		}
 
 		if (!anyEdgeAdded) {

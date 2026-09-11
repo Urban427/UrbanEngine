@@ -136,7 +136,8 @@ public:
 			movement.x = 1;
 		}
 		input.movement = movement.normalized();
-		if(GetKeyDown(KeyCode_Escape) || GetKeyDown((KeyCode_Windows))){
+		if(GetKeyDown(KeyCode_Escape) ){
+		// || GetKeyDown((KeyCode_Windows))
 			input.pausePressed = true;
 		}
 		if(GetKey(KeyCode_Left_Shift)) {

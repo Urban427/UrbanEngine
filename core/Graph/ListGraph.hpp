@@ -26,6 +26,7 @@ template<typename T>
 IGraph<T, ListNeighborIterator<T>>* ListGraph<T>::clone() 
 {
 	ListGraph<T>* copy = new ListGraph<T>(this->number_of_vertices);
+	copy->oriented = this->oriented;
 	for(int i = 0; i < this->number_of_vertices; i++) {
 		copy->data[i] = this->data[i];
 	}

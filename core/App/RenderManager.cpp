@@ -3,156 +3,14 @@
 #include "TextureManager.h"
 #include "ECS.h"
 #include "MeshManager.h"
+#include "ShaderManager.h"
 #include "MaterialManager.h"
 #include "PerlinNoise.h"
 #include "UIManager.h"
 #include "Voxels.h"
 #include "ResourceManager.h"
-#include "AtlasManager.h"
 #include "archiver.h"
-
-void RenderManager::init() {
-	Color noneTex(0, 0, 0, 0);
-	TextureStruct noneTexture;
-	noneTexture.width = 1;
-	noneTexture.height = 1;
-	noneTexture.pixels = (int*)&noneTex;
-	TextureManager::CreateTexture(noneTexture);
-	
-	Color white(255);
-	TextureStruct whiteTexture;
-	whiteTexture.width = 1;
-	whiteTexture.height = 1;
-	whiteTexture.pixels = (int*)&white;
-	TextureManager::CreateTexture(whiteTexture);
-
-
-	const char* assetArchiveFilename = "assetArchive.pck";
-	Archive assetArchive;
-	#define Debug
-
-	#ifdef Debug 
-		CFile atlasFile = openCFile("Fonts/MyriadWeb.ttf");
-		assetArchive.addFile(std::move(atlasFile));
-		
-		CFile atlasMapFile = openCFile("Textures/atlas.bmp"); \
-		if(atlasMapFile.isEmpty() || isFileOlder("Textures/atlas.bmp", "Fonts/MyriadWeb.ttf")) { \
-			TTFAtlas atlas;
-			IOSystem::readTTF(atlas, assetArchive.getFile(0));
-			seekCFile(assetArchive.getFile(0), 0, SEEK_SET);
-			atlas.calculateLayout();
-
-			TextureStruct texture = atlas.toTexture();
-			IOSystem::writeBMP(texture, atlasMapFile);
-			saveCFile("Textures/atlas.bmp", atlasMapFile);
-		}
-		assetArchive.addFile(std::move(atlasMapFile));
-
-
-		#define FIELD(name, combineMode) \
-			{ \
-				CFile blendFile = openCFile("./Models/" #name ".blend"); \
-				if(blendFile.isEmpty()) return; \
-				CFile checkfile = openCFile("./Models/fbx/" #name ".fbx"); \
-				if(checkfile.isEmpty() || isFileOlder("./Models/fbx/" #name ".fbx", "./Models/" #name ".blend")) { \
-					std::string command =                                                  \
-						"cmd /c \"\""                                                       \
-						"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Blender\\blender.exe\"" \
-						" \"./Models/" #name ".blend\""                                          \
-						" --python-expr "                                                  \
-						"\"import bpy; bpy.ops.export_scene.fbx(filepath='./Models/fbx/" #name ".fbx')\"" \
-						" -b\"";                                                           \
-					int result = std::system(command.c_str()); \
-					checkfile = openCFile("./Models/fbx/" #name ".fbx"); \
-				} \
-				assetArchive.addFile(std::move(checkfile));           \
-			}
-		MESHES
-		#undef FIELD
-	#else
-	{
-		#define FIELD(name) \
-			{ \
-				std::string command =                                                  \
-					"cmd /c \"\""                                                       \
-					"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Blender\\blender.exe\"" \
-					" \"./Models/box.blend\""                                          \
-					" --python-expr "                                                  \
-					"\"import bpy; bpy.ops.export_scene.fbx(filepath='./Models/fbx/" \
-					#name ".fbx')\""                                                   \
-					" -b\"";                                                           \
-				int result = std::system(command.c_str()); \
-				assetArchive.addFile("./Models/fbx/" #name ".fbx");           \
-			}
-		MESHES
-		#undef FIELD
-		
-		CFile archiveFile = assetArchive.toFile();
-		saveCFile(assetArchiveFilename, archiveFile);
-
-		if(!Archive::loadFromFile(assetArchive, assetArchiveFilename)) {
-			return;
-		}
-	}
-	#endif
-
-
-	int fileIndex = 0;
-	TTFAtlas atlasFinal;
-	IOSystem::readTTF(atlasFinal, assetArchive.getFile(fileIndex++));
-	atlasFinal.calculateLayout();
-	AtlasManager::SetAtlas(atlasFinal);
-
-	TextureStruct atlasTexture;
-	if (IOSystem::readImage(atlasTexture, assetArchive.getFile(fileIndex++))) {
-		TextureManager::CreateTexture(atlasTexture);
-	}
-
-	// create shape points
-	MeshManager::addMesh(CreatePlane());
-	MeshManager::addMesh(CreateCube());
-	MeshManager::addMesh(CreateSphere(0.5f, 32, 32));
-	MeshManager::addMesh(CreateCylinder(32));
-	MeshManager::addMesh(CreateCapsule(1.0f, 0.5f, 32, 32));
-
-	#define FIELD(name, combineMode) \
-		{ \
-			std::vector<Mesh> meshes = IOSystem::readFBX(assetArchive.getFile(fileIndex++)); \
-			for(auto& mesh : meshes) mesh.combineMaterials(combineMode); \
-			MeshManager::addMeshes(meshes); \
-		}
-	MESHES
-	#undef FIELD
-
-	// create texture
-	#define FIELD(name) \
-		{ \
-			TextureStruct temp; \
-			CFile file = openCFile("Textures/" #name ".png"); \
-			if (IOSystem::readImage(temp, file)) { \
-				TextureManager::CreateTexture(temp); \
-			} \
-		}
-	TEXTURES
-	#undef FIELD
-
-	// create shader
-	#define FIELD(name) \
-		shaders.push_back(GraphicsEngine::createShaderProgram({ \
-			openCFile("Shaders/" #name ".vsh").getPtr(), \
-			openCFile("Shaders/" #name ".fsh").getPtr() \
-		}));
-	SHADERS
-	#undef FIELD
-
-
-	#ifdef Debug 
-		CFile itemsFile;
-		TextureStruct items = renderItemAtlas();
-		IOSystem::writeBMP(items, itemsFile);
-		saveCFile("Textures/items.bmp", itemsFile);
-	#endif
-}
+#include "AtlasManager.h"
 
 Quaternion getWorldRotation(int objectID) {
     Quaternion rot;
@@ -200,11 +58,12 @@ TextureStruct RenderManager::renderItemAtlas() {
 	
 	Matrix4x4 rot;
 	Matrix4x4 world;
-	GraphicsEngine::setShaderProgram(shaders[SHADER_icons]);
-	GraphicsEngine::setProjectionMatrix(shaders[SHADER_icons], projection);
-	GraphicsEngine::setCameraViewMatrix(shaders[SHADER_icons], camView);
-	GraphicsEngine::setTexture(TextureManager::GetTextureByID(0), shaders[SHADER_icons]);
-	GraphicsEngine::setVector4(shaders[SHADER_icons], Color(0).ToVector4());
+	Shader* shader = ShaderManager::GetShader(SHADER_icons);
+	GraphicsEngine::setShaderProgram(shader);
+	GraphicsEngine::setProjectionMatrix(shader, projection);
+	GraphicsEngine::setCameraViewMatrix(shader, camView);
+	GraphicsEngine::setTexture(TextureManager::GetTextureByID(0), shader);
+	GraphicsEngine::setVector4(shader, Color(0).ToVector4());
 	for(size_t i = 0; i < MeshManager::getOffsetsCount(); i++) {
 		int column = i % columns;
 		int row = i / columns;
@@ -259,7 +118,7 @@ TextureStruct RenderManager::renderItemAtlas() {
 			-center.z * scaleFactor
 		));
 		world = world * rot;
-		GraphicsEngine::setMatrix(shaders[SHADER_icons], world);
+		GraphicsEngine::setMatrix(shader, world);
 
 		unsigned int number_of_mats = MeshManager::setMeshById(meshID);
 		int number_of_triangles = MeshManager::getNumberOfPolygonsByMaterialID(meshID, 0);
@@ -304,7 +163,7 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 			int texture_index = material.texture_index;
 			int texture_index1 = material.texture_index1;
 			int mesh_index = renderView.mesh_index;
-			Shader *shader_ptr = shaders[shader_index];
+			Shader *shader_ptr = ShaderManager::GetShader(shader_index);
 			// set material
 			GraphicsEngine::setShaderProgram(shader_ptr);
 			GraphicsEngine::setTime(shader_ptr, Time::time);
@@ -325,11 +184,12 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 		}
 	}
 
+	Shader* textViewShader = ShaderManager::GetShader(SHADER_textShader);
 	Span<TextView> textViews = ECS::GetComponents<TextView>();
-	GraphicsEngine::setShaderProgram(shaders[SHADER_textShader]);
-	GraphicsEngine::setProjectionMatrix(shaders[SHADER_textShader], projection);
-	GraphicsEngine::setCameraViewMatrix(shaders[SHADER_textShader], camView);
-	GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), shaders[SHADER_textShader]);
+	GraphicsEngine::setShaderProgram(textViewShader);
+	GraphicsEngine::setProjectionMatrix(textViewShader, projection);
+	GraphicsEngine::setCameraViewMatrix(textViewShader, camView);
+	GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), textViewShader);
 	for (auto& textView : textViews) {
 		if (textView.layout != renderViewIndex) continue;
 		int objectID = textView.object.getID();
@@ -341,26 +201,27 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 
 		// set material
 		unsigned int number_of_mats = MeshManager::setMeshById(mesh_index);
-		GraphicsEngine::setMatrix(shaders[SHADER_textShader], worlds[objectID]);
+		GraphicsEngine::setMatrix(textViewShader, worlds[objectID]);
 		int number_of_triangles = MeshManager::getNumberOfPolygonsByMaterialID(mesh_index, 0);
 		GraphicsEngine::drawTriangles(number_of_triangles, nullptr);
 	}
 	
+	Shader* uiShader = ShaderManager::GetShader(SHADER_uiShader);
 	constexpr float scaleUI = 0.01f;
 	if(false) {
 		unsigned int number_of_mats = MeshManager::setMeshById(MESH_Plane);
 		int planeTriangles = MeshManager::getNumberOfPolygonsByMaterialID(MESH_Plane, 0);
 		Span<UIImage> uiImages = ECS::GetComponents<UIImage>();
-		GraphicsEngine::setShaderProgram(shaders[SHADER_uiShader]);
-		GraphicsEngine::setProjectionMatrix(shaders[SHADER_uiShader], projection);
-		GraphicsEngine::setCameraViewMatrix(shaders[SHADER_uiShader], camView);
+		GraphicsEngine::setShaderProgram(uiShader);
+		GraphicsEngine::setProjectionMatrix(uiShader, projection);
+		GraphicsEngine::setCameraViewMatrix(uiShader, camView);
 		for (auto& uiImage : uiImages) {
 			if (uiImage.layout != renderViewIndex) continue;
 			int objectID = uiImage.object.getID();
 			if (!ECS::isActive(objectID)) continue;
 
-			GraphicsEngine::setTexture(TextureManager::GetTextureByID(uiImage.texture), shaders[SHADER_uiShader]);
-			GraphicsEngine::setVector4(shaders[SHADER_uiShader], uiImage.color.ToVector4());
+			GraphicsEngine::setTexture(TextureManager::GetTextureByID(uiImage.texture), uiShader);
+			GraphicsEngine::setVector4(uiShader, uiImage.color.ToVector4());
 
 			Vector3 offset = uiImage.getOffset() * scaleUI;
 			offset.z *= -1;
@@ -369,13 +230,13 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 			worlds[objectID].setScale(uiImage.getComputedSize() * scaleUI);
 			worlds[objectID].setTranslation(offset);
 
-			GraphicsEngine::setMatrix(shaders[SHADER_uiShader], worlds[objectID]);
+			GraphicsEngine::setMatrix(uiShader, worlds[objectID]);
 			GraphicsEngine::drawTriangles(planeTriangles, nullptr);
 		}
 
 		Span<UIText> uiTextes = ECS::GetComponents<UIText>();
-		GraphicsEngine::setShaderProgram(shaders[SHADER_textShader]);
-		GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), shaders[SHADER_textShader]);
+		GraphicsEngine::setShaderProgram(textViewShader);
+		GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), textViewShader);
 		
 		for (auto& uiText : uiTextes) {
 			if (uiText.layout != renderViewIndex) continue;
@@ -389,8 +250,8 @@ void RenderManager::renderCamera(Camera &camera, int renderViewIndex) {
 			worlds[objectID].setScale(scaleUI);
 			worlds[objectID].setTranslation(offset);
 
-			GraphicsEngine::setVector4(shaders[SHADER_textShader], uiText.color.ToVector4());
-			GraphicsEngine::setMatrix(shaders[SHADER_textShader], worlds[objectID]);
+			GraphicsEngine::setVector4(textViewShader, uiText.color.ToVector4());
+			GraphicsEngine::setMatrix(textViewShader, worlds[objectID]);
 			
 			int uiTextMesh = uiText.getId();
 			if(uiTextMesh == -1) continue;
@@ -415,34 +276,36 @@ void RenderManager::renderUI(int renderViewIndex) {
 	projection.setIdentity();
 	projection.setOrthoLH(0.0f, uiSize.x, 0.0f, uiSize.y, -100.0f, 100.0f);
 
+	Shader* uiShader = ShaderManager::GetShader(SHADER_uiShader);
 	unsigned int number_of_mats = MeshManager::setMeshById(MESH_Plane);
 	int planeTriangles = MeshManager::getNumberOfPolygonsByMaterialID(MESH_Plane, 0);
-	GraphicsEngine::setShaderProgram(shaders[SHADER_uiShader]);
-	GraphicsEngine::setProjectionMatrix(shaders[SHADER_uiShader], projection);
-	GraphicsEngine::setCameraViewMatrix(shaders[SHADER_uiShader], camView);
+	GraphicsEngine::setShaderProgram(uiShader);
+	GraphicsEngine::setProjectionMatrix(uiShader, projection);
+	GraphicsEngine::setCameraViewMatrix(uiShader, camView);
 	for (auto& uiImage : uiImages) {
 		if (uiImage.layout != renderViewIndex) continue;
 		int objectID = uiImage.object.getID();
 		if (!ECS::isActive(objectID)) continue;
 
-		GraphicsEngine::setTexture(TextureManager::GetTextureByID(uiImage.texture), shaders[SHADER_uiShader]);
-		GraphicsEngine::setVector4(shaders[SHADER_uiShader], uiImage.color.ToVector4());
+		GraphicsEngine::setTexture(TextureManager::GetTextureByID(uiImage.texture), uiShader);
+		GraphicsEngine::setVector4(uiShader, uiImage.color.ToVector4());
 
 		Matrix4x4 world;
 		world.setIdentity();
 		world.setScale(uiImage.getComputedSize());
 		world.setTranslation(uiImage.getOffset());
 
-		GraphicsEngine::setMatrix(shaders[SHADER_uiShader], world);
+		GraphicsEngine::setMatrix(uiShader, world);
 		GraphicsEngine::drawTriangles(planeTriangles, nullptr);
 	}
 
 	//ui text
+	Shader* textViewShader = ShaderManager::GetShader(SHADER_textShader);
 	Span<UIText> uiTextes = ECS::GetComponents<UIText>();
-	GraphicsEngine::setShaderProgram(shaders[SHADER_textShader]);
-	GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), shaders[SHADER_textShader]);
-	GraphicsEngine::setProjectionMatrix(shaders[SHADER_textShader], projection);
-	GraphicsEngine::setCameraViewMatrix(shaders[SHADER_textShader], camView);
+	GraphicsEngine::setShaderProgram(textViewShader);
+	GraphicsEngine::setTexture(TextureManager::GetTextureByID(TEX_Atlas), textViewShader);
+	GraphicsEngine::setProjectionMatrix(textViewShader, projection);
+	GraphicsEngine::setCameraViewMatrix(textViewShader, camView);
 	for (auto& uiText : uiTextes) {
 		if (uiText.layout != renderViewIndex) continue;
 		int objectID = uiText.object.getID();
@@ -451,8 +314,8 @@ void RenderManager::renderUI(int renderViewIndex) {
 		worlds[objectID].setIdentity();
 		worlds[objectID].setTranslation(uiText.getOffset());
 
-		GraphicsEngine::setVector4(shaders[SHADER_textShader], uiText.color.ToVector4());
-		GraphicsEngine::setMatrix(shaders[SHADER_textShader], worlds[objectID]);
+		GraphicsEngine::setVector4(textViewShader, uiText.color.ToVector4());
+		GraphicsEngine::setMatrix(textViewShader, worlds[objectID]);
 		
 		int uiTextMesh = uiText.getId();
 		if(uiTextMesh == -1) continue;

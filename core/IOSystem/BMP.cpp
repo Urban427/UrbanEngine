@@ -34,9 +34,8 @@ bool IOSystem::readBMP(TextureStruct& out, CFile& f) {
 	seekCFile(f, bfOffBits, SEEK_SET);
 	
 	//set texture's data
-	out.width = biWidth;
-	out.height = biHeight;
-    out.pixels = new int[biWidth * biHeight];
+	out.resize(biWidth, biHeight);
+	int* pixels = out.getData();
 	
 	//helping values
 	char temp = 0;
@@ -54,7 +53,7 @@ bool IOSystem::readBMP(TextureStruct& out, CFile& f) {
 			if(biBitCount < 32) {
 				bytes[3] = 0xff;
 			}
-			out.pixels[index] = r;
+			pixels[index] = r;
 			index++;
         }
 		
@@ -68,16 +67,14 @@ bool IOSystem::readBMP(TextureStruct& out, CFile& f) {
 }
 
 bool IOSystem::writeBMP(const TextureStruct& texture, CFile& file) {
-	if(texture.pixels == nullptr || texture.width <= 0 || texture.height <= 0) {
-		return false;
-	}
+	if(!texture.valid()) return false;
 	file = createCFile();
 
 	const uint16_t bitsPerPixel = 32;
 	const uint32_t bytesPerPixel = bitsPerPixel / 8;
 
-	const uint32_t rowSize = texture.width * bytesPerPixel;
-	const uint32_t imageSize = rowSize * texture.height;
+	const uint32_t rowSize = texture.width() * bytesPerPixel;
+	const uint32_t imageSize = rowSize * texture.height();
 	const uint32_t pixelOffset = 14 + 40;
 	const uint32_t fileSize = pixelOffset + imageSize;
 
@@ -88,8 +85,8 @@ bool IOSystem::writeBMP(const TextureStruct& texture, CFile& file) {
 	file.write<uint32_t>(pixelOffset);
 
 	file.write<uint32_t>(40); 
-	file.write<int32_t>(texture.width);
-	file.write<int32_t>(texture.height);
+	file.write<int32_t>(texture.width());
+	file.write<int32_t>(texture.height());
 
 	file.write<uint16_t>(1);
 	file.write<uint16_t>(bitsPerPixel);
@@ -101,9 +98,10 @@ bool IOSystem::writeBMP(const TextureStruct& texture, CFile& file) {
 	file.write<uint32_t>(0); 
 	file.write<uint32_t>(0);
 
-	for(int y = 0; y < texture.height; ++y) {
-		for(int x = 0; x < texture.width; ++x) {
-			uint32_t pixel = static_cast<uint32_t>(texture.pixels[y * texture.width + x]);
+	uint32_t* pixels = (uint32_t*)texture.getData();
+	for(int y = 0; y < texture.height(); ++y) {
+		for(int x = 0; x < texture.width(); ++x) {
+			uint32_t pixel = pixels[y * texture.width() + x];
 			file.write<uint32_t>(pixel);
 		}
 	}

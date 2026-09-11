@@ -6,7 +6,6 @@
 CFile openCFile(const char* name)
 {
 	FILE* f = fopen(name, "rb");
-	
 	//end if file not found
 	if(f == NULL) {
 		return CFile();
@@ -28,7 +27,7 @@ CFile openCFile(const char* name)
 }
 
 void saveCFile(const char* name, CFile& file) {
-    FILE* f = fopen(name, "wb");
+    FILE* f = fopen(name, "wb"); 
     if (!f) return;
     fwrite(file.start, 1, file._size, f);
     fclose(f);

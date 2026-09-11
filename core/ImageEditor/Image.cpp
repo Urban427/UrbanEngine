@@ -51,11 +51,11 @@ char Image::saveImage(const char* filename) {
 }
 
 TextureStruct Image::convertToTexture() {
-    int* buffer = new int[width * height];
+	TextureStruct texture(width, height);
 	// memset(buffer, 0xff'ff'ff'ff, width * height * 4);
 	for(int i = 0; i < layers.size(); i++) {
-		writeLayersToPixelsBuffer(layers[i], width, height, buffer);
+		writeLayersToPixelsBuffer(layers[i], width, height, texture.getData());
 	}
-    return {width, height, buffer}; 
+    return texture; 
 }
 	
